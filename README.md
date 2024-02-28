@@ -32,3 +32,24 @@
   : html 등 렌더링 파일
 + ### app.js <br/>
   : 서버 전체 루트. 미들웨어 관리.
+
+## Git Branch Rules
++ ### master branch, develop branch
+master와 develop 브랜치는 본래 이름 그대로 사용.
+
++ ### feature branch
+master, develop, release-..., hotfix-... 제외 전부 가능. <br/>
+```
+feature/기능요약
+ex) feature/login
+```
++ ### release branch
+```
+release-...
+ex) release-1.0
+```
++ ### hotfix branch
+```
+hotfix-...
+ex) hotfix-1.2.1
+```
