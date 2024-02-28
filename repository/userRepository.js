@@ -1,5 +1,5 @@
 const { User } = require('../config/mongodbConfig');
-var UserNameDuplicateError = require('../exception/userException');
+var userException = require('../exception/userException');
 
 // CREATE user
 const addUser = async function (name, profileImg) {
@@ -8,12 +8,11 @@ const addUser = async function (name, profileImg) {
 			name : name,
 			profile_img : profileImg
 		});
-		console.log("successfully added user : " + result.name + " id : " + result._id);
+		console.log(`added user to DB : [${result.name}, ${result._id}]`);
 		return result;
 	} catch (error) {
-		if (error.code === 11000) {
-			throw new UserNameDuplicateError("name duplicated : reject from repository");
-		}
+		if (error.code === 11000)
+			throw new userException.UserNameDuplicateError("name duplicated : reject from repository");
 		else
 			throw error;
 	}
@@ -23,20 +22,40 @@ const addUser = async function (name, profileImg) {
 const findUserById = async function (userId) {
 	try {
 		const result = await User.find({ _id : userId });
-		console.log(result);
+		console.log(`user searched from DB : [${result.name}, ${result._id}]`)
 		return result;
 	} catch (error) {
-		console.log(error);
+		throw new userException.UserNotFoundError("user not found : reject from repository");
 	}
 }
 
 // FIND all users
 const findAllUsers = function () {
-	return User.find({});
+	try {
+		console.log('all user searched from DB')
+		return User.find({});
+	} catch (error) {
+		throw error;
+	}
+}
+
+// DELETE user by id
+const deleteUserById = async function (userId) {
+	try {
+		var user = await User.find({ _id : userId });
+		if (user.length === 0)
+			throw new userException.UserNotFoundError("user not found : reject from repository");
+		await User.deleteOne({ _id : userId });
+		console.log(`user deleted from DB : [${user.name}, ${user._id}]`);
+		return user;
+	} catch (error) {
+		throw error;
+	}
 }
 
 module.exports = {
 	addUser,
 	findUserById,
-	findAllUsers
+	findAllUsers,
+	deleteUserById
 };

@@ -5,5 +5,15 @@ class UserNameDuplicateError extends Error {
 	}
 }
 
-module.exports = UserNameDuplicateError;
+class UserNotFoundError extends Error {
+	constructor(message) {
+		super(message);
+		this.name = "UserNotFoundError";
+	}
+}
+
+module.exports = { 
+	UserNameDuplicateError,
+	UserNotFoundError
+};
 	
