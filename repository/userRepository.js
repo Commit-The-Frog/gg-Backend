@@ -39,12 +39,29 @@ const findAllUsers = function () {
 	}
 }
 
+/* UPDATE user by id
+	: [_id] field must not be changed 
+*/
+const updateUserById = async function (userId, name, profileImg) {
+	try {
+		const filter = { _id : userId };
+		const update = { 
+			name : name,
+			profile_img : profileImg
+		}
+		var user = await User.findOne({ _id : userId });
+		var updatedUser = await User.updateOne(filter, update);
+		user = await User.findOne({ _id : userId });
+		return user;
+	} catch (error) {
+		throw new userException.UserNotFoundError("user not found : reject from repository");
+	}
+}
+
 // DELETE user by id
 const deleteUserById = async function (userId) {
 	try {
-		var user = await User.find({ _id : userId });
-		if (user.length === 0)
-			throw new userException.UserNotFoundError("user not found : reject from repository");
+		var user = await User.findOne({ _id : userId });
 		await User.deleteOne({ _id : userId });
 		console.log(`user deleted from DB : [${user.name}, ${user._id}]`);
 		return user;
@@ -57,5 +74,6 @@ module.exports = {
 	addUser,
 	findUserById,
 	findAllUsers,
+	updateUserById,
 	deleteUserById
 };
