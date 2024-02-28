@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var dotenv = require('dotenv').config();
-const connectMongoDB = require('./config/mongodbConfig');
+const { connectMongoDB } = require('./config/mongodbConfig');
 
 var indexRouter = require('./controller/index');
 var usersRouter = require('./controller/users');
