@@ -49,7 +49,7 @@ const deleteUserById = async function (userId) {
 		console.log(`user deleted from DB : [${user.name}, ${user._id}]`);
 		return user;
 	} catch (error) {
-		throw error;
+		throw new userException.UserNotFoundError("user not found : reject from repository");
 	}
 }
 
