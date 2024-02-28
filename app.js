@@ -8,6 +8,7 @@ const { connectMongoDB } = require('./config/mongodbConfig');
 
 var indexRouter = require('./controller/index');
 var usersRouter = require('./controller/users');
+var loginRouter = require('./controller/login');
 
 var app = express();
 
@@ -24,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // routing
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/login', loginRouter);
 
 // connect MongoDB
 connectMongoDB();
