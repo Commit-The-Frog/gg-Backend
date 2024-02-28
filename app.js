@@ -9,9 +9,12 @@ const { connectMongoDB } = require('./config/mongodbConfig');
 var indexRouter = require('./controller/index');
 var usersRouter = require('./controller/users');
 var loginRouter = require('./controller/login');
+const cors = require('cors');
 
+// CORS 미들웨어 추가
 var app = express();
 
+app.use(cors());
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
