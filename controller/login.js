@@ -2,21 +2,15 @@ var express = require('express');
 var router = express.Router();
 
 const jwt = require("../service/jwtService.js")
-const apiGetter = require("../service/authService.js")
+const apiGetter = require("../service/auth.js")
 const userRepo = require("../repository/userRepository.js")
 
 router.get("/", async (req, res) => {
 	try {
 		const userInfo = await apiGetter(req.query.code);
 		const result = await userRepo.addUser(userInfo.id, userInfo.login, userInfo.image.versions.small);
-		const accessToken = jwt.sign(result.user_id);
-		const refreshToken = jwt.refresh(result.user_id);
-		res.status(200).send({
-			user_id: result.user_id,
-			accessToken: accessToken,
-			refreshToken: refreshToken
-		});
-	} catch (error) {
+		res.status(200).send({user_id: result.user_id});
+	} catch (error) {;
 		res.send({
 			stat: error.stat,
 			message: error.message
