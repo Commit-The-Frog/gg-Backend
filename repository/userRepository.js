@@ -9,7 +9,7 @@ const addUser = async function (userId, name, profileImg) {
 			name : name,
 			profile_img : profileImg
 		});
-		console.log(`added user to DB : [${result.name}, ${result._id}]`);
+		console.log(`### added user to DB : [${result.name}, ${result._id}]`);
 		return result;
 	} catch (error) {
 		if (error.code === 11000)
@@ -23,7 +23,7 @@ const addUser = async function (userId, name, profileImg) {
 const findUserById = async function (userId) {
 	try {
 		const result = await User.find({ user_id : userId });
-		console.log(`user searched from DB : [${result.name}, ${result.user_id}]`)
+		console.log(`### user searched from DB : [${result.name}, ${result.user_id}]`)
 		return result;
 	} catch (error) {
 		throw new userException.UserNotFoundError("user not found : reject from repository");
@@ -33,7 +33,7 @@ const findUserById = async function (userId) {
 // FIND all users
 const findAllUsers = function () {
 	try {
-		console.log('all user searched from DB')
+		console.log('### all user searched from DB')
 		return User.find({});
 	} catch (error) {
 		throw error;
@@ -51,8 +51,9 @@ const updateUserById = async function (userId, name, profileImg) {
 			profile_img : profileImg
 		}
 		var user = await User.findOne({ user_id : userId });
-		var updatedUser = await User.updateOne(filter, update);
+		await User.updateOne(filter, update);
 		user = await User.findOne({ user_id : userId });
+		console.log(`### user updated from DB : [${user.name}, ${user.user_id}]`);
 		return user;
 	} catch (error) {
 		throw new userException.UserNotFoundError("user not found : reject from repository");
@@ -64,7 +65,7 @@ const deleteUserById = async function (userId) {
 	try {
 		var user = await User.findOne({ user_id : userId });
 		await User.deleteOne({ user_id : userId });
-		console.log(`user deleted from DB : [${user.name}, ${user.user_id}]`);
+		console.log(`### user deleted from DB : [${user.name}, ${user.user_id}]`);
 		return user;
 	} catch (error) {
 		throw new userException.UserNotFoundError("user not found : reject from repository");
