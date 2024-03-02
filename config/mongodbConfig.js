@@ -12,7 +12,7 @@ const connectMongoDB = function () {
 	return;
 }
 
-// Define Schemas
+// Define Schema : user
 const userSchema = new mongoose.Schema({
 	user_id : { type : String, required: true, unique : true },
 	name : { type : String, required: true, unique : true },
@@ -22,10 +22,23 @@ const userSchema = new mongoose.Schema({
 	timestamps: true
 });
 
-// Create Model
+// Define Scehma : book
+const bookSchema = new mongoose.Schema({
+	user_id : { type : String, required: true },
+	start_time : { type : Number, required: true },
+	end_time : { type : Number, required : true },
+	date : { type : String, required : true }
+},
+{
+	timestamps: true
+});
+
+// Create Models
 const User = mongoose.model('user', userSchema);
+const Book = mongoose.model('book', bookSchema);
 
 module.exports = {
 	connectMongoDB,
-	User
+	User,
+	Book
 };
