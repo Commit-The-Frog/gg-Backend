@@ -27,7 +27,8 @@ const bookSchema = new mongoose.Schema({
 	user_id : { type : String, required: true },
 	start_time : { type : Number, required: true },
 	end_time : { type : Number, required : true },
-	date : { type : String, required : true }
+	date : { type : String, required : true },
+	type : { type : Number, required : true }
 },
 {
 	timestamps: true
