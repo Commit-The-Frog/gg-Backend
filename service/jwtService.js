@@ -6,7 +6,7 @@ const jwtException = require('../exception/jwtException.js');
 
 const tokenParse = (rawToken) => {
 	try {
-		if (rawToken.split(' ')[0] != "bearer")
+		if (rawToken.split(' ')[0] != "Bearer")
 			throw Error();
 		return rawToken.split(' ')[1];
 	} catch(error) {
