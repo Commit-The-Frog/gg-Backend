@@ -13,7 +13,7 @@ const addUser = async function (userId, name, profileImg) {
 		return result;
 	} catch (error) {
 		if (error.code === 11000)
-			throw new userException.UserNameDuplicateError("name duplicated : reject from repository");
+			throw new userException.UserNameDuplicateError("from repository");
 		else
 			throw error;
 	}
@@ -21,12 +21,13 @@ const addUser = async function (userId, name, profileImg) {
 
 // FIND user by id
 const findUserById = async function (userId) {
+	console.log("findUserById called");
 	try {
-		const result = await User.find({ user_id : userId });
+		const result = await User.findOne({ user_id : userId });
 		console.log(`### user searched from DB : [${result.name}, ${result.user_id}]`)
 		return result;
 	} catch (error) {
-		throw new userException.UserNotFoundError("user not found : reject from repository");
+		throw new userException.UserNotFoundError("from repository");
 	}
 }
 
@@ -55,7 +56,7 @@ const updateUserById = async function (userId, name, profileImg) {
 		console.log(`### user updated from DB : [${user.name}, ${user.user_id}]`);
 		return user;
 	} catch (error) {
-		throw new userException.UserNotFoundError("user not found : reject from repository");
+		throw new userException.UserNotFoundError("from repository");
 	}
 }
 
@@ -67,7 +68,7 @@ const deleteUserById = async function (userId) {
 		console.log(`### user deleted from DB : [${user.name}, ${user.user_id}]`);
 		return user;
 	} catch (error) {
-		throw new userException.UserNotFoundError("user not found : reject from repository");
+		throw new userException.UserNotFoundError("from repository");
 	}
 }
 
