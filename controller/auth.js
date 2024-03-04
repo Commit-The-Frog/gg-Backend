@@ -22,7 +22,7 @@ router.get("/refresh", async (req, res) => {
 	try{
 		const result = await loginService.createNewAccessToken(req.query.userId, req.headers.authorization);
 		res.status(200).send({
-			token: result.token
+			authorization: result
 		});
 	} catch(error) {
 		res.status(error.status || 500).send(error.name || "Internal Server Error");

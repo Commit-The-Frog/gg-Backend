@@ -87,18 +87,18 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 			userId = userId.toString();
 		const redisClient = await createRedisClient();
 		const data = await redisClient.get(userId);
-		console.log("### Redis Refresh Token Successfully Searched");
 		if (refreshToken === data) {
+			console.log("### Redis RT and Request RT matched");
 			const decoded = jwt.verify(refreshToken, refresh_secret);
 			if (decoded.id != userId)
-				throw new Error();
+				throw Error();
 		}
 		else {
-			throw new Error();
+			throw Error();
 		}
 		return (true);
 	} catch (error) {
-		return new jwtException.TokenAuthorizeError("from service");
+		throw new jwtException.TokenAuthorizeError("from service");
 	}
 }
 
