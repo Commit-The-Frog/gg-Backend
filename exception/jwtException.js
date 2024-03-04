@@ -13,7 +13,7 @@ class TokenSignError extends Exception {
 	constructor(from) {
 		super(from);
 		this.name = "TokenSignError";
-		this.status = 402;
+		this.status = 500;
 		this.logger();
 	}
 }
