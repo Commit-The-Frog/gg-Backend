@@ -31,4 +31,10 @@ router.post('/', async function(req, res, next) {
 	}
 });
 
+// router.patch('/', async function(req, res, next) {
+// 	try {
+// 		var
+// 	}
+// })
+
 module.exports = router;
