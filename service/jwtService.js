@@ -4,6 +4,16 @@ const access_secret = process.env.JWT_ACCESS_SECRET;
 const refresh_secret = process.env.JWT_REFRESH_SECRET;
 const jwtException = require('../exception/jwtException.js');
 
+const tokenParse = (rawToken) => {
+	try {
+		if (rawToken.split(' ')[0] != "bearer")
+			throw Error();
+		return rawToken.split(' ')[1];
+	} catch(error) {
+		throw new jwtException.TokenAuthorizeError("from service")
+	}
+}
+
 /*	[accessTokenSign]
 	access token의 payload에 user id 입력
 	access token 발급
@@ -36,6 +46,7 @@ const accessTokenSign = (userId) => {
 */
 const accessTokenVerify = (userId, accessToken) => {
 	try {
+		accessToken = tokenParse(accessToken);
 		if (!(userId instanceof String))
 		userId = userId.toString();
 		const decoded = jwt.verify(accessToken, access_secret);
@@ -85,6 +96,7 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
+		refreshToken = tokenParse(refreshToken);
 		const redisClient = await createRedisClient();
 		const data = await redisClient.get(userId);
 		if (refreshToken === data) {
