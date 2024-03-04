@@ -1,6 +1,5 @@
-var express = require('express');
-var router = express.Router();
-
+const express = require('express');
+const router = express.Router();
 const loginService = require("../service/loginService.js");
 
 /* LOGIN */
@@ -9,7 +8,7 @@ router.get("/login", async (req, res) => {
 		result = await loginService.setUserAndCreateToken(req.query.code);
 		res.status(200).send(result);
 	} catch (error) {
-		res.status(error.status || 500).send(error.message || "Internal Server Error");
+		res.status(error.status || 500).send(error.name || "Internal Server Error");
 	}
 })
 
@@ -22,15 +21,12 @@ router.get("/test", async (req, res) => {
 router.get("/refresh", async (req, res) => {
 	try{
 		const result = await loginService.createNewAccessToken(req.query.userId, req.headers.authorization);
-		if (result.verified) {
-			res.status(200).send({
-				token: result.token
-			});
-		} else {
-			res.status(402).send("Invalid Refresh Token");
-		}
+		res.status(200).send({
+			token: result.token
+		});
 	} catch(error) {
-		res.status(error.status || 500).send(error.message || "Internal Server Error");
+		res.status(error.status || 500).send(error.name || "Internal Server Error");
 	}
 });
+
 module.exports = router;

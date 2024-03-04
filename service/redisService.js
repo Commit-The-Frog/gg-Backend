@@ -12,12 +12,12 @@ async function createRedisClient() {
         });
 
         client.on('error', err => {
-            console.error('Redis Client Error', err);
+            console.error('### Redis Client Error', err);
             reject(err);
         });
 
         client.on('connect', () => {
-            console.log('Connected to Redis');
+            console.log('### Connected to Redis');
             resolve(client);
         }).connect();
     });
