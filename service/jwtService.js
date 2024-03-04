@@ -5,7 +5,8 @@ const refresh_secret = process.env.JWT_REFRESH_SECRET;
 
 // Access Token 생성
 const sign = (userId) => {
-	userId = userId.toString();
+	if (!(userId instanceof String))
+		userId = userId.toString();
 	const payload = {
 		id: userId
 	}
@@ -34,7 +35,8 @@ const verify = (token) => {
 
 // refresh token 발급
 const refresh = async (userId) => {
-	userId = userId.toString();
+	if (!(userId instanceof String))
+		userId = userId.toString();
 	const data = jwt.sign({
 		id: userId
 	}, refresh_secret, {
@@ -43,7 +45,6 @@ const refresh = async (userId) => {
 	})
 	try{
 		const redisClient = await createRedisClient();
-		console.log(redisClient);
 		redisClient.set(userId, data);
 		return data;
 	} catch (err) {
@@ -53,13 +54,11 @@ const refresh = async (userId) => {
 
 // refresh token 검증
 const refreshVerify = async (refreshToken, userId) => {
-	console.log(refreshToken);
 	if (!(userId instanceof String))
 		userId = userId.toString();
 	try {
 		const redisClient = await createRedisClient();
 		const data = await redisClient.get(userId);
-		console.log(data);
 		if (refreshToken === data) {
 			try {
 				jwt.verify(refreshToken, refresh_secret);

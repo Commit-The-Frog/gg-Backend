@@ -12,7 +12,6 @@ const setUserAndCreateToken = async (code) => {
 		let userInfo = null;
 		try {
 			userInfo = await apiGetter(code);
-			console.log(userInfo.id.toString(), userInfo.login, userInfo.image.versions.small);
 			await userRepo.findUserById(userInfo.id);
 			await userRepo.updateUserById(userInfo.id, userInfo.login, userInfo.image.versions.small);
 		} catch (error) {

@@ -33,13 +33,4 @@ router.get("/refresh", async (req, res) => {
 		res.status(error.status || 500).send(error.message || "Internal Server Error");
 	}
 });
-
-// router.get("/refresh", async (req, res) => {
-// 	const user_id = await req.query.user_id;
-// 	const token = await jwt.refresh(user_id);
-// 	console.log(user_id);
-// 	console.log(token);
-// 	res.send(token);
-// })
-
 module.exports = router;
