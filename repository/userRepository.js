@@ -1,4 +1,5 @@
 const { User } = require('../config/mongodbConfig');
+const Exception = require('../exception/exception');
 var userException = require('../exception/userException');
 
 // CREATE user
@@ -15,13 +16,12 @@ const addUser = async function (userId, name, profileImg) {
 		if (error.code === 11000)
 			throw new userException.UserNameDuplicateError("from repository");
 		else
-			throw error;
+			throw new Exception("from repository");
 	}
 };
 
 // FIND user by id
 const findUserById = async function (userId) {
-	console.log("findUserById called");
 	try {
 		const result = await User.findOne({ user_id : userId });
 		console.log(`### user searched from DB : [${result.name}, ${result.user_id}]`)
