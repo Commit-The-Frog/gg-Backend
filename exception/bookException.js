@@ -25,20 +25,27 @@ class BookNotFoundError extends Exception {
 		this.status = 400;
 		this.logger();
 	}
-}
+};
 
-class BookTimeConfilctError extends Exception {
+class InvalidTimeError extends Exception {
 	constructor(message) {
 		super(message);
 		this.name = 'BookTimeConfilctError';
 		this.status = 400;
 		this.logger();
 	}
-}
+};
+
+class InvalidTypeError extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'InvalidTypeError';
+		this.status = 400;
+		this.logger();
+	}
+};
 
 module.exports = {
-	InvalidTypeError,
-	InvalidTimeError,
-	BookNotFoundError,
-	BookTimeConfilctError
+	BookTimeConfilctError,
+	BookTimeFormatError
 };
