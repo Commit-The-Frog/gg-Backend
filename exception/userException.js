@@ -1,14 +1,20 @@
-class UserNameDuplicateError extends Error {
-	constructor(message) {
-		super(message);
+const Exception = require('./exception');
+
+class UserNameDuplicateError extends Exception {
+	constructor(from) {
+		super(from);
 		this.name = "UserNameDuplicateError";
+		this.status = 400;
+		this.logger();
 	}
 }
 
-class UserNotFoundError extends Error {
-	constructor(message) {
-		super(message);
+class UserNotFoundError extends Exception {
+	constructor(from) {
+		super(from);
 		this.name = "UserNotFoundError";
+		this.status = 404;
+		this.logger();
 	}
 }
 

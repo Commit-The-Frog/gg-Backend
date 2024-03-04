@@ -1,4 +1,5 @@
 const { User } = require('../config/mongodbConfig');
+const Exception = require('../exception/exception');
 var userException = require('../exception/userException');
 
 // CREATE user
@@ -9,31 +10,31 @@ const addUser = async function (userId, name, profileImg) {
 			name : name,
 			profile_img : profileImg
 		});
-		console.log(`added user to DB : [${result.name}, ${result._id}]`);
+		console.log(`### added user to DB : [${result.name}, ${result._id}]`);
 		return result;
 	} catch (error) {
 		if (error.code === 11000)
-			throw new userException.UserNameDuplicateError("name duplicated : reject from repository");
+			throw new userException.UserNameDuplicateError("from repository");
 		else
-			throw error;
+			throw new Exception("from repository");
 	}
 };
 
 // FIND user by id
 const findUserById = async function (userId) {
 	try {
-		const result = await User.find({ user_id : userId });
-		console.log(`user searched from DB : [${result.name}, ${result.user_id}]`)
+		const result = await User.findOne({ user_id : userId });
+		console.log(`### user searched from DB : [${result.name}, ${result.user_id}]`)
 		return result;
 	} catch (error) {
-		throw new userException.UserNotFoundError("user not found : reject from repository");
+		throw new userException.UserNotFoundError("from repository");
 	}
 }
 
 // FIND all users
 const findAllUsers = function () {
 	try {
-		console.log('all user searched from DB')
+		console.log('### all user searched from DB')
 		return User.find({});
 	} catch (error) {
 		throw error;
@@ -41,8 +42,7 @@ const findAllUsers = function () {
 }
 
 /* UPDATE user by id
-	: [_id] field must not be changed 
-*/
+	: [_id] field must not be changed */
 const updateUserById = async function (userId, name, profileImg) {
 	try {
 		const filter = { user_id : userId };
@@ -51,11 +51,12 @@ const updateUserById = async function (userId, name, profileImg) {
 			profile_img : profileImg
 		}
 		var user = await User.findOne({ user_id : userId });
-		var updatedUser = await User.updateOne(filter, update);
+		await User.updateOne(filter, update);
 		user = await User.findOne({ user_id : userId });
+		console.log(`### user updated from DB : [${user.name}, ${user.user_id}]`);
 		return user;
 	} catch (error) {
-		throw new userException.UserNotFoundError("user not found : reject from repository");
+		throw new userException.UserNotFoundError("from repository");
 	}
 }
 
@@ -64,10 +65,10 @@ const deleteUserById = async function (userId) {
 	try {
 		var user = await User.findOne({ user_id : userId });
 		await User.deleteOne({ user_id : userId });
-		console.log(`user deleted from DB : [${user.name}, ${user.user_id}]`);
+		console.log(`### user deleted from DB : [${user.name}, ${user.user_id}]`);
 		return user;
 	} catch (error) {
-		throw new userException.UserNotFoundError("user not found : reject from repository");
+		throw new userException.UserNotFoundError("from repository");
 	}
 }
 
