@@ -1,5 +1,6 @@
 const { Book } = require('../config/mongodbConfig');
 const Exception = require('../exception/exception');
+const bookException = require('../exception/bookException');
 
 // CREATE book
 const createBook = async function (userId, start, end, date, type) {
@@ -18,8 +19,20 @@ const createBook = async function (userId, start, end, date, type) {
 	}
 };
 
+// READ book by bookId
+const findBookById = async function (bookId) {
+	try {
+		var result = await Book.find({
+			_id : bookId
+		});
+		console.log(`### book searched from DB : [${bookId}, ${book.start_time}-${book.end_time}]`);
+	} catch (error) {
+		throw new bookException.BookNotFoundError("from repository");
+	}
+}
+
 // READ book by userId
-const readBooksByUserId = async function (userId) {
+const findBooksByUserId = async function (userId) {
 	try {
 		var result = await Book.find({
 			user_id : userId
@@ -32,7 +45,7 @@ const readBooksByUserId = async function (userId) {
 };
 
 // READ book by type and start/end time
-const readBookOfTime = async function (type, start, end, date) {
+const findBookAtTime = async function (type, start, end, date) {
 	try {
 		var result = await Book.find({
 			$and : [
@@ -42,15 +55,35 @@ const readBookOfTime = async function (type, start, end, date) {
 				{ date : date }
 			]
 		});
-		console.log(`### book of time searched from DB : [count : ${result.length}]`);
+		console.log(`### book at time searched from DB : [count : ${result.length}]`);
 		return result;
 	} catch (error) {
 		throw new Exception("from repository");
 	}
 }
 
+// READ book of user at time
+const findBookOfUserAtTime = async function (userId, start, end, date) {
+	try {
+		var result = await Book.find({
+			$and : [
+				{ user_id : userId },
+				{ start_time : { $lt : end } },
+				{ end_time : { $gt : start }},
+				{ date : date }
+			]
+		});
+		console.log(`### book of user at time searched from DB : [${start}-${end}]`);
+		return result;
+	} catch (error) {
+		throw new Exception('from repository');
+	}
+}
+
 module.exports = {
 	createBook,
-	readBooksByUserId,
-	readBookOfTime
+	findBookById,
+	findBooksByUserId,
+	findBookAtTime,
+	findBookOfUserAtTime
 };

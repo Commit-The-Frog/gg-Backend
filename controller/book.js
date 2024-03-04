@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var bookService = require('../service/bookService');
-const userException = require('../exception/userException');
-const bookException = require('../exception/bookException');
 
 /* GET book list of user */
 router.get('/', async function(req, res, next) {
@@ -27,8 +25,7 @@ router.post('/', async function(req, res, next) {
 			req.body.date,
 			req.body.type
 		);
-		res.status(200).send(`successfully added book 
-		[${book.start_time}-${book.end_time}]`);
+		res.status(200).send(`successfully added book [${book._id}, ${book.start_time}-${book.end_time}]`);
 	} catch (error) {
 		res.status(error.status).send(error.name);
 	}
