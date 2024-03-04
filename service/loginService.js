@@ -3,7 +3,11 @@ const apiGetter = require("../service/authService.js")
 const userRepo = require("../repository/userRepository.js");
 const { UserNotFoundError } = require("../exception/userException.js");
 
-const init = async (code) => {
+/*  [INIT]
+	code 로 42 API 에서 유저 정보 받아옴
+	유저 조회 후 존재하면 정보 업데이트, 없으면 생성(회원가입)
+	해당 유저정보로 AT, RT 발급 후 리턴 */
+const setUserAndCreateToken = async (code) => {
 	try {
 		let userInfo = null;
 		try {
@@ -30,9 +34,14 @@ const init = async (code) => {
 	}
 };
 
-const access = async (userId, refreshToken) => {
+/*	[createNewAccessToken]
+	RT 를 받아서 검증
+	새로운 AT 발급
+	실패시 (false, null)
+	성공시 (true, newToken) */
+const createNewAccessToken = async (userId, refreshToken) => {
 	try {
-		if (jwt.refreshVerify(refreshToken, userId)) {
+		if (await jwt.refreshVerify(refreshToken, userId)) {
 			const newToken = await jwt.sign(userId);
 			return ({
 				verified: true,
@@ -50,6 +59,6 @@ const access = async (userId, refreshToken) => {
 };
 
 module.exports = {
-	init,
-	access
+	setUserAndCreateToken,
+	createNewAccessToken
 }

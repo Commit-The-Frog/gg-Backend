@@ -1,27 +1,27 @@
 var express = require('express');
 var router = express.Router();
 
-const jwt = require("../service/jwtService.js");
-const login = require("../service/loginService.js");
+const loginService = require("../service/loginService.js");
 
+/* LOGIN */
 router.get("/login", async (req, res) => {
 	try {
-		result = await login.init(req.query.code);
+		result = await loginService.setUserAndCreateToken(req.query.code);
 		res.status(200).send(result);
-		console.log(result);
 	} catch (error) {
-		console.log(error)
 		res.status(error.status || 500).send(error.message || "Internal Server Error");
 	}
 })
 
-// router.get("/test", async (req, res) => {
-// 	res.redirect("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-14d5f5759457b14c79fed9c8777b6f58f50adb219baeb9d22c040626453e7eea&redirect_uri=http%3A%2F%2F10.18.226.23%3A3000%2Fauth%2Flogin&response_type=code");
-// });
+/* REDIRECTION TEST of FE */
+router.get("/test", async (req, res) => {
+	res.redirect("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-e5a9910877e1e306623ecbae62eb240fc56ab7acd22f6276836ae72077a5315f&redirect_uri=http%3A%2F%2F54.180.96.16%3A3000%2Fauth%2Flogin&response_type=code");
+});
 
-router.get("/token", async (req, res) => {
+/* ACCESS TOKEN REFRESH */
+router.get("/refresh", async (req, res) => {
 	try{
-		const result = await login.access(req.query.userId, req.headers.refreshToken);
+		const result = await loginService.createNewAccessToken(req.query.userId, req.headers.authorization);
 		if (result.verified) {
 			res.status(200).send({
 				token: result.token
@@ -32,7 +32,7 @@ router.get("/token", async (req, res) => {
 	} catch(error) {
 		res.status(error.status || 500).send(error.message || "Internal Server Error");
 	}
-})
+});
 
 // router.get("/refresh", async (req, res) => {
 // 	const user_id = await req.query.user_id;

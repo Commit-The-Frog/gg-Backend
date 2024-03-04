@@ -32,9 +32,8 @@ const verify = (token) => {
 	}
 };
 
-
-//
-const refresh = async (userId) => { // refresh token 발급
+// refresh token 발급
+const refresh = async (userId) => {
 	userId = userId.toString();
 	const data = jwt.sign({
 		id: userId
@@ -52,14 +51,18 @@ const refresh = async (userId) => { // refresh token 발급
 	}
 }
 
-const refreshVerify = async (token, userId) => { // refresh token 검증
-	userId = userId.toString();
+// refresh token 검증
+const refreshVerify = async (refreshToken, userId) => {
+	console.log(refreshToken);
+	if (!(userId instanceof String))
+		userId = userId.toString();
 	try {
 		const redisClient = await createRedisClient();
 		const data = await redisClient.get(userId);
-		if (token === data) {
+		console.log(data);
+		if (refreshToken === data) {
 			try {
-				jwt.verify(token, refresh_secret);
+				jwt.verify(refreshToken, refresh_secret);
 				return true;
 			} catch (err) {
 				return false;

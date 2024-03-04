@@ -9,6 +9,7 @@ const { connectMongoDB } = require('./config/mongodbConfig');
 var indexRouter = require('./controller/index');
 var usersRouter = require('./controller/users');
 var authRouter = require('./controller/auth');
+var bookRouter = require('./controller/book');
 const cors = require('cors');
 
 // CORS 미들웨어 추가
@@ -29,6 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
+app.use('/book', bookRouter);
 
 // connect MongoDB
 connectMongoDB();
