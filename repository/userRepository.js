@@ -41,8 +41,7 @@ const findAllUsers = function () {
 }
 
 /* UPDATE user by id
-	: [_id] field must not be changed 
-*/
+	: [_id] field must not be changed */
 const updateUserById = async function (userId, name, profileImg) {
 	try {
 		const filter = { user_id : userId };
