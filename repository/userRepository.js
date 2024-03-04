@@ -24,6 +24,8 @@ const addUser = async function (userId, name, profileImg) {
 const findUserById = async function (userId) {
 	try {
 		const result = await User.findOne({ user_id : userId });
+		if (result === null)
+			throw new userException.UserNotFoundError("from repository");
 		console.log(`### user searched from DB : [${result.name}, ${result.user_id}]`)
 		return result;
 	} catch (error) {

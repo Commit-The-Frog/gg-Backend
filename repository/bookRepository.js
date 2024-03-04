@@ -12,7 +12,7 @@ const createBook = async function (userId, start, end, date, type) {
 			date : date,
 			type : type
 		});
-		console.log(`### added book to DB : [userId:${result.user_id}, ${result.start_time}-${result.end_time}]`);
+		console.log(`### added book to DB : [userId: ${result.user_id}, ${result.start_time}-${result.end_time}]`);
 		return result;
 	} catch (error) {
 		throw new Exception("from repository");
