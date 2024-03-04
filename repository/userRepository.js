@@ -25,7 +25,7 @@ const findUserById = async function (userId) {
 	try {
 		const result = await User.findOne({ user_id : userId });
 		if (result === null)
-			throw new userException.UserNotFoundError("from repository");
+			throw Error();
 		console.log(`### user searched from DB : [${result.name}, ${result.user_id}]`)
 		return result;
 	} catch (error) {

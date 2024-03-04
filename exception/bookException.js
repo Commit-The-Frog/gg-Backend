@@ -7,7 +7,7 @@ class InvalidTypeError extends Exception {
 		this.status = 400;
 		this.logger();
 	}
-}
+};
 
 class InvalidTimeError extends Exception {
 	constructor(message) {
@@ -21,13 +21,13 @@ class InvalidTimeError extends Exception {
 class BookNotFoundError extends Exception {
 	constructor(message) {
 		super(message);
-		this.name = 'BookTimeConfilctError';
+		this.name = 'BookNotFoundError';
 		this.status = 400;
 		this.logger();
 	}
 };
 
-class InvalidTimeError extends Exception {
+class BookTimeConfilctError extends Exception {
 	constructor(message) {
 		super(message);
 		this.name = 'BookTimeConfilctError';
@@ -36,16 +36,19 @@ class InvalidTimeError extends Exception {
 	}
 };
 
-class InvalidTypeError extends Exception {
+class BookTimeFormatError extends Exception {
 	constructor(message) {
 		super(message);
-		this.name = 'InvalidTypeError';
+		this.name = 'BookTimeFormatError';
 		this.status = 400;
 		this.logger();
 	}
 };
 
 module.exports = {
+	InvalidTypeError,
+	BookNotFoundError,
+	InvalidTimeError,
 	BookTimeConfilctError,
 	BookTimeFormatError
 };

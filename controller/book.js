@@ -5,7 +5,7 @@ var bookService = require('../service/bookService');
 /* GET book list of user */
 router.get('/', async function(req, res, next) {
 	try {
-		var book = await bookRepository.findBooksByUserId(
+		var book = await bookService.findBookListOfUser(
 			req.query.userId
 		);
 		res.status(200).send(book);
@@ -19,7 +19,7 @@ router.get('/', async function(req, res, next) {
 router.post('/', async function(req, res, next) {
 	try {
 		var book = await bookService.addBook(
-			req.body.userId,
+			req.query.userId,
 			req.body.start,
 			req.body.end,
 			req.body.date,
@@ -30,11 +30,5 @@ router.post('/', async function(req, res, next) {
 		res.status(error.status).send(error.name);
 	}
 });
-
-// router.patch('/', async function(req, res, next) {
-// 	try {
-// 		var
-// 	}
-// })
 
 module.exports = router;
