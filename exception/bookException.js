@@ -1,8 +1,8 @@
 const Exception = require('./exception');
 
 class BookTimeConfilctError extends Exception {
-	constructor(from) {
-		super(from);
+	constructor(message) {
+		super(message);
 		this.name = 'BookTimeConfilctError';
 		this.status = 400;
 		this.logger();
@@ -10,8 +10,8 @@ class BookTimeConfilctError extends Exception {
 }
 
 class BookTimeFormatError extends Exception {
-	constructor(from) {
-		super(from);
+	constructor(message) {
+		super(message);
 		this.name = 'BookTimeFormatError';
 		this.staus = 400;
 		this.logger();
