@@ -6,10 +6,15 @@ const bookException = require('../exception/bookException');
 
 /* GET book list of user */
 router.get('/', async function(req, res, next) {
-	var book = await bookRepository.findBooksByUserId(
-		req.query.userId
-	);
-	res.status(200).send(book);
+	try {
+		var book = await bookRepository.findBooksByUserId(
+			req.query.userId
+		);
+		res.status(200).send(book);
+	}
+	catch (error) {
+		res.status(error.status).send(error.name);
+	}
 });
 
 /* POST new book of user */
@@ -25,12 +30,7 @@ router.post('/', async function(req, res, next) {
 		res.status(200).send(`successfully added book 
 		[${book.start_time}-${book.end_time}]`);
 	} catch (error) {
-		if (error instanceof userException.UserNotFoundError)
-			res.status(404).send("user not found");
-		else if (error instanceof bookException.BookTimeConfilctError)
-			res.status(400).send("book time conflict");
-		else
-			res.status(400).send('unknown error');
+		res.status(error.status).send(error.name);
 	}
 });
 

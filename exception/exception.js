@@ -1,12 +1,13 @@
 class Exception extends Error {
-	constructor(message) {
-		super(message);
+	constructor(from) {
+		super(from);
 		this.name = 'Exception';
+		this.status = 400;
 	}
 
 	// Logger method : must be implemented
 	logger() {
-		console.log(`[ERROR : ${this.name}] ` + this.message);
+		console.log(`[ERROR : ${this.name}] ` + this.from);
 	}
 }
 
