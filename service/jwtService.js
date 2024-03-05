@@ -101,16 +101,28 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 		const data = await redisClient.get(userId);
 		if (refreshToken === data) {
 			console.log("### Redis RT and Request RT matched");
-			const decoded = jwt.verify(refreshToken, refresh_secret);
-			if (decoded.id != userId)
-				throw Error();
-		}
-		else {
+		const decoded = jwt.verify(refreshToken, refresh_secret);
+		if (decoded.id != userId)
 			throw Error();
-		}
-		return (true);
+	}
+	else {
+		throw Error();
+	}
+	return (true);
+} catch (error) {
+	throw new jwtException.TokenAuthorizeError("from service");
+}
+}
+
+const refreshTokenDelete = async (userId) => {
+	try {
+		if (!(userId instanceof String))
+			userId = userId.toString();
+		const redisClient = await createRedisClient();
+		redisClient.del(userId);
+		console.log("### " + userId + "'s RT Deleted From Redis");
 	} catch (error) {
-		throw new jwtException.TokenAuthorizeError("from service");
+		throw new jwtException.LogoutError("from service");
 	}
 }
 
@@ -118,5 +130,6 @@ module.exports = {
 	accessTokenSign,
 	accessTokenVerify,
 	refreshTokenSign,
-	refreshTokenVerify
+	refreshTokenVerify,
+	refreshTokenDelete
 }
