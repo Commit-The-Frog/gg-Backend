@@ -12,7 +12,7 @@ const createBook = async function (userId, start, end, date, type) {
 			date : date,
 			type : type
 		});
-		console.log(`### added book to DB : [userId:${result.user_id}, ${result.start_time}-${result.end_time}]`);
+		console.log(`### added book to DB : [userId: ${result.user_id}, ${result.start_time}-${result.end_time}]`);
 		return result;
 	} catch (error) {
 		throw new Exception("from repository");
@@ -22,10 +22,27 @@ const createBook = async function (userId, start, end, date, type) {
 // READ book by bookId
 const findBookById = async function (bookId) {
 	try {
-		var result = await Book.find({
+		var result = await Book.findOne({
 			_id : bookId
 		});
 		console.log(`### book searched from DB : [${bookId}, ${book.start_time}-${book.end_time}]`);
+	} catch (error) {
+		throw new bookException.BookNotFoundError("from repository");
+	}
+}
+
+// READ book by userId, type, date
+const findBooksByUserIdAndTypeAndDate = async function (userId, type, date) {
+	try {
+		if (!(date instanceof String))
+			date = date.toString();
+		var result = await Book.find({
+			user_id : userId,
+			type : type,
+			date : date
+		});
+		console.log(`### book searched from DB : [count : ${result.length}]`);
+		return result;
 	} catch (error) {
 		throw new bookException.BookNotFoundError("from repository");
 	}
@@ -43,6 +60,19 @@ const findBooksByUserId = async function (userId) {
 		throw new Exception("from repository");
 	} 
 };
+
+// READ book by date
+const findBooksAtDate = async function (date) {
+	try {
+		var result = await Book.find({
+			date : date
+		});
+		console.log(`### book searched from DB : [count : ${result.length}]`);
+		return result;
+	} catch (error) {
+		throw new Exception('from repository');
+	}
+}
 
 // READ book by type and start/end time
 const findBookAtTime = async function (type, start, end, date) {
@@ -85,5 +115,7 @@ module.exports = {
 	findBookById,
 	findBooksByUserId,
 	findBookAtTime,
-	findBookOfUserAtTime
+	findBooksAtDate,
+	findBookOfUserAtTime,
+	findBooksByUserIdAndTypeAndDate
 };

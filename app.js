@@ -31,7 +31,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
-app.use('/book', bookRouter);
+app.use('/books', bookRouter);
+
+// swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));

@@ -33,9 +33,46 @@ const addBook = async function (userId, start, end, date, type) {
 	}
 };
 
+/*	[findBookById]
+	=> 예약 id로 단일 예약 정보 조회 */
+const findBookById = async function (bookId) {
+	try {
+		var book = await bookRepository.findBookById(bookId);
+		if (book === null)
+			throw new bookException.BookNotFoundError("from service");
+		return book;
+	} catch (error) {
+		throw error;
+	}
+}
+
+/*	[findBookListOfDate]
+	=> 특정 날짜의 모든 예약 목록 조회 */
+const findBookListOfDate = async function (date) {
+	try {
+		var bookList = await bookRepository.findBooksAtDate(date);
+		return bookList;
+	} catch (error) {
+		throw error;
+	}
+}
+
+/*	[findBookListOfUserByTypeAndDate]
+	유저 id로 존재하는 유저인지 검사
+	=> 유저의 예약 목록 조회 (특정 날짜의 특정 타입) */
+const findBookListOfUserByTypeAndDate = async function (userId, type, date) {
+	try {
+		await userRepository.findUserById(userId);
+		var bookList = await bookRepository.findBooksByUserIdAndTypeAndDate(userId, type, date);
+		return bookList;
+	} catch (error) {
+		throw error;
+	}
+}
+
 /*	[findBookListOfUser]
 	유저 id로 해당 유저가 존재하는지 검사
-	=> 해당 유저의 예약 목록 조회 */
+	=> 해당 유저의 모든 예약 목록 조회 */
 const findBookListOfUser = async function (userId) {
 	try {
 		await userRepository.findUserById(userId);
@@ -63,5 +100,8 @@ const updateBookById = async function (userId, bookId, start, end, date) {
 module.exports = {
 	addBook,
 	findBookListOfUser,
-	updateBookById
+	findBookListOfDate,
+	findBookListOfUserByTypeAndDate,
+	updateBookById,
+	findBookById
 };
