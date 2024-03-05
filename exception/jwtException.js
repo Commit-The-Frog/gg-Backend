@@ -18,7 +18,17 @@ class TokenSignError extends Exception {
 	}
 }
 
+class LogoutError extends Exception {
+	constructor(from) {
+		super(from);
+		this.name = "LogoutError";
+		this.status = 500;
+		this.logger();
+	}
+}
+
 module.exports = {
 	TokenAuthorizeError,
-	TokenSignError
+	TokenSignError,
+	LogoutError
 }

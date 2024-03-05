@@ -29,4 +29,13 @@ router.get("/refresh", async (req, res) => {
 	}
 });
 
+router.delete("/logout", async (req, res) => {
+	try {
+		const result = await loginService.logoutRefreshToken(req.query.userId, req.headers.authorization);
+		res.status(200).send();
+	} catch(error) {
+		res.status(error.status || 500).send(error.name || "Internal Server Error");
+	}
+});
+
 module.exports = router;

@@ -47,7 +47,18 @@ const createNewAccessToken = async (userId, refreshToken) => {
 	}
 };
 
+const logoutRefreshToken = async (userId, refreshToken) => {
+	try {
+		await jwt.refreshTokenVerify(refreshToken, userId);
+		await jwt.refreshTokenDelete(userId);
+		return true;
+	} catch (error) {
+		throw error;
+	}
+}
+
 module.exports = {
 	setUserAndCreateToken,
-	createNewAccessToken
+	createNewAccessToken,
+	logoutRefreshToken
 }
