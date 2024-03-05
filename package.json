@@ -21,5 +21,9 @@
     "pug": "2.0.0-beta11",
     "redis": "^4.6.13",
     "simple-oauth2": "^5.0.0"
+  },
+  "devDependencies": {
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
   }
 }

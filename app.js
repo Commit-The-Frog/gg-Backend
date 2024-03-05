@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var dotenv = require('dotenv').config();
 const { connectMongoDB } = require('./config/mongodbConfig');
+const { swaggerUi, specs } = require('./swagger/swagger');
 
 var indexRouter = require('./controller/index');
 var usersRouter = require('./controller/users');
@@ -31,6 +32,9 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/books', bookRouter);
+
+// swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // connect MongoDB
 connectMongoDB();
