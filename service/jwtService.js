@@ -114,6 +114,9 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 }
 }
 
+/*	[refreshTokenDelete]
+	query로 받은 userId에 해당하는 RT를 redis에서 제거한다.
+*/
 const refreshTokenDelete = async (userId) => {
 	try {
 		if (!(userId instanceof String))
