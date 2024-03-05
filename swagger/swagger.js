@@ -6,9 +6,9 @@ const options = {
     openapi: "3.0.0",
     info: {
       version: "1.0.0",
-      title: "TEAM GG",
+      title: "team GG api reference",
       description:
-        "swagger-test",
+        "This is API Reference for TEAM GG",
     },
     servers: [
       {
@@ -18,6 +18,7 @@ const options = {
   },
   apis: ["./controller/*.js"], //Swagger 파일 연동
 }
-const specs = swaggereJsdoc(options)
+
+const specs = swaggereJsdoc(options);
 
 module.exports = { swaggerUi, specs }
