@@ -47,6 +47,10 @@ const createNewAccessToken = async (userId, refreshToken) => {
 	}
 };
 
+/*	[logoutRefreshToken]
+	RT 를 받아서 검증
+	RT 를 Redis에서 삭제
+	성공시 status 200 반환 */
 const logoutRefreshToken = async (userId, refreshToken) => {
 	try {
 		await jwt.refreshTokenVerify(refreshToken, userId);
