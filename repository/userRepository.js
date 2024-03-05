@@ -1,6 +1,7 @@
 const { User } = require('../config/mongodbConfig');
 const Exception = require('../exception/exception');
 var userException = require('../exception/userException');
+var logger = require('../config/logger');
 
 // CREATE user
 const addUser = async function (userId, name, profileImg) {
@@ -10,7 +11,7 @@ const addUser = async function (userId, name, profileImg) {
 			name : name,
 			profile_img : profileImg
 		});
-		console.log(`### added user to DB : [${result.name}, ${result._id}]`);
+		logger.info(`### added user to DB : [${result.name}, ${result._id}]`);
 		return result;
 	} catch (error) {
 		if (error.code === 11000)
@@ -26,7 +27,7 @@ const findUserById = async function (userId) {
 		const result = await User.findOne({ user_id : userId });
 		if (result === null)
 			throw Error();
-		console.log(`### user searched from DB : [${result.name}, ${result.user_id}]`)
+		logger.info(`### user searched from DB : [${result.name}, ${result.user_id}]`)
 		return result;
 	} catch (error) {
 		throw new userException.UserNotFoundError("from repository");
@@ -36,7 +37,7 @@ const findUserById = async function (userId) {
 // FIND all users
 const findAllUsers = function () {
 	try {
-		console.log('### all user searched from DB')
+		logger.info('### all user searched from DB')
 		return User.find({});
 	} catch (error) {
 		throw error;
@@ -55,7 +56,7 @@ const updateUserById = async function (userId, name, profileImg) {
 		var user = await User.findOne({ user_id : userId });
 		await User.updateOne(filter, update);
 		user = await User.findOne({ user_id : userId });
-		console.log(`### user updated from DB : [${user.name}, ${user.user_id}]`);
+		logger.info(`### user updated from DB : [${user.name}, ${user.user_id}]`);
 		return user;
 	} catch (error) {
 		throw new userException.UserNotFoundError("from repository");
@@ -67,7 +68,7 @@ const deleteUserById = async function (userId) {
 	try {
 		var user = await User.findOne({ user_id : userId });
 		await User.deleteOne({ user_id : userId });
-		console.log(`### user deleted from DB : [${user.name}, ${user.user_id}]`);
+		logger.info(`### user deleted from DB : [${user.name}, ${user.user_id}]`);
 		return user;
 	} catch (error) {
 		throw new userException.UserNotFoundError("from repository");

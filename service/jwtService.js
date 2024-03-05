@@ -3,6 +3,7 @@ const createRedisClient = require('./redisService.js');
 const access_secret = process.env.JWT_ACCESS_SECRET;
 const refresh_secret = process.env.JWT_REFRESH_SECRET;
 const jwtException = require('../exception/jwtException.js');
+var logger = require('../config/logger');
 
 const tokenParse = (rawToken) => {
 	try {
@@ -32,7 +33,7 @@ const accessTokenSign = (userId) => {
 			algorithm: 'HS256',
 			expiresIn: '1h'
 		});
-		console.log("### Access Token Signed");
+		logger.info("### Access Token Signed");
 		return (accessToken);
 	} catch(error) {
 		throw new jwtException.TokenSignError("from service")
@@ -50,11 +51,11 @@ const accessTokenVerify = (userId, accessToken) => {
 		if (!(userId instanceof String))
 		userId = userId.toString();
 		const decoded = jwt.verify(accessToken, access_secret);
-		console.log("### Access Token Verified");
+		logger.info("### Access Token Verified");
 		if (decoded.id != userId) {
 			throw new Error();
 		}
-		console.log("### Access Token ID Verified");
+		logger.info("### Access Token ID Verified");
 		return (true);
 	} catch (error) {
 		throw new jwtException.TokenAuthorizeError("from service");
@@ -78,7 +79,7 @@ const refreshTokenSign = async (userId) => {
 		})
 		const redisClient = await createRedisClient();
 		redisClient.set(userId, data, 'EX', 60 * 60 * 24 * 14); // 2주 후에 만료
-		console.log("### Refresh Token Saved in Redis")
+		logger.info("### Refresh Token Saved in Redis")
 		return (data);
 	} catch (error) {
 		throw new jwtException.TokenSignError("from service");
@@ -100,7 +101,7 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 		const redisClient = await createRedisClient();
 		const data = await redisClient.get(userId);
 		if (refreshToken === data) {
-			console.log("### Redis RT and Request RT matched");
+			logger.info("### Redis RT and Request RT matched");
 		const decoded = jwt.verify(refreshToken, refresh_secret);
 		if (decoded.id != userId)
 			throw Error();
@@ -123,7 +124,7 @@ const refreshTokenDelete = async (userId) => {
 			userId = userId.toString();
 		const redisClient = await createRedisClient();
 		redisClient.del(userId);
-		console.log("### " + userId + "'s RT Deleted From Redis");
+		logger.info("### " + userId + "'s RT Deleted From Redis");
 	} catch (error) {
 		throw new jwtException.LogoutError("from service");
 	}
