@@ -12,18 +12,17 @@ const setUserAndCreateToken = async (code) => {
 		let userInfo = null;
 		try {
 			userInfo = await apiGetter(code);
-			console.log(userInfo.id.toString(), userInfo.login, userInfo.image.versions.small);
 			await userRepo.findUserById(userInfo.id);
 			await userRepo.updateUserById(userInfo.id, userInfo.login, userInfo.image.versions.small);
 		} catch (error) {
 			if (error instanceof UserNotFoundError) {
 				await userRepo.addUser(userInfo.id, userInfo.login, userInfo.image.versions.small);
 			} else {
-				throw new Error(error);
+				throw error;
 			}
 		}
-		const accessToken = await jwt.sign(userInfo.id);
-		const refreshToken = await jwt.refresh(userInfo.id);
+		const accessToken = await jwt.accessTokenSign(userInfo.id);
+		const refreshToken = await jwt.refreshTokenSign(userInfo.id);
 		return ({
 			user_id: userInfo.id,
 			accessToken: accessToken,
@@ -37,28 +36,33 @@ const setUserAndCreateToken = async (code) => {
 /*	[createNewAccessToken]
 	RT 를 받아서 검증
 	새로운 AT 발급
-	실패시 (false, null)
-	성공시 (true, newToken) */
+	성공시 newAccessToken 반환 */
 const createNewAccessToken = async (userId, refreshToken) => {
 	try {
-		if (await jwt.refreshVerify(refreshToken, userId)) {
-			const newToken = await jwt.sign(userId);
-			return ({
-				verified: true,
-				token: newToken
-			})
-		} else {
-			return ({
-				verified: false,
-				token: null
-			})
-		}
+		await jwt.refreshTokenVerify(refreshToken, userId);
+		const newAccessToken = jwt.accessTokenSign(userId);
+		return (newAccessToken);
 	} catch (error) {
 		throw error;
 	}
 };
 
+/*	[logoutRefreshToken]
+	RT 를 받아서 검증
+	RT 를 Redis에서 삭제
+	성공시 status 200 반환 */
+const logoutRefreshToken = async (userId, refreshToken) => {
+	try {
+		await jwt.refreshTokenVerify(refreshToken, userId);
+		await jwt.refreshTokenDelete(userId);
+		return true;
+	} catch (error) {
+		throw error;
+	}
+}
+
 module.exports = {
 	setUserAndCreateToken,
-	createNewAccessToken
+	createNewAccessToken,
+	logoutRefreshToken
 }
