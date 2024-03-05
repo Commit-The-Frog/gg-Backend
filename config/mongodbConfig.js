@@ -1,5 +1,6 @@
 const app = require('../app.js');
 var mongoose = require('mongoose');
+var logger = require('../config/logger');
 
 const { MONGO_PORT, MONGO_URI } = process.env;
 
@@ -7,7 +8,7 @@ const { MONGO_PORT, MONGO_URI } = process.env;
 const connectMongoDB = function () {
 	mongoose
 	.connect(MONGO_URI, {  })
-	.then(() => console.log('Successfully connected to mongodb'))
+	.then(() => logger.info('Successfully connected to mongodb'))
 	.catch(e => console.error(e));
 	return;
 }

@@ -1,3 +1,5 @@
+var logger = require('../config/logger');
+
 class Exception extends Error {
 	constructor(message) {
 		super(message);
@@ -8,7 +10,7 @@ class Exception extends Error {
 
 	// Logger method : must be implemented
 	logger() {
-		console.log(`### [ERROR : ${this.name}] ` + this.message);
+		logger.info(`### [ERROR : ${this.name}] ` + this.message);
 	}
 }
 

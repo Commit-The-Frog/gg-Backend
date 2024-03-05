@@ -1,6 +1,7 @@
 const { Book } = require('../config/mongodbConfig');
 const Exception = require('../exception/exception');
 const bookException = require('../exception/bookException');
+var logger = require('../config/logger');
 
 // CREATE book
 const createBook = async function (userId, start, end, date, type) {
@@ -12,7 +13,7 @@ const createBook = async function (userId, start, end, date, type) {
 			date : date,
 			type : type
 		});
-		console.log(`### added book to DB : [userId: ${result.user_id}, ${result.start_time}-${result.end_time}]`);
+		logger.info(`### added book to DB : [userId: ${result.user_id}, ${result.start_time}-${result.end_time}]`);
 		return result;
 	} catch (error) {
 		throw new Exception("from repository");
@@ -25,7 +26,7 @@ const findBookById = async function (bookId) {
 		var result = await Book.findOne({
 			_id : bookId
 		});
-		console.log(`### book searched from DB : [${bookId}, ${book.start_time}-${book.end_time}]`);
+		logger.info(`### book searched from DB : [${bookId}, ${book.start_time}-${book.end_time}]`);
 	} catch (error) {
 		throw new bookException.BookNotFoundError("from repository");
 	}
@@ -41,7 +42,7 @@ const findBooksByUserIdAndTypeAndDate = async function (userId, type, date) {
 			type : type,
 			date : date
 		});
-		console.log(`### book searched from DB : [count : ${result.length}]`);
+		logger.info(`### book searched from DB : [count : ${result.length}]`);
 		return result;
 	} catch (error) {
 		throw new bookException.BookNotFoundError("from repository");
@@ -54,7 +55,7 @@ const findBooksByUserId = async function (userId) {
 		var result = await Book.find({
 			user_id : userId
 		});
-		console.log(`### book searched from DB : [count : ${result.length}]`);
+		logger.info(`### book searched from DB : [count : ${result.length}]`);
 		return result;
 	} catch (error) {
 		throw new Exception("from repository");
@@ -67,7 +68,7 @@ const findBooksAtDate = async function (date) {
 		var result = await Book.find({
 			date : date
 		});
-		console.log(`### book searched from DB : [count : ${result.length}]`);
+		logger.info(`### book searched from DB : [count : ${result.length}]`);
 		return result;
 	} catch (error) {
 		throw new Exception('from repository');
@@ -85,7 +86,7 @@ const findBookAtTime = async function (type, start, end, date) {
 				{ date : date }
 			]
 		});
-		console.log(`### book at time searched from DB : [count : ${result.length}]`);
+		logger.info(`### book at time searched from DB : [count : ${result.length}]`);
 		return result;
 	} catch (error) {
 		throw new Exception("from repository");
@@ -103,7 +104,7 @@ const findBookOfUserAtTime = async function (userId, start, end, date) {
 				{ date : date }
 			]
 		});
-		console.log(`### book of user at time searched from DB : [${start}-${end}]`);
+		logger.info(`### book of user at time searched from DB : [${start}-${end}]`);
 		return result;
 	} catch (error) {
 		throw new Exception('from repository');

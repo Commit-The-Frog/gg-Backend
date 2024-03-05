@@ -1,5 +1,6 @@
 const dotenv = require("dotenv").config();
 const redis = require('redis');
+var logger = require('../config/logger');
 const access_secret = process.env.JWT_ACCESS_SECRET;
 const refresh_secret = process.env.JWT_REFRESH_SECRET;
 
@@ -17,7 +18,7 @@ async function createRedisClient() {
         });
 
         client.on('connect', () => {
-            console.log('### Connected to Redis');
+            logger.info('### Connected to Redis');
             resolve(client);
         }).connect();
     });
