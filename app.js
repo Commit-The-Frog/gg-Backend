@@ -36,6 +36,9 @@ app.use('/books', bookRouter);
 // swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
+// swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 // connect MongoDB
 connectMongoDB();
 

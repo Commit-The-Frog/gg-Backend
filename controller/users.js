@@ -2,6 +2,27 @@ var express = require('express');
 var router = express.Router();
 const userService = require('../service/userService.js');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User 관련 API
+ */
+
+/**
+ * @swagger
+ * /user:
+ *   get:
+ *     summary: Get all users
+ *     tags: [Users]
+ *     responses:
+ *       '200':
+ *         description: A successful response
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: 'respond with a resource'
+ */
 /* GET users listing. */
 router.get('/', async function (req, res, next) {
 	try {
