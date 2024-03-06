@@ -1,7 +1,9 @@
 const { Book } = require('../config/mongodbConfig');
+const { User } = require('../config/mongodbConfig');
 const Exception = require('../exception/exception');
 const bookException = require('../exception/bookException');
 var logger = require('../config/logger');
+const { UserNotFoundError } = require('../exception/userException');
 
 // CREATE book
 const createBook = async function (userId, start, end, date, type) {
@@ -24,7 +26,7 @@ const createBook = async function (userId, start, end, date, type) {
 const findBookById = async function (bookId) {
 	try {
 		var result = await Book.findOne({
-			_id : bookId
+			_id : new ObjectId(bookId)
 		});
 		logger.info(`### book searched from DB : [${bookId}, ${book.start_time}-${book.end_time}]`);
 	} catch (error) {
@@ -109,6 +111,29 @@ const findBookOfUserAtTime = async function (userId, start, end, date) {
 	} catch (error) {
 		throw new Exception('from repository');
 	}
+};
+
+// UPDATE book by book id
+const updateBookById = async function (userId, bookId, start, end, date, type) {
+	try {
+		const filter = { _id : new ObjectId(bookId) };
+		const update = { 
+			start_time : start,
+			end_time : end,
+			date : date,
+			type : type
+		};
+		var user = await User.findOne({ user_id : userId });
+		if (user === null)
+			throw new UserNotFoundError('from repository');
+		var result = await Book.updateOne(filter, update);
+		if (result.modifiedCount == 0)
+			throw new bookException.BookNotFoundError('from repository');
+		logger.info(`### book of user updated from DB`);
+		return await Book.findOne({ _id : new ObjectId(bookId) });
+	} catch (error) {
+		throw new Exception('from repository');
+	}
 }
 
 module.exports = {
@@ -118,5 +143,6 @@ module.exports = {
 	findBookAtTime,
 	findBooksAtDate,
 	findBookOfUserAtTime,
-	findBooksByUserIdAndTypeAndDate
+	findBooksByUserIdAndTypeAndDate,
+	updateBookById
 };
