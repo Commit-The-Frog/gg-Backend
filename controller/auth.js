@@ -34,6 +34,8 @@ const loginService = require("../service/loginService.js");
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/LoginInfo'
+ *       '400':
+ *         description: "ApiInfoGetError"
  *       '500':
  *         description: "TokenSignError or InternalServerError"
  */
@@ -49,7 +51,7 @@ router.get("/login", async (req, res) => {
 
 /* REDIRECTION TEST of FE */
 router.get("/test", async (req, res) => {
-	res.redirect(process.env.LOGIN_42_API_REDIRECT);
+	res.redirect("https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-e5a9910877e1e306623ecbae62eb240fc56ab7acd22f6276836ae72077a5315f&redirect_uri=http%3A%2F%2F54.180.96.16%3A4242%2Fauth%2Flogin&response_type=code");
 });
 
 /**

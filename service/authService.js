@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const { AuthorizationCode } = require ('simple-oauth2');
+const authException = require ('../exception/authException');
 const axios = require('axios');
 
 async function apiGetter(codee) {
@@ -24,7 +25,7 @@ async function apiGetter(codee) {
 			}});
 		return (response.data);
 	} catch (error){
-		throw error;
+		throw new authException.ApiInfoGetError("in service");
 	}
 }
 
