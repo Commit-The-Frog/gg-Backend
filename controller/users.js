@@ -35,7 +35,7 @@ router.get('/', async function (req, res, next) {
 		const usersInfo = await userService.getUsersInfo();
 		res.status(200).send(usersInfo);
 	} catch(error) {
-		res.status(error.status || 500).send(error.name || "Internal Server Error");
+		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 });
 
@@ -73,7 +73,7 @@ router.get('/:userId', async function (req, res, next) {
 		const userInfo = await userService.getOneUserInfo(req.params.userId);
 		res.status(200).send(userInfo);
 	} catch(error) {
-		res.status(error.status || 500).send(error.name || "Internal Server Error");
+		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 })
 
