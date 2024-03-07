@@ -44,18 +44,18 @@ const findBookById = async function (bookId) {
 	} catch (error) {
 		throw error;
 	}
-}
+};
 
 /*	[findBookListOfDate]
-	=> 특정 날짜의 모든 예약 목록 조회 */
-const findBookListOfDate = async function (date) {
+	=> 특정 날짜의 특정 타입으로 모든 예약 목록 조회 */
+const findBookListOfDate = async function (date, type) {
 	try {
-		var bookList = await bookRepository.findBooksAtDate(date);
+		var bookList = await bookRepository.findBooksAtDate(date, type);
 		return bookList;
 	} catch (error) {
 		throw error;
 	}
-}
+};
 
 /*	[findBookListOfUserByTypeAndDate]
 	유저 id로 존재하는 유저인지 검사
@@ -68,15 +68,15 @@ const findBookListOfUserByTypeAndDate = async function (userId, type, date) {
 	} catch (error) {
 		throw error;
 	}
-}
+};
 
 /*	[findBookListOfUser]
 	유저 id로 해당 유저가 존재하는지 검사
-	=> 해당 유저의 모든 예약 목록 조회 */
-const findBookListOfUser = async function (userId) {
+	=> 해당 유저의 특정 타입으로 모든 예약 목록 조회 */
+const findBookListOfUser = async function (userId, type) {
 	try {
 		await userRepository.findUserById(userId);
-		var bookList = await bookRepository.findBooksByUserId(userId);
+		var bookList = await bookRepository.findBooksByUserId(userId, type);
 		return bookList;
 	} catch (error) {
 		throw error;
@@ -86,15 +86,24 @@ const findBookListOfUser = async function (userId) {
 /*	[updateBook]
 	유저 id로 해당 유저가 존재하는지 검사
 	=> 해당 유저의 해당 예약 id로 예약 정보 수정 */
-const updateBookById = async function (userId, bookId, start, end, date) {
+const updateBookById = async function (userId, bookId, start, end, date, type) {
 	try {
-		await userRepository.findUserById(userId);
-		await bookRepository.findBookById(bookId);
-
+		await bookRepository.updateBookById(userId, bookId, start, end, date, type);
 	} catch (error) {
 		throw error;
 	}
-}
+};
+
+/*	[deleteBook]
+	유저 id로 해당 유저가 존재하는지 검사
+	=> 해당 유저의 해당 예약 id로 예약 정보 삭제 */
+const deleteBookById = async function (userId, bookId) {
+	try {
+		await bookRepository.deleteBookById(userId, bookId);
+	} catch (error) {
+		throw error;
+	}
+};
 
 
 module.exports = {
@@ -103,5 +112,6 @@ module.exports = {
 	findBookListOfDate,
 	findBookListOfUserByTypeAndDate,
 	updateBookById,
-	findBookById
+	findBookById,
+	deleteBookById
 };
