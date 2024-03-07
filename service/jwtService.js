@@ -78,7 +78,7 @@ const refreshTokenSign = async (userId) => {
 			expiresIn: '14d',
 		})
 		const redisClient = await createRedisClient();
-		redisClient.sadd(userId, data); // userId set에 새로운 RT 추가
+		redisClient.sendCommand(['SADD', userId, data]); // userId set에 새로운 RT 추가
 		redisClient.quit();
 		logger.info("### Refresh Token Saved in Redis")
 		return (data);
@@ -102,18 +102,18 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 			userId = userId.toString();
 		refreshToken = tokenParse(refreshToken);
 		const decoded = jwt.verify(refreshToken, refresh_secret);
+		logger.info("### Request RT verified");
 		if (decoded.id != userId)
 			throw Error();
 		const redisClient = await createRedisClient();
-		try {
-			await redisClient.sismember(userId, refreshToken); // RT가 있는지 확인
+		if (await redisClient.sendCommand(['sismember', userId, refreshToken])) { // RT가 있는지 확인
 			logger.info("### Requset RT is not used before");
-		} catch (error) {
-			await redisClient.del(userId);
+		} else {
+			await redisClient.sendCommand(['DEL', userId]);
 			logger.info('### ' + userId + "'s all RT are deleted from redis because of security issue");
 			throw Error();
 		}
-		await redisClient.srem(userId, refreshToken); // 사용된 RT set에서 삭제
+		await redisClient.sendCommand(['SREM', userId, refreshToken]); // 사용된 RT set에서 삭제
 		logger.info("### Make Request RT Expire");
 		redisClient.quit();
 	} catch (error) {
@@ -130,7 +130,7 @@ const refreshTokenDelete = async (userId, refreshToken) => {
 			userId = userId.toString();
 		refreshToken = tokenParse(refreshToken);
 		const redisClient = await createRedisClient();
-		redisClient.srem(userId, refreshToken);
+		redisClient.sendCommand(['SREM', userId, refreshToken]);
 		redisClient.quit();
 		logger.info("### " + userId + "'s RT Deleted From Redis");
 	} catch (error) {

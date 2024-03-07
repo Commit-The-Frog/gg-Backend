@@ -40,8 +40,8 @@ const setUserAndCreateToken = async (code) => {
 const createNewTokenSet = async (userId, refreshToken) => {
 	try {
 		await jwt.refreshTokenVerify(refreshToken, userId);
-		const newRefreshToken = jwt.refreshTokenSign(userId);
-		const newAccessToken = jwt.accessTokenSign(userId);
+		const newRefreshToken = await jwt.refreshTokenSign(userId);
+		const newAccessToken = await jwt.accessTokenSign(userId);
 		return ({
 			accessToken: newAccessToken,
 			refreshToken: newRefreshToken
