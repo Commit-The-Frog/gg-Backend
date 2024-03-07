@@ -34,6 +34,8 @@ const loginService = require("../service/loginService.js");
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/LoginInfo'
+ *       '400':
+ *         description: "ApiInfoGetError"
  *       '500':
  *         description: "TokenSignError or InternalServerError"
  */
