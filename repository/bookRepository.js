@@ -132,8 +132,32 @@ const updateBookById = async function (userId, bookId, start, end, date, type) {
 		logger.info(`### book of user updated from DB`);
 		return await Book.findOne({ _id : new ObjectId(bookId) });
 	} catch (error) {
-		throw new Exception('from repository');
+		if (error instanceof Exception)
+			throw error;
+		else
+			throw new Exception('from repository');
 	}
+};
+
+// DELETE book by book id
+const deleteBookById = async function (userId, bookId) {
+	try {
+		var user = await User.find({ user_id : userId });
+		if (user === null)
+			throw new UserNotFoundError('from repository');
+		var result = await Book.deleteOne({
+			_id : new Object(bookId)
+		});
+		if (result.deletedCount == 0)
+			throw new bookException.BookNotFoundError('from repository');
+		logger.info(`### book of user deleted from DB`);
+	} catch (error) {
+		if (error instanceof Exception)
+			throw error;
+		else
+			throw new Exception('from repository');
+	}
+	
 }
 
 module.exports = {
@@ -144,5 +168,6 @@ module.exports = {
 	findBooksAtDate,
 	findBookOfUserAtTime,
 	findBooksByUserIdAndTypeAndDate,
-	updateBookById
+	updateBookById,
+	deleteBookById
 };
