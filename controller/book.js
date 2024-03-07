@@ -68,11 +68,18 @@ router.get('/:userId/list', async function(req, res, next) {
  *     get:
  *       tags:
  *         - Book
- *       summary: 해당 유저의 모든 예약기록 조회
+ *       summary: 해당 유저의 타입별 모든 예약기록 조회
  *       parameters:
  *         - name: userId
  *           in: path
  *           description: 유저 id
+ *           required: true
+ *           schema:
+ *             type: integer
+ *             format: int64
+ *         - name: type
+ *           in: query
+ *           description: 예약 타입
  *           required: true
  *           schema:
  *             type: integer
@@ -90,7 +97,8 @@ router.get('/:userId/list', async function(req, res, next) {
 router.get('/:userId/history', async function(req, res, next) {
 	try {
 		var bookList = await bookService.findBookListOfUser(
-			req.params.userId
+			req.params.userId,
+			req.query.type
 		);
 		res.status(200).send(bookList);
 	} catch (error) {
@@ -105,7 +113,7 @@ router.get('/:userId/history', async function(req, res, next) {
  *     get:
  *       tags:
  *         - Book
- *       summary: 해당 날짜의 모든 예약 목록 조회
+ *       summary: 해당 날짜의 타입별 모든 예약 목록 조회
  *       parameters:
  *         - name: date
  *           in: query
@@ -113,6 +121,13 @@ router.get('/:userId/history', async function(req, res, next) {
  *           required: true
  *           schema:
  *             type: string
+ *         - name: type
+ *           in: query
+ *           description: 타입
+ *           required: true
+ *           scehma:
+ *             type: int
+ *             format: int64
  *       responses:
  *         '200':
  *           description: 조회 성공
@@ -126,7 +141,8 @@ router.get('/:userId/history', async function(req, res, next) {
 router.get('/', async function(req, res, next) {
 	try {
 		var bookList = await bookService.findBookListOfDate(
-			req.query.date
+			req.query.date,
+			req.query.type
 		);
 		res.status(200).send(bookList);
 	} catch (error) {
