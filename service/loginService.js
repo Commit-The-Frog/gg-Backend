@@ -33,15 +33,19 @@ const setUserAndCreateToken = async (code) => {
 	}
 };
 
-/*	[createNewAccessToken]
+/*	[createNewTokenSet]
 	RT 를 받아서 검증
-	새로운 AT 발급
-	성공시 newAccessToken 반환 */
-const createNewAccessToken = async (userId, refreshToken) => {
+	새로운 AT, RT 발급
+	성공시 Token set 반환 */
+const createNewTokenSet = async (userId, refreshToken) => {
 	try {
 		await jwt.refreshTokenVerify(refreshToken, userId);
-		const newAccessToken = jwt.accessTokenSign(userId);
-		return (newAccessToken);
+		const newRefreshToken = await jwt.refreshTokenSign(userId);
+		const newAccessToken = await jwt.accessTokenSign(userId);
+		return ({
+			accessToken: newAccessToken,
+			refreshToken: newRefreshToken
+		});
 	} catch (error) {
 		throw error;
 	}
@@ -54,7 +58,6 @@ const createNewAccessToken = async (userId, refreshToken) => {
 const logoutRefreshToken = async (userId, refreshToken) => {
 	try {
 		await jwt.refreshTokenVerify(refreshToken, userId);
-		await jwt.refreshTokenDelete(userId);
 		return true;
 	} catch (error) {
 		throw error;
@@ -63,6 +66,6 @@ const logoutRefreshToken = async (userId, refreshToken) => {
 
 module.exports = {
 	setUserAndCreateToken,
-	createNewAccessToken,
+	createNewTokenSet,
 	logoutRefreshToken
 }

@@ -45,7 +45,7 @@ router.get("/login", async (req, res) => {
 		result = await loginService.setUserAndCreateToken(req.query.code);
 		res.status(200).send(result);
 	} catch (error) {
-		res.status(error.status || 500).send(error.name || "Internal Server Error");
+		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 })
 
@@ -63,12 +63,12 @@ router.get("/test", async (req, res) => {
  *     tags:
  *       - Auth
  *     summary: Get access token by refresh token
- *     description: Get access token by refresh token
+ *     description: Get new set of access token and refresh token
  *     operationId: authRefresh
  *     parameters:
  *       - name: userId
  *         in: query
- *         description: user id who wants to get access token
+ *         description: user id who wants to get new token set
  *         required: true
  *         explode: true
  *         schema:
@@ -79,7 +79,7 @@ router.get("/test", async (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/AccessToken'
+ *               $ref: '#/components/schemas/TokenSet'
  *       '402':
  *         description: "TokenAuthorizeError"
  *       '500':
@@ -88,12 +88,10 @@ router.get("/test", async (req, res) => {
 /* ACCESS TOKEN REFRESH */
 router.get("/refresh", async (req, res) => {
 	try{
-		const result = await loginService.createNewAccessToken(req.query.userId, req.headers.authorization);
-		res.status(200).send({
-			authorization: result
-		});
+		const result = await loginService.createNewTokenSet(req.query.userId, req.headers.authorization);
+		res.status(200).send(result);
 	} catch(error) {
-		res.status(error.status || 500).send(error.name || "Internal Server Error");
+		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 });
 
@@ -129,7 +127,7 @@ router.delete("/logout", async (req, res) => {
 		const result = await loginService.logoutRefreshToken(req.query.userId, req.headers.authorization);
 		res.status(200).send();
 	} catch(error) {
-		res.status(error.status || 500).send(error.name || "Internal Server Error");
+		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 });
 
@@ -180,10 +178,13 @@ module.exports = router;
  *         refereshToken:
  *           type: string
  *           example: "<token>"
- *     AccessToken:
+ *     TokenSet:
  *       type: object
  *       properties:
- *         authorization:
+ *         accessToken:
+ *           type: string
+ *           example: "<token>"
+ *         refreshToken:
  *           type: string
  *           example: "<token>"
  */
