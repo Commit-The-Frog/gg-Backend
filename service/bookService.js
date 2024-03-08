@@ -70,6 +70,19 @@ const findBookListOfUserByTypeAndDate = async function (userId, type, date) {
 	}
 }
 
+/*	[findBookListOfUserByDate]
+	유저 id로 존재하는 유저인지 검사
+	=> 유저의 예약 목록 조회 (특정 날짜의 모든 타입) */
+const findBookListOfUserByDate = async function (userId, date) {
+	try {
+		await userRepository.findUserById(userId);
+		var bookList = await bookRepository.findBooksByUserIdAndDate(userId, date);
+		return bookList;
+	} catch (error) {
+		throw error;
+	}
+}
+
 /*	[findBookListOfUser]
 	유저 id로 해당 유저가 존재하는지 검사
 	=> 해당 유저의 모든 예약 목록 조회 */
@@ -102,6 +115,7 @@ module.exports = {
 	findBookListOfUser,
 	findBookListOfDate,
 	findBookListOfUserByTypeAndDate,
+	findBookListOfUserByDate,
 	updateBookById,
 	findBookById
 };

@@ -49,6 +49,22 @@ const findBooksByUserIdAndTypeAndDate = async function (userId, type, date) {
 	}
 }
 
+// READ book by userId, date (every type)
+const findBooksByUserIdAndDate = async function(userId, date) {
+	try {
+		if (!(date instanceof String))
+			date = date.toString();
+		var result = await Book.find({
+			user_id : userId,
+			date : date
+		});
+		logger.info(`### book searched from DB : [count : ${result.length}]`);
+		return result;
+	} catch (error) {
+		throw new bookException.BookNotFoundError("from repository");
+	}
+}
+
 // READ book by userId
 const findBooksByUserId = async function (userId) {
 	try {
@@ -111,6 +127,23 @@ const findBookOfUserAtTime = async function (userId, start, end, date) {
 	}
 }
 
+// UPDATE book by bookId
+const updateBookById = async function (bookId, start, end, date) {
+	try {
+		const filter = { _id : bookId };
+		const update = { 
+			start_time : start,
+			end_time : end,
+			date : date
+		};
+		var bookFound = Book.findOne({_id : bookId});
+		console.log(bookFound);
+		// var result = Book.update(filter, update);
+	} catch (error) {
+		throw new Exception("from repository");
+	}
+}
+
 module.exports = {
 	createBook,
 	findBookById,
@@ -118,5 +151,7 @@ module.exports = {
 	findBookAtTime,
 	findBooksAtDate,
 	findBookOfUserAtTime,
-	findBooksByUserIdAndTypeAndDate
+	findBooksByUserIdAndTypeAndDate,
+	findBooksByUserIdAndDate,
+	updateBookById
 };

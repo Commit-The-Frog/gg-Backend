@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var bookService = require('../service/bookService');
+var bookRepository = require('../repository/bookRepository');
 
 /**
  * @swagger
@@ -16,7 +17,7 @@ var bookService = require('../service/bookService');
  *     get:
  *       tags:
  *         - Book
- *       summary: 해당 유저의 특정 타입, 특정 날짜의 예약 리스트 조회
+ *       summary: 해당 유저의 특정 날짜의 예약 리스트 조회 (타입별/모든타입)
  *       parameters:
  *         - name: userId
  *           in: path
@@ -28,7 +29,7 @@ var bookService = require('../service/bookService');
  *         - name: type
  *           in: query
  *           description: 게임 타입
- *           required: true
+ *           required: false
  *           schema:
  *             type: string
  *         - name: date
@@ -49,11 +50,19 @@ var bookService = require('../service/bookService');
  */
 router.get('/:userId/list', async function(req, res, next) {
 	try {
-		var bookList = await bookService.findBookListOfUserByTypeAndDate(
-			req.params.userId,
-			req.query.type,
-			req.query.date
-		);
+		var bookList;
+		if (req.query.type) {
+			bookList = await bookService.findBookListOfUserByTypeAndDate(
+				req.params.userId,
+				req.query.type,
+				req.query.date
+			);
+		} else {
+			bookList = await bookService.findBookListOfUserByDate(
+				req.params.userId,
+				req.query.date
+			);
+		}
 		res.status(200).send(bookList);
 	}
 	catch (error) {
@@ -221,6 +230,54 @@ router.post('/', async function(req, res, next) {
 
 /**
  * @swagger
+ * paths:
+ *   /books:
+ *     update:
+ *       tags:
+ *         - Book
+ *       summary: 예약 수정
+ *       parameters:
+ *         - name: bookId
+ *           in: query
+ *           description: 예약 id
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         description: 기존 예약 수정
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UpdateBook'
+ *         required: true
+ *       responses:
+ *         '200':
+ *           description: 수정 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/Book'
+ *         '404':
+ *           description: 사용자를 찾지 못함
+ *         '400':
+ *           description: 유효하지 않은 예약시간 또는 타입이거나 시간 겹침
+ */
+router.update('/', async function(req, res, next) {
+	try {
+		var book = await bookRepository.updateBookById(
+			req.body.bookId,
+			req.body.start,
+			req.body.end,
+			req.body.date
+		);
+		res.status(200).send(book);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
+	}
+});
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     Book:
@@ -265,6 +322,18 @@ router.post('/', async function(req, res, next) {
  *         type:
  *           type: integer
  *           example: 3
+ *     UpdateBook:
+ *       type: object
+ *       properties:
+ *         start:
+ *           type: integer
+ *           example: 14
+ *         end:
+ *           type: integer
+ *           example: 15
+ *         date:
+ *           type: string
+ *           exapmle: '2023-03-05'
  */
 
 module.exports = router;
