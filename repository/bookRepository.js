@@ -4,7 +4,7 @@ const Exception = require('../exception/exception');
 const bookException = require('../exception/bookException');
 var logger = require('../config/logger');
 const { UserNotFoundError } = require('../exception/userException');
-const { ObjectId } = require('mongodb');
+const {ObjectId} = require('mongodb');
 
 // CREATE book
 const createBook = async function (userId, start, end, date, type) {
@@ -26,13 +26,13 @@ const createBook = async function (userId, start, end, date, type) {
 // READ book by bookId
 const findBookById = async function (bookId) {
 	try {
-		bookId = new ObjectId(bookId);
+		console.log(bookId);
 		var result = await Book.findOne({
-			_id : bookId
+			_id : ObjectId.createFromHexString(bookId)
 		});
 		if (result === null)
 			throw new bookException.BookNotFoundError('from repository');
-		logger.info(`### book searched from DB : [${bookId}, ${book.start_time}-${book.end_time}]`);
+		logger.info(`### book searched from DB]`);
 		return result;
 	} catch (error) {
 		if (error instanceof Exception)
@@ -168,7 +168,7 @@ const findBookOfUserAtTime = async function (userId, start, end, date) {
 // UPDATE book by book id
 const updateBookById = async function (userId, bookId, start, end, date, type) {
 	try {
-		bookId = new ObjectId(bookId);
+		bookId = ObjectId.createFromHexString(bookId);
 		const filter = { _id : bookId };
 		const update = { 
 			start_time : start,
@@ -183,7 +183,7 @@ const updateBookById = async function (userId, bookId, start, end, date, type) {
 		if (result.modifiedCount == 0)
 			throw new bookException.BookNotFoundError('from repository');
 		logger.info(`### book of user updated from DB`);
-		return await Book.findOne({ _id : new ObjectId(bookId) });
+		return await Book.findOne({ _id : bookId });
 	} catch (error) {
 		if (error instanceof Exception)
 			throw error;
@@ -195,13 +195,15 @@ const updateBookById = async function (userId, bookId, start, end, date, type) {
 // DELETE book by book id
 const deleteBookById = async function (userId, bookId) {
 	try {
-		var user = await User.find({ user_id : userId });
+		bookId = ObjectId.createFromHexString(bookId);
+		var user = await User.findOne({ user_id : userId });
 		if (user === null)
 			throw new UserNotFoundError('from repository');
-		bookId = new ObjectId(bookId);
 		var result = await Book.deleteOne({
-			_id : bookId
+			_id : bookId,
+			user_id: userId
 		});
+		console.log(result);
 		if (result.deletedCount == 0)
 			throw new bookException.BookNotFoundError('from repository');
 		logger.info(`### book of user deleted from DB`);

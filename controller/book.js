@@ -265,7 +265,7 @@ router.post('/', async function(req, res, next) {
  *         required: true
  *       responses:
  *         '200':
- *           description: 생성 성공
+ *           description: 수정 성공
  *           content:
  *             application/json:
  *               schema:
@@ -277,9 +277,13 @@ router.post('/', async function(req, res, next) {
  */
 router.patch('/', async function (req, res, next) {
 	try {
-		var book = bookService.updateBookById(
+		var book = await bookService.updateBookById(
 			req.query.userId,
-			req.query.bookId
+			req.query.bookId,
+			req.body.start,
+			req.body.end,
+			req.body.date,
+			req.body.type
 		);
 		res.status(200).send(book);
 	} catch (error) {
@@ -287,6 +291,44 @@ router.patch('/', async function (req, res, next) {
 	}
 });
 
+/**
+ * @swagger
+ * paths:
+ *   /books:
+ *     delete:
+ *       tags:
+ *         - Book
+ *       summary: 예약 삭제
+ *       parameters:
+ *         - name: userId
+ *           in: query
+ *           description: 유저 id
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: bookId
+ *           in: query
+ *           description: 예약 id
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         '200':
+ *           description: 삭제 성공
+ *         '404':
+ *           description: 사용자를 찾지 못함
+ */
+router.delete('/', async function (req, res, next) {
+	try {
+		await bookService.deleteBookById(
+			req.query.userId,
+			req.query.bookId
+		);
+		res.status(200).send('success');
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
+	}
+})
 
 /**
  * @swagger

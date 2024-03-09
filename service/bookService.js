@@ -11,7 +11,7 @@ const userRepository = require('../repository/userRepository');
 	=> 예약 추가 */
 const addBook = async function (userId, start, end, date, type) {
 	try {
-		verifyBook(usrId, start, end, date, type);
+		await verifyBook(userId, start, end, date, type);
 		var result = await bookRepository.createBook(
 			userId, start, end, date, type
 		);
@@ -104,8 +104,8 @@ const findBookListOfUser = async function (userId, type) {
 	=> 해당 유저의 해당 예약 id로 예약 정보 수정 */
 const updateBookById = async function (userId, bookId, start, end, date, type) {
 	try {
-		verifyBook(userId, start, end, date, type);
-		await bookRepository.updateBookById(userId, bookId, start, end, date, type);
+		await verifyBook(userId, start, end, date, type);
+		return await bookRepository.updateBookById(userId, bookId, start, end, date, type);
 	} catch (error) {
 		throw error;
 	}
