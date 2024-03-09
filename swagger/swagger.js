@@ -6,9 +6,9 @@ const options = {
     openapi: "3.0.0",
     info: {
       version: "1.0.0",
-      title: "team GG api reference",
+      title: "team LV42 api reference",
       description:
-        "This is API Reference for TEAM GG",
+        "This is API Reference for TEAM LV42",
     },
     servers: [
       {
