@@ -197,7 +197,7 @@ router.get('/:bookId', async function (req, res, next) {
  *       parameters:
  *         - name: userId
  *           in: query
- *           description: 날짜
+ *           description: 유저 id
  *           required: true
  *           schema:
  *             type: string
@@ -234,6 +234,59 @@ router.post('/', async function(req, res, next) {
 		res.status(error.status || 500).send(error.name || 'InternalServerError');
 	}
 });
+
+/**
+ * @swagger
+ * paths:
+ *   /books:
+ *     patch:
+ *       tags:
+ *         - Book
+ *       summary: 예약 수정
+ *       parameters:
+ *         - name: userId
+ *           in: query
+ *           description: 유저 id
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: bookId
+ *           in: query
+ *           description: 예약 id
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         description: 예약 수정
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AddBook'
+ *         required: true
+ *       responses:
+ *         '200':
+ *           description: 생성 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/Book'
+ *         '404':
+ *           description: 사용자를 찾지 못함
+ *         '400':
+ *           description: 유효하지 않은 예약시간 또는 타입이거나 시간 겹침
+ */
+router.patch('/', async function (req, res, next) {
+	try {
+		var book = bookService.updateBookById(
+			req.query.userId,
+			req.query.bookId
+		);
+		res.status(200).send(book);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
+	}
+});
+
 
 /**
  * @swagger

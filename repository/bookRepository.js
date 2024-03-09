@@ -4,6 +4,7 @@ const Exception = require('../exception/exception');
 const bookException = require('../exception/bookException');
 var logger = require('../config/logger');
 const { UserNotFoundError } = require('../exception/userException');
+const { ObjectId } = require('mongodb');
 
 // CREATE book
 const createBook = async function (userId, start, end, date, type) {
@@ -25,8 +26,9 @@ const createBook = async function (userId, start, end, date, type) {
 // READ book by bookId
 const findBookById = async function (bookId) {
 	try {
+		bookId = new ObjectId(bookId);
 		var result = await Book.findOne({
-			_id : new ObjectId(bookId)
+			_id : bookId
 		});
 		if (result === null)
 			throw new bookException.BookNotFoundError('from repository');
@@ -166,7 +168,8 @@ const findBookOfUserAtTime = async function (userId, start, end, date) {
 // UPDATE book by book id
 const updateBookById = async function (userId, bookId, start, end, date, type) {
 	try {
-		const filter = { _id : new ObjectId(bookId) };
+		bookId = new ObjectId(bookId);
+		const filter = { _id : bookId };
 		const update = { 
 			start_time : start,
 			end_time : end,
@@ -195,8 +198,9 @@ const deleteBookById = async function (userId, bookId) {
 		var user = await User.find({ user_id : userId });
 		if (user === null)
 			throw new UserNotFoundError('from repository');
+		bookId = new ObjectId(bookId);
 		var result = await Book.deleteOne({
-			_id : new Object(bookId)
+			_id : bookId
 		});
 		if (result.deletedCount == 0)
 			throw new bookException.BookNotFoundError('from repository');

@@ -11,19 +11,7 @@ const userRepository = require('../repository/userRepository');
 	=> 예약 추가 */
 const addBook = async function (userId, start, end, date, type) {
 	try {
-		if (type < 1 || type > 3)
-			throw new bookException.InvalidTypeError('from service');
-		if (start >= end || start > 144 || end < 0)
-			throw new bookException.InvalidTimeError('from service');
-		await userRepository.findUserById(userId);
-		var bookOfUserAtTime = await bookRepository.findBookOfUserAtTime(userId, start, end, date);
-		if (bookOfUserAtTime.length > 0)
-			throw new bookException.BookTimeConfilctError('from service');
-		var bookList = await bookRepository.findBookAtTime(
-			type,start,end,date
-		);
-		if (bookList.length > 0)
-			throw new bookException.BookTimeConfilctError('from service');
+		verifyBook(usrId, start, end, date, type);
 		var result = await bookRepository.createBook(
 			userId, start, end, date, type
 		);
@@ -32,6 +20,24 @@ const addBook = async function (userId, start, end, date, type) {
 		throw error;
 	}
 };
+
+/*	[verifyBook]
+	=> 유효한 예약인지 검사 */
+const verifyBook = async function (userId, start, end, date, type) {
+	if (type < 1 || type > 3)
+		throw new bookException.InvalidTypeError('from service');
+	if (start >= end || start > 144 || start < 0 || end > 144 || end < 0)
+		throw new bookException.InvalidTimeError('from service');
+	await userRepository.findUserById(userId);
+	var bookOfUserAtTime = await bookRepository.findBookOfUserAtTime(userId, start, end, date);
+	if (bookOfUserAtTime.length > 0)
+		throw new bookException.BookTimeConfilctError('from service');
+	var bookList = await bookRepository.findBookAtTime(
+		type,start,end,date
+	);
+	if (bookList.length > 0)
+		throw new bookException.BookTimeConfilctError('from service');
+}
 
 /*	[findBookById]
 	=> 예약 id로 단일 예약 정보 조회 */
@@ -94,6 +100,7 @@ const findBookListOfUser = async function (userId, type) {
 	=> 해당 유저의 해당 예약 id로 예약 정보 수정 */
 const updateBookById = async function (userId, bookId, start, end, date, type) {
 	try {
+		verifyBook(userId, start, end, date, type);
 		await bookRepository.updateBookById(userId, bookId, start, end, date, type);
 	} catch (error) {
 		throw error;
