@@ -63,7 +63,13 @@ const findBookListOfDate = async function (date, type) {
 const findBookListOfUserByTypeAndDate = async function (userId, type, date) {
 	try {
 		await userRepository.findUserById(userId);
-		var bookList = await bookRepository.findBooksByUserIdAndTypeAndDate(userId, type, date);
+		var bookList;
+		if (type) {
+			bookList = await bookRepository.findBooksByUserIdAndTypeAndDate(userId, type, date);
+		}
+		else {
+			bookList = await bookRepository.findBooksByUserIdAndDate(userId, date);
+		}
 		return bookList;
 	} catch (error) {
 		throw error;

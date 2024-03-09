@@ -62,13 +62,42 @@ const findBooksByUserIdAndTypeAndDate = async function (userId, type, date) {
 	}
 };
 
+// READ books by userId, date (all type)
+const findBooksByUserIdAndDate = async function (userId, date) {
+	try {
+		if (!(date instanceof String))
+			date = date.toString();
+		var result = await Book.find({
+			user_id : userId,
+			date : date
+		});
+		if (result === null)
+			throw new bookException.BookNotFoundError('from repository');
+		logger.info(`### book searched from DB : [count : ${result.length}]`);
+		return result;
+	} catch (error) {
+		if (error instanceof Exception)
+			throw error;
+		else
+			throw new Exception("from repository");
+	}
+};
+
 // READ books by userId and type
 const findBooksByUserId = async function (userId, type) {
 	try {
-		var result = await Book.find({
-			user_id : userId,
-			type : type
-		});
+		var result;
+		if (type) {
+			result = await Book.find({
+				user_id : userId,
+				type : type
+			});
+		}
+		else {
+			result = await Book.find({
+				user_id : userId
+			});
+		}
 		logger.info(`### book searched from DB : [count : ${result.length}]`);
 		return result;
 	} catch (error) {
@@ -79,10 +108,18 @@ const findBooksByUserId = async function (userId, type) {
 // READ books by date and type
 const findBooksAtDate = async function (date, type) {
 	try {
-		var result = await Book.find({
-			date : date,
-			type : type
-		});
+		var result;
+		if (type) {
+			result = await Book.find({
+				date : date,
+				type : type
+			});
+		}
+		else {
+			result = await Book.find({
+				date : date
+			});
+		}
 		logger.info(`### book searched from DB : [count : ${result.length}]`);
 		return result;
 	} catch (error) {
@@ -180,6 +217,7 @@ module.exports = {
 	findBooksAtDate,
 	findBookOfUserAtTime,
 	findBooksByUserIdAndTypeAndDate,
+	findBooksByUserIdAndDate,
 	updateBookById,
 	deleteBookById
 };

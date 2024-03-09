@@ -28,7 +28,7 @@ var bookService = require('../service/bookService');
  *         - name: type
  *           in: query
  *           description: 게임 타입
- *           required: true
+ *           required: false
  *           schema:
  *             type: string
  *         - name: date
@@ -79,8 +79,8 @@ router.get('/:userId/list', async function(req, res, next) {
  *             format: int64
  *         - name: type
  *           in: query
- *           description: 예약 타입
- *           required: true
+ *           description: 게임 타입
+ *           required: false
  *           schema:
  *             type: integer
  *             format: int64
@@ -124,7 +124,7 @@ router.get('/:userId/history', async function(req, res, next) {
  *         - name: type
  *           in: query
  *           description: 타입
- *           required: true
+ *           required: false
  *           scehma:
  *             type: int
  *             format: int64
