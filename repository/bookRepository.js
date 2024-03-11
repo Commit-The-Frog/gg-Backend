@@ -17,7 +17,7 @@ const createBook = async function (userId, start, end, date, type) {
 			type : type
 		});
 		logger.info(`### added book to DB : [userId: ${result.user_id}, ${result.start_time}-${result.end_time}]`);
-		return result;
+		return await findBookById(result._id.toHexString());
 	} catch (error) {
 		throw new Exception("from repository");
 	}
@@ -26,15 +26,28 @@ const createBook = async function (userId, start, end, date, type) {
 // READ book by bookId
 const findBookById = async function (bookId) {
 	try {
-		console.log(bookId);
-		var result = await Book.findOne({
-			_id : ObjectId.createFromHexString(bookId)
-		});
-		if (result === null)
-			throw new bookException.BookNotFoundError('from repository');
-		logger.info(`### book searched from DB]`);
+		bookId = ObjectId.createFromHexString(bookId);
+		var result = await Book.aggregate([
+			{
+				$match:
+				{
+					_id : bookId
+				}
+			},
+			{
+				$lookup: 
+				{
+					from : "users",
+					localField: "user_id",
+					foreignField: "user_id",
+					as: "user"
+				}
+			}
+		]);
+		logger.info(`### book searched from DB [count : ${result.length}]`);
 		return result;
 	} catch (error) {
+		console.log(error);
 		if (error instanceof Exception)
 			throw error;
 		else
@@ -45,15 +58,26 @@ const findBookById = async function (bookId) {
 // READ books by userId, type, date
 const findBooksByUserIdAndTypeAndDate = async function (userId, type, date) {
 	try {
-		if (!(date instanceof String))
-			date = date.toString();
-		var result = await Book.find({
-			user_id : userId,
-			type : type,
-			date : date
-		});
-		if (result === null)
-			throw new bookException.BookNotFoundError('from repository');
+		type = parseInt(type);
+		var result = await Book.aggregate([
+			{
+				$match:
+				{
+					user_id: userId,
+					type: type,
+					date: date
+				}
+			},
+			{
+				$lookup: 
+				{
+					from : "users",
+					localField: "user_id",
+					foreignField: "user_id",
+					as: "user"
+				}
+			}
+		]);
 		logger.info(`### book searched from DB : [count : ${result.length}]`);
 		return result;
 	} catch (error) {
@@ -67,14 +91,24 @@ const findBooksByUserIdAndTypeAndDate = async function (userId, type, date) {
 // READ books by userId, date (all type)
 const findBooksByUserIdAndDate = async function (userId, date) {
 	try {
-		if (!(date instanceof String))
-			date = date.toString();
-		var result = await Book.find({
-			user_id : userId,
-			date : date
-		});
-		if (result === null)
-			throw new bookException.BookNotFoundError('from repository');
+		result = await Book.aggregate([
+			{
+				$match:
+				{
+					user_id: userId,
+					date: date
+				}
+			},
+			{
+				$lookup: 
+				{
+					from : "users",
+					localField: "user_id",
+					foreignField: "user_id",
+					as: "user"
+				}
+			}
+		]);
 		logger.info(`### book searched from DB : [count : ${result.length}]`);
 		return result;
 	} catch (error) {
@@ -90,15 +124,43 @@ const findBooksByUserId = async function (userId, type) {
 	try {
 		var result;
 		if (type) {
-			result = await Book.find({
-				user_id : userId,
-				type : type
-			});
+			result = await Book.aggregate([
+				{
+					$match:
+					{
+						user_id: userId,
+						type: parseInt(type)
+					}
+				},
+				{
+					$lookup: 
+					{
+						from : "users",
+						localField: "user_id",
+						foreignField: "user_id",
+						as: "user"
+					}
+				}
+			]);
 		}
 		else {
-			result = await Book.find({
-				user_id : userId
-			});
+			result = await Book.aggregate([
+				{
+					$match:
+					{
+						user_id: userId
+					}
+				},
+				{
+					$lookup: 
+					{
+						from : "users",
+						localField: "user_id",
+						foreignField: "user_id",
+						as: "user"
+					}
+				}
+			]);
 		}
 		logger.info(`### book searched from DB : [count : ${result.length}]`);
 		return result;
@@ -111,16 +173,44 @@ const findBooksByUserId = async function (userId, type) {
 const findBooksAtDate = async function (date, type) {
 	try {
 		var result;
+		type = parseInt(type);
 		if (type) {
-			result = await Book.find({
-				date : date,
-				type : type
-			});
-		}
-		else {
-			result = await Book.find({
-				date : date
-			});
+			result = await Book.aggregate([
+				{
+					$match:
+					{
+						date: date,
+						type: type
+					}
+				},
+				{
+					$lookup: 
+					{
+						from : "users",
+						localField: "user_id",
+						foreignField: "user_id",
+						as: "user"
+					}
+				}
+			]);
+		} else {
+			result = await Book.aggregate([
+				{
+					$match:
+					{
+						date: date
+					}
+				},
+				{
+					$lookup: 
+					{
+						from : "users",
+						localField: "user_id",
+						foreignField: "user_id",
+						as: "user"
+					}
+				}
+			]);
 		}
 		logger.info(`### book searched from DB : [count : ${result.length}]`);
 		return result;
@@ -168,8 +258,7 @@ const findBookOfUserAtTime = async function (userId, start, end, date) {
 // UPDATE book by book id
 const updateBookById = async function (userId, bookId, start, end, date, type) {
 	try {
-		bookId = ObjectId.createFromHexString(bookId);
-		const filter = { _id : bookId };
+		const filter = { _id : ObjectId.createFromHexString(bookId) };
 		const update = { 
 			start_time : start,
 			end_time : end,
@@ -183,7 +272,7 @@ const updateBookById = async function (userId, bookId, start, end, date, type) {
 		if (result.modifiedCount == 0)
 			throw new bookException.BookNotFoundError('from repository');
 		logger.info(`### book of user updated from DB`);
-		return await Book.findOne({ _id : bookId });
+		return await findBookById(bookId);
 	} catch (error) {
 		if (error instanceof Exception)
 			throw error;
@@ -203,7 +292,6 @@ const deleteBookById = async function (userId, bookId) {
 			_id : bookId,
 			user_id: userId
 		});
-		console.log(result);
 		if (result.deletedCount == 0)
 			throw new bookException.BookNotFoundError('from repository');
 		logger.info(`### book of user deleted from DB`);
