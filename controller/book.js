@@ -197,7 +197,7 @@ router.get('/:bookId', async function (req, res, next) {
  *       parameters:
  *         - name: userId
  *           in: query
- *           description: 날짜
+ *           description: 유저 id
  *           required: true
  *           schema:
  *             type: string
@@ -237,6 +237,101 @@ router.post('/', async function(req, res, next) {
 
 /**
  * @swagger
+ * paths:
+ *   /books:
+ *     patch:
+ *       tags:
+ *         - Book
+ *       summary: 예약 수정
+ *       parameters:
+ *         - name: userId
+ *           in: query
+ *           description: 유저 id
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: bookId
+ *           in: query
+ *           description: 예약 id
+ *           required: true
+ *           schema:
+ *             type: string
+ *       requestBody:
+ *         description: 예약 수정
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AddBook'
+ *         required: true
+ *       responses:
+ *         '200':
+ *           description: 수정 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 $ref: '#/components/schemas/Book'
+ *         '404':
+ *           description: 사용자를 찾지 못함
+ *         '400':
+ *           description: 유효하지 않은 예약시간 또는 타입이거나 시간 겹침
+ */
+router.patch('/', async function (req, res, next) {
+	try {
+		var book = await bookService.updateBookById(
+			req.query.userId,
+			req.query.bookId,
+			req.body.start,
+			req.body.end,
+			req.body.date,
+			req.body.type
+		);
+		res.status(200).send(book);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
+	}
+});
+
+/**
+ * @swagger
+ * paths:
+ *   /books:
+ *     delete:
+ *       tags:
+ *         - Book
+ *       summary: 예약 삭제
+ *       parameters:
+ *         - name: userId
+ *           in: query
+ *           description: 유저 id
+ *           required: true
+ *           schema:
+ *             type: string
+ *         - name: bookId
+ *           in: query
+ *           description: 예약 id
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         '200':
+ *           description: 삭제 성공
+ *         '404':
+ *           description: 사용자를 찾지 못함
+ */
+router.delete('/', async function (req, res, next) {
+	try {
+		await bookService.deleteBookById(
+			req.query.userId,
+			req.query.bookId
+		);
+		res.status(200).send('success');
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
+	}
+})
+
+/**
+ * @swagger
  * components:
  *   schemas:
  *     Book:
@@ -266,6 +361,8 @@ router.post('/', async function(req, res, next) {
  *         updatedAt:
  *           type: ISODate
  *           example: ISODate('2024-03-04T13:01:13.534Z')
+ *         user:
+ *           type: object
  *     AddBook:
  *       type: object
  *       properties:
