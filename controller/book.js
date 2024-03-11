@@ -361,6 +361,8 @@ router.delete('/', async function (req, res, next) {
  *         updatedAt:
  *           type: ISODate
  *           example: ISODate('2024-03-04T13:01:13.534Z')
+ *         user:
+ *           type: object
  *     AddBook:
  *       type: object
  *       properties:
