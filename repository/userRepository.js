@@ -44,15 +44,6 @@ const findAllUsers = function () {
 	}
 }
 
-const findUserNamesByRegex = async function (regex) {
-	try {
-		logger.info('### find user by regex from DB');
-		return await User.find({name: {$regex: regex}}).select('name');
-	} catch (error) {
-		throw new userException.UserNotFoundError("from repository");
-	}
-}
-
 const findUserByName = async function (name) {
 	try {
 		logger.info('### find user by regex from DB');
@@ -99,6 +90,5 @@ module.exports = {
 	findAllUsers,
 	updateUserById,
 	deleteUserById,
-	findUserNamesByRegex,
 	findUserByName
 };

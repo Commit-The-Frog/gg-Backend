@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const userService = require('../service/userService.js');
+const searchService = require('../service/searchService.js');
 
 /**
  * @swagger
@@ -68,10 +69,19 @@ router.get('/', async function (req, res, next) {
  *       '500':
  *         description: InternalServerError
  */
-router.get('/:userId', async function (req, res, next) {
+router.get('/findOne', async function (req, res, next) {
 	try {
-		const userInfo = await userService.getOneUserInfo(req.params.userId);
+		const userInfo = await userService.getOneUserInfoByName(req.query.name);
 		res.status(200).send(userInfo);
+	} catch(error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+})
+
+router.get('/findNames', async function (req, res, next) {
+	try {
+		const userNames = await searchService.findUserNameByPattern(req.query.pattern + '*');
+		res.status(200).send(userNames);
 	} catch(error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
@@ -106,18 +116,9 @@ router.get('/:userId', async function (req, res, next) {
  *       '500':
  *         description: InternalServerError
  */
-router.get('/findOne', async function (req, res, next) {
+router.get('/:userId', async function (req, res, next) {
 	try {
-		const userInfo = await userService.getOneUserInfoByName(req.query.name);
-		res.status(200).send(userInfo);
-	} catch(error) {
-		res.status(error.status || 500).send(error.name || "InternalServerError");
-	}
-})
-
-router.get('/findNames', async function (req, res, next) {
-	try {
-		const userInfo = await userService.getUserNamesStartWith(req.query.reg);
+		const userInfo = await userService.getOneUserInfo(req.params.userId);
 		res.status(200).send(userInfo);
 	} catch(error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");

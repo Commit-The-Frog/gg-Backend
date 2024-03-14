@@ -1,3 +1,4 @@
+const logger = require('../config/logger');
 const userRepository = require('../repository/userRepository');
 
 const getOneUserInfo = async (userId) => {
@@ -29,7 +30,7 @@ const getOneUserInfoByName = async (name) => {
 
 const getUserNamesStartWith = async (str) => {
 	try {
-		const userNames = await userRepository.findUserNamesByRegex("/^" + str + "/");
+		const userNames = await userRepository.findUserNamesByRegex("/^" + str + ".*/");
 		return (userNames);
 	} catch (error) {
 		throw error;

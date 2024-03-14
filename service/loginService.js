@@ -2,6 +2,7 @@ const jwt = require("../service/jwtService.js")
 const apiGetter = require("../service/authService.js")
 const userRepo = require("../repository/userRepository.js");
 const { UserNotFoundError } = require("../exception/userException.js");
+const createRedisClient = require('./redisService.js');
 
 /*  [INIT]
 	code 로 42 API 에서 유저 정보 받아옴
@@ -17,6 +18,8 @@ const setUserAndCreateToken = async (code) => {
 		} catch (error) {
 			if (error instanceof UserNotFoundError) {
 				await userRepo.addUser(userInfo.id, userInfo.login, userInfo.image.versions.small);
+				const redisClient = await createRedisClient();
+				await redisClient.sendCommand(['ZADD', 'users', 0, userInfo.login]);
 			} else {
 				throw error;
 			}
