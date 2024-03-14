@@ -77,6 +77,53 @@ router.get('/:userId', async function (req, res, next) {
 	}
 })
 
+/**
+ * @swagger
+ * /users/{userId}:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Get one user's info
+ *     description: Get one user's info by get request
+ *     operationId: getOneUser
+ *     parameters:
+ *       - name: userId
+ *         in: path
+ *         description: value of user id to get user info
+ *         required: true
+ *         explode: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: successful operation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       '404':
+ *         description: UserNotFoundError
+ *       '500':
+ *         description: InternalServerError
+ */
+router.get('/findOne', async function (req, res, next) {
+	try {
+		const userInfo = await userService.getOneUserInfoByName(req.query.name);
+		res.status(200).send(userInfo);
+	} catch(error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+})
+
+router.get('/findNames', async function (req, res, next) {
+	try {
+		const userInfo = await userService.getUserNamesStartWith(req.query.reg);
+		res.status(200).send(userInfo);
+	} catch(error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+})
+
 module.exports = router;
 
 /**

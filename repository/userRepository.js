@@ -44,12 +44,30 @@ const findAllUsers = function () {
 	}
 }
 
+const findUserNamesByRegex = async function (regex) {
+	try {
+		logger.info('### find user by regex from DB');
+		return await User.find({name: {$regex: regex}}).select('name');
+	} catch (error) {
+		throw new userException.UserNotFoundError("from repository");
+	}
+}
+
+const findUserByName = async function (name) {
+	try {
+		logger.info('### find user by regex from DB');
+		return await User.findOne({name: name});
+	} catch (error) {
+		throw new userException.UserNotFoundError("from repository");
+	}
+}
+
 /* UPDATE user by id
 	: [_id] field must not be changed */
 const updateUserById = async function (userId, name, profileImg) {
 	try {
 		const filter = { user_id : userId };
-		const update = { 
+		const update = {
 			name : name,
 			profile_img : profileImg
 		}
@@ -80,5 +98,7 @@ module.exports = {
 	findUserById,
 	findAllUsers,
 	updateUserById,
-	deleteUserById
+	deleteUserById,
+	findUserNamesByRegex,
+	findUserByName
 };
