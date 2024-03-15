@@ -46,8 +46,11 @@ const findAllUsers = function () {
 
 const findUserByName = async function (name) {
 	try {
-		logger.info('### find user by regex from DB');
-		return await User.findOne({name: name});
+		const result = await User.findOne({ name : name });
+		if (result === null)
+				throw Error();
+		logger.info(`### user searched from DB : [${result.name}, ${result.user_id}]`)
+		return result;
 	} catch (error) {
 		throw new userException.UserNotFoundError("from repository");
 	}

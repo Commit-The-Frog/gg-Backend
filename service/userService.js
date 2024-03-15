@@ -28,18 +28,8 @@ const getOneUserInfoByName = async (name) => {
 	}
 }
 
-const getUserNamesStartWith = async (str) => {
-	try {
-		const userNames = await userRepository.findUserNamesByRegex("/^" + str + ".*/");
-		return (userNames);
-	} catch (error) {
-		throw error;
-	}
-}
-
 module.exports = {
 	getOneUserInfo,
 	getUsersInfo,
-	getOneUserInfoByName,
-	getUserNamesStartWith
+	getOneUserInfoByName
 }
