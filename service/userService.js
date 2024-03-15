@@ -1,3 +1,4 @@
+const logger = require('../config/logger');
 const userRepository = require('../repository/userRepository');
 
 const getOneUserInfo = async (userId) => {
@@ -18,7 +19,17 @@ const getUsersInfo = async () => {
 	}
 }
 
+const getOneUserInfoByName = async (name) => {
+	try {
+		const userInfo = await userRepository.findUserByName(name);
+		return (userInfo);
+	} catch (error) {
+		throw error;
+	}
+}
+
 module.exports = {
 	getOneUserInfo,
-	getUsersInfo
+	getUsersInfo,
+	getOneUserInfoByName
 }

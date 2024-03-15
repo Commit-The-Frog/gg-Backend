@@ -44,12 +44,24 @@ const findAllUsers = function () {
 	}
 }
 
+const findUserByName = async function (name) {
+	try {
+		const result = await User.findOne({ name : name });
+		if (result === null)
+				throw Error();
+		logger.info(`### user searched from DB : [${result.name}, ${result.user_id}]`)
+		return result;
+	} catch (error) {
+		throw new userException.UserNotFoundError("from repository");
+	}
+}
+
 /* UPDATE user by id
 	: [_id] field must not be changed */
 const updateUserById = async function (userId, name, profileImg) {
 	try {
 		const filter = { user_id : userId };
-		const update = { 
+		const update = {
 			name : name,
 			profile_img : profileImg
 		}
@@ -80,5 +92,6 @@ module.exports = {
 	findUserById,
 	findAllUsers,
 	updateUserById,
-	deleteUserById
+	deleteUserById,
+	findUserByName
 };
