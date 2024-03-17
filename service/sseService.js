@@ -13,7 +13,7 @@ const addListener = function (id, res, info) {
 		res.header('Connection', 'keep-alive');
 		logger.info('### Add ' + id + ' To Listener');
 		listener.push({id: id, res: res});
-		res.write(`data : ${JSON.stringify(info)}\n\n`);
+		res.write(`status : subscribe success\n\n`);
 	} catch (error) {
 		throw new sseException.SseException('from service');
 	}
