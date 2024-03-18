@@ -4,11 +4,12 @@ var userException = require('../exception/userException');
 var logger = require('../config/logger');
 
 // CREATE user
-const addUser = async function (userId, name, profileImg) {
+const addUser = async function (userId, name, displayName, profileImg) {
 	try {
 		const result = await User.create({
 			user_id : userId,
 			name : name,
+			displayname : displayName,
 			profile_img : profileImg
 		});
 		logger.info(`### added user to DB : [${result.name}, ${result._id}]`);
@@ -58,11 +59,12 @@ const findUserByName = async function (name) {
 
 /* UPDATE user by id
 	: [_id] field must not be changed */
-const updateUserById = async function (userId, name, profileImg) {
+const updateUserById = async function (userId, name, displayName, profileImg) {
 	try {
 		const filter = { user_id : userId };
 		const update = {
 			name : name,
+			displayname : displayName,
 			profile_img : profileImg
 		}
 		var user = await User.findOne({ user_id : userId });

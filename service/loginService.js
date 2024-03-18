@@ -14,10 +14,10 @@ const setUserAndCreateToken = async (code) => {
 		try {
 			userInfo = await apiGetter(code);
 			await userRepo.findUserById(userInfo.id);
-			await userRepo.updateUserById(userInfo.id, userInfo.login, userInfo.image.versions.small);
+			await userRepo.updateUserById(userInfo.id, userInfo.login, userInfo.displayname, userInfo.image.versions.small, userInfo.image.versions.micro);
 		} catch (error) {
 			if (error instanceof UserNotFoundError) {
-				await userRepo.addUser(userInfo.id, userInfo.login, userInfo.image.versions.small);
+				await userRepo.addUser(userInfo.id, userInfo.login, userInfo.displayname, userInfo.image.versions.small, userInfo.image.versions.micro);
 				await searchService.addUserNameInRedis(userInfo.login);
 			} else {
 				throw error;
