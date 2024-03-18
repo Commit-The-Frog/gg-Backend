@@ -1,8 +1,6 @@
 const dotenv = require("dotenv").config();
 const redis = require('redis');
 var logger = require('../config/logger');
-const access_secret = process.env.JWT_ACCESS_SECRET;
-const refresh_secret = process.env.JWT_REFRESH_SECRET;
 
 async function createRedisClient() {
     return new Promise((resolve, reject) => {

@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const userService = require('../service/userService.js');
+const searchService = require('../service/searchService.js');
+var logger = require('../config/logger');
 
 /**
  * @swagger
@@ -13,10 +15,32 @@ const userService = require('../service/userService.js');
  * @swagger
  * /users:
  *   get:
- *     summary: Get all users' info
- *     description: Get all users' info by get request
+ *     summary: Get users' info
+ *     description: Get users' info by get request
  *     operationId: getUsers
  *     tags: [Users]
+ *     parameters:
+ *       - name: id
+ *         in: query
+ *         description: value of user id to get user info
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *       - name: name
+ *         in: query
+ *         description: value of user name to get user info
+ *         required: false
+ *         explode: true
+ *         schema:
+ *           type: string
+ *       - name: pattern
+ *         in: query
+ *         description: user names for auto fill
+ *         required: false
+ *         explode: true
+ *         schema:
+ *           type: string
  *     responses:
  *       '200':
  *         description: successful operation
@@ -26,14 +50,23 @@ const userService = require('../service/userService.js');
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/User'
- *         '500':
- *           description: InternalServerError
- */
+ *       '500':
+ *         description: InternalServerError
+ *  */
 /* GET users listing. */
 router.get('/', async function (req, res, next) {
 	try {
-		const usersInfo = await userService.getUsersInfo();
-		res.status(200).send(usersInfo);
+		let result;
+		if (req.query.id) {
+			result = await userService.getOneUserInfo(req.query.id);
+		} else if (req.query.name) {
+			result = await userService.getOneUserInfoByName(req.query.name);
+		} else if (req.query.pattern) {
+			result = await searchService.findUserNameByPatternInRedis(req.query.pattern + '*');
+		} else {
+			result = await userService.getUsersInfo();
+		}
+		res.status(200).send(result);
 	} catch(error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
@@ -41,17 +74,17 @@ router.get('/', async function (req, res, next) {
 
 /**
  * @swagger
- * /users/{userId}:
- *   get:
+ * /users/add/{name}:
+ *   post:
  *     tags:
  *       - Users
- *     summary: Get one user's info
- *     description: Get one user's info by get request
- *     operationId: getOneUser
+ *     summary: add user name
+ *     description: add user name
+ *     operationId: adduser
  *     parameters:
- *       - name: userId
+ *       - name: name
  *         in: path
- *         description: value of user id to get user info
+ *         description: name of user name starts with
  *         required: true
  *         explode: true
  *         schema:
@@ -68,10 +101,11 @@ router.get('/', async function (req, res, next) {
  *       '500':
  *         description: InternalServerError
  */
-router.get('/:userId', async function (req, res, next) {
+router.post('/add/:name', async function (req, res, next) {
 	try {
-		const userInfo = await userService.getOneUserInfo(req.params.userId);
-		res.status(200).send(userInfo);
+		logger.info(req.params.name);
+		await searchService.addUserNameInRedis(req.params.name);
+		res.status(200).send();
 	} catch(error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
@@ -119,4 +153,8 @@ module.exports = router;
  *         refereshToken:
  *           type: string
  *           example: "<token>"
+ *     UserName:
+ *       type: string
+ *       properties:
+ *         userName
  */
