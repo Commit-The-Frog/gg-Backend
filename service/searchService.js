@@ -16,7 +16,10 @@ const findUserNameByPatternInRedis = async function (pattern) {
 		if (!userExists)
 			throw Error();
 		if (!isValidString(pattern))
+		{
+			logger.info("### Invalide Pattern Found In User Find")
 			throw Error();
+		}
 		const userNames = await redisClient.sendCommand(['ZSCAN', 'users', pattern.charCodeAt(0).toString(), 'MATCH', pattern, 'COUNT', '5']);
 		logger.info("### User Searched Match With Pattern");
 		const nameArray = [];
