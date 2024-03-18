@@ -9,7 +9,7 @@ const findUserNameByPatternInRedis = async function (pattern) {
 		const userExists = await redisClient.sendCommand(['EXISTS', 'users']);
 		if (!userExists)
 			throw Error();
-		const userNames = await redisClient.sendCommand(['ZSCAN', 'users', '0', 'MATCH', pattern, 'COUNT', '5']);
+		const userNames = await redisClient.sendCommand(['ZSCAN', 'users', pattern.charCodeAt(0).toString(), 'MATCH', pattern, 'COUNT', '5']);
 		logger.info("### User Searched Match With Pattern");
 		const nameArray = [];
 		for (let i = 0; i < userNames[1].length; i += 2){
