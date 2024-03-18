@@ -81,6 +81,7 @@ router.post('/speaker', async function (req, res, next) {
 
 module.exports = router;
 
+
 /**
  * @swagger
  * components:
@@ -97,6 +98,9 @@ module.exports = router;
  *         name:
  *           type: string
  *           example: "minjacho"
+ *         displayname:
+ *           type: string
+ *           example: "MinJae Choi"
  *         profile_img:
  *           type: string
  *           example: "https://cdn.intra.42.fr/users/1bf8948249e8d63a265c19b793c62bc9/small_minjacho.jpg"
@@ -126,3 +130,4 @@ module.exports = router;
  *       properties:
  *         userName
  */
+

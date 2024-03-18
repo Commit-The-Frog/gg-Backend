@@ -133,14 +133,10 @@ router.delete("/logout", async (req, res) => {
 
 module.exports = router;
 
+
 /**
  * @swagger
  * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  *   schemas:
  *     User:
  *       type: object
@@ -154,6 +150,9 @@ module.exports = router;
  *         name:
  *           type: string
  *           example: "minjacho"
+ *         displayname:
+ *           type: string
+ *           example: "MinJae Choi"
  *         profile_img:
  *           type: string
  *           example: "https://cdn.intra.42.fr/users/1bf8948249e8d63a265c19b793c62bc9/small_minjacho.jpg"
@@ -178,13 +177,8 @@ module.exports = router;
  *         refereshToken:
  *           type: string
  *           example: "<token>"
- *     TokenSet:
- *       type: object
+ *     UserName:
+ *       type: string
  *       properties:
- *         accessToken:
- *           type: string
- *           example: "<token>"
- *         refreshToken:
- *           type: string
- *           example: "<token>"
+ *         userName
  */
