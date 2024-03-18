@@ -62,9 +62,7 @@ router.get('/', async function (req, res, next) {
 		} else if (req.query.name) {
 			result = await userService.getOneUserInfoByName(req.query.name);
 		} else if (req.query.pattern) {
-			result = await searchService.findUserNameByPatternInRedis(req.query.pattern + '*');
-		} else {
-			result = await userService.getUsersInfo();
+			result = await searchService.findUserNameByPatternInRedis(req.query.pattern);
 		}
 		res.status(200).send(result);
 	} catch(error) {
