@@ -78,9 +78,16 @@ const refreshTokenSign = async (userId) => {
 			expiresIn: '14d',
 		})
 		const redisClient = await createRedisClient();
-		redisClient.sendCommand(['SADD', userId, data]); // userId set에 새로운 RT 추가
+		const tokenScore = Date.now() / 1000;
+		await redisClient.sendCommand(['ZADD', userId, tokenScore.toString(), data]); // userId set에 새로운 RT 추가
+		logger.info("### Refresh Token Saved In Redis");
+		const tokenLength = await redisClient.sendCommand(['ZCARD', userId]);
+		if (tokenLength > 5)
+		{
+			await redisClient.sendCommand(['ZREMRANGEBYRANK', userId, '0', '0']);
+			logger.info("### Oldest Refresh Token Deleted");
+		}
 		redisClient.quit();
-		logger.info("### Refresh Token Saved in Redis")
 		return (data);
 	} catch (error) {
 		throw new jwtException.TokenSignError("from service");
@@ -106,14 +113,14 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 		if (decoded.id != userId)
 			throw Error();
 		const redisClient = await createRedisClient();
-		if (await redisClient.sendCommand(['sismember', userId, refreshToken])) { // RT가 있는지 확인
+		if (await redisClient.sendCommand(['ZSCORE', userId, refreshToken])) { // RT가 있는지 확인
 			logger.info("### Requset RT is not used before");
 		} else {
 			await redisClient.sendCommand(['DEL', userId]);
 			logger.info('### ' + userId + "'s all RT are deleted from redis because of security issue");
 			throw Error();
 		}
-		await redisClient.sendCommand(['SREM', userId, refreshToken]); // 사용된 RT set에서 삭제
+		await redisClient.sendCommand(['ZREM', userId, refreshToken]); // 사용된 RT set에서 삭제
 		logger.info("### Make Request RT Expire");
 		redisClient.quit();
 	} catch (error) {
@@ -130,7 +137,7 @@ const refreshTokenDelete = async (userId, refreshToken) => {
 			userId = userId.toString();
 		refreshToken = tokenParse(refreshToken);
 		const redisClient = await createRedisClient();
-		redisClient.sendCommand(['SREM', userId, refreshToken]);
+		await redisClient.sendCommand(['ZREM', userId, refreshToken]);
 		redisClient.quit();
 		logger.info("### " + userId + "'s RT Deleted From Redis");
 	} catch (error) {
