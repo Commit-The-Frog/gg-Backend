@@ -137,6 +137,11 @@ module.exports = router;
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     User:
  *       type: object
@@ -181,4 +186,13 @@ module.exports = router;
  *       type: string
  *       properties:
  *         userName
+ *     TokenSet:
+ *       type: object
+ *       properties:
+ *         accessToken:
+ *           type: string
+ *           example: "<token>"
+ *         refreshToken:
+ *           type: string
+ *           example: "<token>"
  */
