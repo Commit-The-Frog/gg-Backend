@@ -1,5 +1,6 @@
 var logger = require('../config/logger');
 var sseException = require('../exception/sseException');
+const verifyService = require('../service/verifyService.js');
 
 let listener = [];
 
@@ -8,9 +9,12 @@ let listener = [];
 */
 const addListener = function (id, res, info) {
 	try {
+		if (!verifyService.isValidId(id))
+			throw Error();
 		res.header('Content-Type', 'text/event-stream');
 		res.header('Cache-Control', 'no-cache');
 		res.header('Connection', 'keep-alive');
+		id = Date.now() + '.' + id;
 		logger.info('### Add ' + id + ' To Listener');
 		listener.push({id: id, res: res});
 		res.write(`status : subscribe success\n\n`);

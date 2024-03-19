@@ -2,13 +2,12 @@ const logger = require('../config/logger');
 const userRepository = require('../repository/userRepository');
 const createRedisClient = require('./redisService.js');
 var userException = require('../exception/userException');
+var verifyService = require('../service/verifyService.js');
 
-
-function isValidString(str) {
-	const pattern = /^[a-zA-Z]+$/;
-	return pattern.test(str);
-}
-
+/*
+[findUserNameByPatternInRedis]
+매개변수로 받은 패턴을 기준으로 users에서 5개의 일치하는 검색 결과를 내보내준다.
+*/
 const findUserNameByPatternInRedis = async function (pattern) {
 	try {
 		const redisClient = await createRedisClient();
@@ -16,7 +15,7 @@ const findUserNameByPatternInRedis = async function (pattern) {
 		if (!userExists)
 			throw Error();
 		const nameArray = [];
-		if (!isValidString(pattern))
+		if (!verifyService.isValidName(pattern))
 		{
 			logger.info("### Invalide Pattern Found In User Find")
 			return nameArray;
@@ -36,6 +35,9 @@ const findUserNameByPatternInRedis = async function (pattern) {
 	}
 }
 
+/*
+테스트용 함수
+*/
 const addUserNameInRedis = async function (name) {
 	try {
 		const redisClient = await createRedisClient();
