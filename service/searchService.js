@@ -15,19 +15,23 @@ const findUserNameByPatternInRedis = async function (pattern) {
 		const userExists = await redisClient.sendCommand(['EXISTS', 'users']);
 		if (!userExists)
 			throw Error();
+		const nameArray = [];
 		if (!isValidString(pattern))
 		{
 			logger.info("### Invalide Pattern Found In User Find")
-			throw Error();
+			return nameArray;
 		}
-		const userNames = await redisClient.sendCommand(['ZSCAN', 'users', pattern.charCodeAt(0).toString(), 'MATCH', pattern, 'COUNT', '5']);
+		if (pattern.length < 2)
+			return nameArray;
+		pattern = pattern + '*';
+		const userNames = await redisClient.sendCommand(['ZSCAN', 'users', pattern.charCodeAt(0).toString(), 'MATCH', pattern]);
 		logger.info("### User Searched Match With Pattern");
-		const nameArray = [];
-		for (let i = 0; i < userNames[1].length; i += 2){
+		for (let i = 0; i < Math.min(userNames[1].length, 10); i += 2){
 			nameArray.push(userNames[1][i]);
 		}
 		return nameArray;
 	} catch (error) {
+		logger.info("###" + error);
 		throw new userException.UserNotFoundError('from service');
 	}
 }
