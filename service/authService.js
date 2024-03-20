@@ -4,7 +4,7 @@ const { AuthorizationCode } = require ('simple-oauth2');
 const authException = require ('../exception/authException');
 const axios = require('axios');
 
-async function apiGetter(codee) {
+async function apiGetter(code) {
 	try {
 		const client = new AuthorizationCode({
 			client: {
@@ -15,7 +15,7 @@ async function apiGetter(codee) {
 				tokenHost: process.env.TOKENHOST
 			}});
 		const accessToken = await client.getToken({
-			code: codee,
+			code: code,
 			redirect_uri: `${process.env.REDIRECT_URI}`
 		});
 		const apiUrl = `${process.env.TOKENHOST}/v2/me`;

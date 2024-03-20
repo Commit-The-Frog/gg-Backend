@@ -35,13 +35,12 @@ var logger = require('../config/logger');
 /* listing events by subscribe */
 router.get('/subscribe', async function (req, res, next) {
 	try {
-		const id = Date.now() + '.' + req.query.userId;
-		sseService.addListener(id, res);
+		sseService.addListener(req.query.userId, res);
 		req.on('close', function () {
 			sseService.deleteListener(id);
 		});
 	} catch (error) {
-		throw error;
+		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 })
 
@@ -75,7 +74,7 @@ router.post('/speaker', async function (req, res, next) {
 		sseService.sendInfoToListeners(req.body);
 		res.send(req.body);
 	} catch (error) {
-		throw error;
+		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 })
 

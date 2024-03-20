@@ -4,6 +4,7 @@ const access_secret = process.env.JWT_ACCESS_SECRET;
 const refresh_secret = process.env.JWT_REFRESH_SECRET;
 const jwtException = require('../exception/jwtException.js');
 var logger = require('../config/logger');
+var verifyService = require('../service/verifyService.js');
 
 const tokenParse = (rawToken) => {
 	try {
@@ -24,6 +25,8 @@ const accessTokenSign = (userId) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
+		if (!verifyService.isValidId(userId))
+			throw Error();
 		const payload = {
 			id: userId
 		}
@@ -49,7 +52,11 @@ const accessTokenVerify = (userId, accessToken) => {
 	try {
 		accessToken = tokenParse(accessToken);
 		if (!(userId instanceof String))
-		userId = userId.toString();
+			userId = userId.toString();
+		if (!verifyService.isValidId(userId))
+			throw Error();
+		if (!verifyService.isValidTokenStruct(accessToken))
+			throw Error();
 		const decoded = jwt.verify(accessToken, access_secret);
 		logger.info("### Access Token Verified");
 		if (decoded.id != userId) {
@@ -71,6 +78,8 @@ const refreshTokenSign = async (userId) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
+		if (!verifyService.isValidId(userId))
+			throw Error();
 		const data = jwt.sign({
 			id: userId
 		}, refresh_secret, {
@@ -107,7 +116,11 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
+		if (!verifyService.isValidId(userId))
+			throw Error();
 		refreshToken = tokenParse(refreshToken);
+		if (!verifyService.isValidTokenStruct(refreshToken))
+			throw Error();
 		const decoded = jwt.verify(refreshToken, refresh_secret);
 		logger.info("### Request RT verified");
 		if (decoded.id != userId)
@@ -135,7 +148,11 @@ const refreshTokenDelete = async (userId, refreshToken) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
+		if (!verifyService.isValidId(userId))
+			throw Error();
 		refreshToken = tokenParse(refreshToken);
+		if (!verifyService.isValidTokenStruct(refreshToken))
+			throw Error();
 		const redisClient = await createRedisClient();
 		await redisClient.sendCommand(['ZREM', userId, refreshToken]);
 		redisClient.quit();
