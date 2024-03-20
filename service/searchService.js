@@ -35,13 +35,10 @@ const findUserNameByPatternInRedis = async function (pattern) {
 	}
 }
 
-/*
-테스트용 함수
-*/
-const addUserNameInRedis = async function (name) {
+const addUserNameInRedis = async function (name, id) {
 	try {
 		const redisClient = await createRedisClient();
-		await redisClient.sendCommand(['ZADD', 'users', name.charCodeAt(0).toString(), name]);
+		await redisClient.sendCommand(['ZADD', 'users', name.charCodeAt(0).toString(), name + ':' + id]);
 		logger.info("### User Name Added In Redis Pattern");
 	} catch (error) {
 		throw error;
