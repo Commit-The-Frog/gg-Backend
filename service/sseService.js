@@ -41,7 +41,7 @@ const deleteListener = function (id) {
 */
 const sendInfoToListeners = function (action, info) {
 	try {
-		listener.forEach(listener => listener.res.write(`{action: ${action}, data: ${JSON.stringify(info)}}\n\n`));
+		listener.forEach(listener => listener.res.write(`{action: "${action}", data: ${JSON.stringify(info)}}\n\n`));
 		logger.info('>>> SSE Speaker Speaks...' + JSON.stringify(info));
 	} catch (error) {
 		throw new sseException.SseException('from service');
