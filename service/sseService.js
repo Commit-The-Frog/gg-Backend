@@ -15,9 +15,10 @@ const addListener = function (id, res, info) {
 		res.header('Cache-Control', 'no-cache');
 		res.header('Connection', 'keep-alive');
 		id = Date.now() + '.' + id;
-		logger.info('### Add ' + id + ' To Listener');
 		listener.push({id: id, res: res});
-		res.write(`status : subscribe success\n\n`);
+		res.write(`{action : INIT}\n\n`);
+		logger.info('### Add ' + id + ' To Listener');
+		return (id);
 	} catch (error) {
 		throw new sseException.SseException('from service');
 	}
@@ -38,10 +39,10 @@ const deleteListener = function (id) {
 /*	[sendInfoToListeners]
 	info를 구독자들 각각에 보낸다.
 */
-const sendInfoToListeners = function (info) {
+const sendInfoToListeners = function (action, info) {
 	try {
-		logger.info('## SSE Speaker Speaks...');
-		listener.forEach(listener => listener.res.write(`data: ${JSON.stringify(info)}\n\n`));
+		listener.forEach(listener => listener.res.write(`{action: "${action}", data: ${JSON.stringify(info)}}\n\n`));
+		logger.info('>>> SSE Speaker Speaks...' + JSON.stringify(info));
 	} catch (error) {
 		throw new sseException.SseException('from service');
 	}

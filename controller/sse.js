@@ -35,7 +35,7 @@ var logger = require('../config/logger');
 /* listing events by subscribe */
 router.get('/subscribe', async function (req, res, next) {
 	try {
-		sseService.addListener(req.query.userId, res);
+		const id = sseService.addListener(req.query.userId, res);
 		req.on('close', function () {
 			sseService.deleteListener(id);
 		});
