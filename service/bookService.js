@@ -4,7 +4,6 @@ const bookRepository = require('../repository/bookRepository');
 const userRepository = require('../repository/userRepository');
 const verifyService = require('../service/verifyService.js');
 const sseService = require('../service/sseService.js');
-var logger = require('../config/logger');
 
 /*	[addBook]
 	해당 기기가 유효한지 검사
@@ -140,7 +139,6 @@ const deleteBookById = async function (userId, bookId) {
 			throw new verifyException.inputFormatError('from service');
 		const targetBook = await bookRepository.findBookById(bookId);
 		await bookRepository.deleteBookById(userId, bookId);
-		logger.info(targetBook[0].type);
 		sseService.sendInfoToListeners("DEL", {"_id": bookId, "type": targetBook[0].type});
 	} catch (error) {
 		throw error;

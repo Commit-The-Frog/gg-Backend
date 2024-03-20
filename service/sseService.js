@@ -15,9 +15,9 @@ const addListener = function (id, res, info) {
 		res.header('Cache-Control', 'no-cache');
 		res.header('Connection', 'keep-alive');
 		id = Date.now() + '.' + id;
-		logger.info('### Add ' + id + ' To Listener');
 		listener.push({id: id, res: res});
 		res.write(`{action : INIT}\n\n`);
+		logger.info('### Add ' + id + ' To Listener');
 		return (id);
 	} catch (error) {
 		throw new sseException.SseException('from service');
@@ -41,8 +41,8 @@ const deleteListener = function (id) {
 */
 const sendInfoToListeners = function (action, info) {
 	try {
-		logger.info('## SSE Speaker Speaks...' + JSON.stringify(info));
 		listener.forEach(listener => listener.res.write(`{action: ${action}, data: ${JSON.stringify(info)}}\n\n`));
+		logger.info('>>> SSE Speaker Speaks...' + JSON.stringify(info));
 	} catch (error) {
 		throw new sseException.SseException('from service');
 	}
