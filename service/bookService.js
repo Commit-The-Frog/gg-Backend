@@ -3,6 +3,8 @@ const verifyException = require('../exception/verifyException');
 const bookRepository = require('../repository/bookRepository');
 const userRepository = require('../repository/userRepository');
 const verifyService = require('../service/verifyService.js');
+const sseService = require('../service/sseService.js');
+var logger = require('../config/logger');
 
 /*	[addBook]
 	해당 기기가 유효한지 검사
@@ -17,6 +19,7 @@ const addBook = async function (userId, start, end, date, type) {
 		var result = await bookRepository.createBook(
 			userId, start, end, date, type
 		);
+		sseService.sendInfoToListeners('ADD', result[0]);
 		return result;
 	} catch (error) {
 		throw error;
@@ -135,7 +138,10 @@ const deleteBookById = async function (userId, bookId) {
 	try {
 		if (!verifyService.isValidId(userId))
 			throw new verifyException.inputFormatError('from service');
+		const targetBook = await bookRepository.findBookById(bookId);
 		await bookRepository.deleteBookById(userId, bookId);
+		logger.info(targetBook[0].type);
+		sseService.sendInfoToListeners("DEL", {"_id": bookId, "type": targetBook[0].type});
 	} catch (error) {
 		throw error;
 	}
