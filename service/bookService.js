@@ -33,7 +33,7 @@ const verifyBook = async function (userId, start, end, date, type) {
 			throw new verifyException.inputFormatError('from service');
 		if (type < 1 || type > 3)
 			throw new bookException.InvalidTypeError('from service');
-		if (start >= end || start > 144 || start < 0 || end > 144 || end < 0)
+		if (start > end || start > 144 || start < 0 || end > 144 || end < 0)
 			throw new bookException.InvalidTimeError('from service');
 		await userRepository.findUserById(userId);
 		var bookOfUserAtTime = await bookRepository.findBookOfUserAtTime(userId, start, end, date);
@@ -81,7 +81,7 @@ const findBookListOfDate = async function (date, type) {
 const findBookListOfUserByTypeAndDate = async function (userId, type, date) {
 	try {
 		if (!verifyService.isValidDate(date) || !verifyService.isValidId(userId)
-			|| !verifyService.isValidNumber(type))
+			|| (type && !verifyService.isValidNumber(type)))
 			throw new verifyException.inputFormatError('from service');
 		await userRepository.findUserById(userId);
 		var bookList;
