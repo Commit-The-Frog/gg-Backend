@@ -3,6 +3,7 @@ const apiGetter = require("../service/authService.js")
 const userRepo = require("../repository/userRepository.js");
 const { UserNotFoundError } = require("../exception/userException.js");
 const searchService = require('./searchService.js');
+const adminService = require('./adminService.js');
 
 /*  [INIT]
 	code 로 42 API 에서 유저 정보 받아옴
@@ -27,6 +28,7 @@ const setUserAndCreateToken = async (code) => {
 		const refreshToken = await jwt.refreshTokenSign(userInfo.id);
 		return ({
 			user_id: userInfo.id,
+			admin: adminService.isAdminUser(userInfo.id),
 			accessToken: accessToken,
 			refreshToken: refreshToken
 		})
