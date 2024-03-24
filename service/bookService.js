@@ -1,9 +1,35 @@
+const dotenv = require("dotenv").config();
 const bookException = require('../exception/bookException');
 const verifyException = require('../exception/verifyException');
 const bookRepository = require('../repository/bookRepository');
 const userRepository = require('../repository/userRepository');
 const verifyService = require('../service/verifyService.js');
 const sseService = require('../service/sseService.js');
+const logger = require('../config/logger.js');
+
+/**
+ * [isValidBook]
+ * start, end시간에 대해서
+ * 유저가 현재 시각부터 남은 슬롯의 개수와
+ * 새로 넣는 start end 시각이 차지하는 슬롯의 개수 합이
+ *
+ */
+async function isValidBook(userId, start, end, date) {
+	const limit_slot = parseInt(process.env.LIMIT_SLOT);
+	var now = new Date();
+	var utc = now.getTime() + now.getTimezoneOffset() * 60000;
+	var newDateTime = new Date(utc + 9 * 3600000);
+	var today = `${newDateTime.getFullYear()}-${(newDateTime.getMonth() + 1).toString().padStart(2, '0')}-${newDateTime.getDate().toString().padStart(2, '0')}`;
+	var curTick = Math.floor((newDateTime.getHours() + newDateTime.getMinutes() / 60) * 2);
+	var userRemainBook = await bookRepository.findBookOfUserAtTime(userId, curTick, 47, today);
+	var userRemainBookTick = 0;
+	userRemainBook.forEach(function(element) {
+		userRemainBookTick += element.end_time - Math.max(element.start_time, curTick) + 1;
+	});
+	logger.info(`### User Remain Book Tick = ${userRemainBookTick}`);
+	if (date != today || curTick > start || end - start + 1 > limit_slot || userRemainBookTick + (end - start + 1) > limit_slot)
+		throw new bookException.InvalidTimeError('from service');
+}
 
 /*	[addBook]
 	해당 기기가 유효한지 검사
@@ -37,6 +63,7 @@ const verifyBook = async function (userId, start, end, date, type) {
 			throw new bookException.InvalidTypeError('from service');
 		if (start > end || start > 144 || start < 0 || end > 144 || end < 0)
 			throw new bookException.InvalidTimeError('from service');
+		await isValidBook(userId, start, end, date);
 		await userRepository.findUserById(userId);
 		var bookOfUserAtTime = await bookRepository.findBookOfUserAtTime(userId, start, end, date);
 		if (bookOfUserAtTime.length > 0)
@@ -68,6 +95,7 @@ const findBookById = async function (bookId) {
 	=> 특정 날짜의 특정 타입으로 모든 예약 목록 조회 */
 const findBookListOfDate = async function (date, type) {
 	try {
+		isValidBook(158010);
 		if (!verifyService.isValidDate(date) || (type && !verifyService.isValidNumber(type)))
 			throw new verifyException.inputFormatError('from service');
 		var bookList = await bookRepository.findBooksAtDate(date, type);
