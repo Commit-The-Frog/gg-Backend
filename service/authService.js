@@ -3,6 +3,7 @@ require('dotenv').config();
 const { AuthorizationCode } = require ('simple-oauth2');
 const authException = require ('../exception/authException');
 const axios = require('axios');
+const logger = require('../config/logger');
 
 async function apiGetter(code) {
 	try {
@@ -18,6 +19,7 @@ async function apiGetter(code) {
 			code: code,
 			redirect_uri: `${process.env.REDIRECT_URI}`
 		});
+		logger.info("### Get Token From API Server");
 		const apiUrl = `${process.env.TOKENHOST}/v2/me`;
 		const response = await axios.get(apiUrl, {
 			headers: {
@@ -25,6 +27,7 @@ async function apiGetter(code) {
 			}});
 		return (response.data);
 	} catch (error){
+		logger.info(`${error}`);
 		throw new authException.ApiInfoGetError("in service");
 	}
 }

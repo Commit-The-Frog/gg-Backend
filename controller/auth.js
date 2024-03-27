@@ -176,6 +176,9 @@ module.exports = router;
  *         user_id:
  *           type: string
  *           example: "158010"
+ *         admin:
+ *           type: string
+ *           example: "true"
  *         accessToken:
  *           type: string
  *           example: "<token>"
@@ -189,6 +192,9 @@ module.exports = router;
  *     TokenSet:
  *       type: object
  *       properties:
+ *         admin:
+ *           type: string
+ *           example: "true"
  *         accessToken:
  *           type: string
  *           example: "<token>"

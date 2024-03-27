@@ -47,6 +47,7 @@ const createNewTokenSet = async (userId, refreshToken) => {
 		const newRefreshToken = await jwt.refreshTokenSign(userId);
 		const newAccessToken = await jwt.accessTokenSign(userId);
 		return ({
+			admin: adminService.isAdminUser(userId),
 			accessToken: newAccessToken,
 			refreshToken: newRefreshToken
 		});

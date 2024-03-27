@@ -8,6 +8,8 @@ var logger = require('../config/logger');
 var verifyService = require('../service/verifyService.js');
 
 const isAdminUser = function (id) {
+	if (!(id instanceof String))
+		id = id.toString();
 	const idArray = process.env.ADMIN_USER_ID_LIST.split(':');
 	if (idArray.includes(id))
 	{

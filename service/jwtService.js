@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
 const createRedisClient = require('./redisService.js');
-const access_secret = process.env.JWT_ACCESS_SECRET;
-const refresh_secret = process.env.JWT_REFRESH_SECRET;
+const common_access_secret = process.env.JWT_ACCESS_SECRET;
+const admin_access_secret = process.env.ADMIN_ACCESS_SECRET;
+const common_refresh_secret = process.env.JWT_REFRESH_SECRET;
+const admin_refresh_secret = process.env.ADMIN_REFRESH_SECRET;
 const jwtException = require('../exception/jwtException.js');
 const logger = require('../config/logger');
 const verifyService = require('../service/verifyService.js');
@@ -18,7 +20,7 @@ const tokenParse = (rawToken) => {
 }
 
 /*	[accessTokenSign]
-	access token의 payload에 user id 입력
+	access token의 payload에 user id, admin 여부 입력
 	access token 발급
 	실패시 TokenSignError
 */
@@ -28,11 +30,13 @@ const accessTokenSign = (userId) => {
 			userId = userId.toString();
 		if (!verifyService.isValidId(userId))
 			throw Error();
-		if (adminService.isAdminUser(userId))
-			return (adminService.accessTokenSign(userId));
+		let access_secret = common_access_secret;
+		let isAdmin = adminService.isAdminUser(userId);
+		if (isAdmin)
+			access_secret = admin_access_secret;
 		const payload = {
 			id: userId,
-			admin: adminService.isAdminUser(userId)
+			admin: isAdmin
 		}
 		const accessToken = jwt.sign(
 			payload,
@@ -61,6 +65,10 @@ const accessTokenVerify = (userId, accessToken) => {
 			throw Error();
 		if (!verifyService.isValidTokenStruct(accessToken))
 			throw Error();
+		let access_secret = common_access_secret;
+		let isAdmin = adminService.isAdminUser(userId);
+		if (isAdmin)
+			access_secret = admin_access_secret;
 		const decoded = jwt.verify(accessToken, access_secret);
 		logger.info("### Access Token Verified");
 		if (decoded.id != userId) {
@@ -74,7 +82,7 @@ const accessTokenVerify = (userId, accessToken) => {
 };
 
 /*	[refreshTokenSign]
-	refresh token의 payload에 user id 입력
+	refresh token의 payload에 user id, admin 여부 입력
 	새로은 refresh token 발급 2주 이후에는 자동 삭제
 	실패시 TokenSignError
 */
@@ -84,8 +92,13 @@ const refreshTokenSign = async (userId) => {
 			userId = userId.toString();
 		if (!verifyService.isValidId(userId))
 			throw Error();
+		let refresh_secret = common_refresh_secret;
+		let isAdmin = adminService.isAdminUser(userId);
+		if (isAdmin)
+			refresh_secret = admin_refresh_secret;
 		const data = jwt.sign({
-			id: userId
+			id: userId,
+			admin: isAdmin
 		}, refresh_secret, {
 			algorithm: 'HS256',
 			expiresIn: '14d',
@@ -125,6 +138,10 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 		refreshToken = tokenParse(refreshToken);
 		if (!verifyService.isValidTokenStruct(refreshToken))
 			throw Error();
+		let refresh_secret = common_refresh_secret;
+		let isAdmin = adminService.isAdminUser(userId);
+		if (isAdmin)
+			refresh_secret = admin_refresh_secret;
 		const decoded = jwt.verify(refreshToken, refresh_secret);
 		logger.info("### Request RT verified");
 		if (decoded.id != userId)
