@@ -24,8 +24,8 @@ const setUserAndCreateToken = async (code) => {
 				throw error;
 			}
 		}
-		const accessToken = await jwt.accessTokenSign(userInfo.id);
-		const refreshToken = await jwt.refreshTokenSign(userInfo.id);
+		const accessToken = await jwt.accessTokenSign(userInfo.id, adminService.isAdminUser(userInfo.id));
+		const refreshToken = await jwt.refreshTokenSign(userInfo.id, adminService.isAdminUser(userInfo.id));
 		return ({
 			user_id: userInfo.id,
 			admin: adminService.isAdminUser(userInfo.id),
@@ -44,8 +44,8 @@ const setUserAndCreateToken = async (code) => {
 const createNewTokenSet = async (userId, refreshToken) => {
 	try {
 		await jwt.refreshTokenVerify(refreshToken, userId);
-		const newRefreshToken = await jwt.refreshTokenSign(userId);
-		const newAccessToken = await jwt.accessTokenSign(userId);
+		const newRefreshToken = await jwt.refreshTokenSign(userId, adminService.isAdminUser(userId));
+		const newAccessToken = await jwt.accessTokenSign(userId, adminService.isAdminUser(userId));
 		return ({
 			admin: adminService.isAdminUser(userId),
 			accessToken: newAccessToken,

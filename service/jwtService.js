@@ -24,19 +24,18 @@ const tokenParse = (rawToken) => {
 	access token 발급
 	실패시 TokenSignError
 */
-const accessTokenSign = (userId) => {
+const accessTokenSign = (userId, admin) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
 		if (!verifyService.isValidId(userId))
 			throw Error();
 		let access_secret = common_access_secret;
-		let isAdmin = adminService.isAdminUser(userId);
-		if (isAdmin)
+		if (admin)
 			access_secret = admin_access_secret;
 		const payload = {
 			id: userId,
-			admin: isAdmin
+			admin: admin
 		}
 		const accessToken = jwt.sign(
 			payload,
@@ -66,15 +65,16 @@ const accessTokenVerify = (userId, accessToken) => {
 		if (!verifyService.isValidTokenStruct(accessToken))
 			throw Error();
 		let access_secret = common_access_secret;
-		let isAdmin = adminService.isAdminUser(userId);
+		let isAdmin = adminService.isAdminUserToken(accessToken);
 		if (isAdmin)
 			access_secret = admin_access_secret;
 		const decoded = jwt.verify(accessToken, access_secret);
 		logger.info(`### Access Token Verified ADMIN : ${isAdmin}`);
 		if (!isAdmin && decoded.id != userId) {
 			throw new Error();
+		} else {
+			logger.info("### Access Token ID Verified");
 		}
-		logger.info("### Access Token ID Verified");
 		return (true);
 	} catch (error) {
 		throw new jwtException.TokenAuthorizeError("from service");
@@ -86,19 +86,18 @@ const accessTokenVerify = (userId, accessToken) => {
 	새로은 refresh token 발급 2주 이후에는 자동 삭제
 	실패시 TokenSignError
 */
-const refreshTokenSign = async (userId) => {
+const refreshTokenSign = async (userId, admin) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
 		if (!verifyService.isValidId(userId))
 			throw Error();
 		let refresh_secret = common_refresh_secret;
-		let isAdmin = adminService.isAdminUser(userId);
-		if (isAdmin)
+		if (admin)
 			refresh_secret = admin_refresh_secret;
 		const data = jwt.sign({
 			id: userId,
-			admin: isAdmin
+			admin: admin
 		}, refresh_secret, {
 			algorithm: 'HS256',
 			expiresIn: '14d',
@@ -139,13 +138,16 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 		if (!verifyService.isValidTokenStruct(refreshToken))
 			throw Error();
 		let refresh_secret = common_refresh_secret;
-		let isAdmin = adminService.isAdminUser(userId);
+		let isAdmin = adminService.isAdminUserToken(refreshToken);
 		if (isAdmin)
 			refresh_secret = admin_refresh_secret;
 		const decoded = jwt.verify(refreshToken, refresh_secret);
 		logger.info(`### Request RT verified ADMIN : ${isAdmin}`);
-		if (!isAdmin && decoded.id != userId)
+		if (!isAdmin && decoded.id != userId) {
 			throw Error();
+		} else {
+			logger.info("### Refresh Token ID Verified");
+		}
 		const redisClient = await createRedisClient();
 		if (await redisClient.sendCommand(['ZSCORE', userId, refreshToken])) { // RT가 있는지 확인
 			logger.info("### Requset RT is not used before");
