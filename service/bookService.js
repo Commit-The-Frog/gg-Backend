@@ -95,7 +95,6 @@ const findBookById = async function (bookId) {
 	=> 특정 날짜의 특정 타입으로 모든 예약 목록 조회 */
 const findBookListOfDate = async function (date, type) {
 	try {
-		isValidBook(158010);
 		if (!verifyService.isValidDate(date) || (type && !verifyService.isValidNumber(type)))
 			throw new verifyException.inputFormatError('from service');
 		var bookList = await bookRepository.findBooksAtDate(date, type);
