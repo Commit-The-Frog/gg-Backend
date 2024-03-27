@@ -70,8 +70,8 @@ const accessTokenVerify = (userId, accessToken) => {
 		if (isAdmin)
 			access_secret = admin_access_secret;
 		const decoded = jwt.verify(accessToken, access_secret);
-		logger.info("### Access Token Verified");
-		if (decoded.id != userId) {
+		logger.info(`### Access Token Verified ADMIN : ${isAdmin}`);
+		if (!isAdmin && decoded.id != userId) {
 			throw new Error();
 		}
 		logger.info("### Access Token ID Verified");
@@ -143,8 +143,8 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 		if (isAdmin)
 			refresh_secret = admin_refresh_secret;
 		const decoded = jwt.verify(refreshToken, refresh_secret);
-		logger.info("### Request RT verified");
-		if (decoded.id != userId)
+		logger.info(`### Request RT verified ADMIN : ${isAdmin}`);
+		if (!isAdmin && decoded.id != userId)
 			throw Error();
 		const redisClient = await createRedisClient();
 		if (await redisClient.sendCommand(['ZSCORE', userId, refreshToken])) { // RT가 있는지 확인
