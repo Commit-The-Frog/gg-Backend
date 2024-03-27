@@ -35,7 +35,7 @@ const findBookById = async function (bookId) {
 				}
 			},
 			{
-				$lookup: 
+				$lookup:
 				{
 					from : "users",
 					localField: "user_id",
@@ -69,7 +69,7 @@ const findBooksByUserIdAndTypeAndDate = async function (userId, type, date) {
 				}
 			},
 			{
-				$lookup: 
+				$lookup:
 				{
 					from : "users",
 					localField: "user_id",
@@ -100,7 +100,7 @@ const findBooksByUserIdAndDate = async function (userId, date) {
 				}
 			},
 			{
-				$lookup: 
+				$lookup:
 				{
 					from : "users",
 					localField: "user_id",
@@ -133,7 +133,7 @@ const findBooksByUserId = async function (userId, type) {
 					}
 				},
 				{
-					$lookup: 
+					$lookup:
 					{
 						from : "users",
 						localField: "user_id",
@@ -152,7 +152,7 @@ const findBooksByUserId = async function (userId, type) {
 					}
 				},
 				{
-					$lookup: 
+					$lookup:
 					{
 						from : "users",
 						localField: "user_id",
@@ -166,7 +166,7 @@ const findBooksByUserId = async function (userId, type) {
 		return result;
 	} catch (error) {
 		throw new Exception("from repository");
-	} 
+	}
 };
 
 // READ books by date and type
@@ -184,7 +184,7 @@ const findBooksAtDate = async function (date, type) {
 					}
 				},
 				{
-					$lookup: 
+					$lookup:
 					{
 						from : "users",
 						localField: "user_id",
@@ -202,7 +202,7 @@ const findBooksAtDate = async function (date, type) {
 					}
 				},
 				{
-					$lookup: 
+					$lookup:
 					{
 						from : "users",
 						localField: "user_id",
@@ -225,8 +225,8 @@ const findBookAtTime = async function (type, start, end, date) {
 		var result = await Book.find({
 			$and : [
 				{ type: type },
-				{ start_time : { $lt : end } },
-				{ end_time : { $gt : start }},
+				{ start_time : { $lte : end } },
+				{ end_time : { $gte : start }},
 				{ date : date }
 			]
 		});
@@ -243,8 +243,8 @@ const findBookOfUserAtTime = async function (userId, start, end, date) {
 		var result = await Book.find({
 			$and : [
 				{ user_id : userId },
-				{ start_time : { $lt : end } },
-				{ end_time : { $gt : start }},
+				{ start_time : { $lte : end } },
+				{ end_time : { $gte : start }},
 				{ date : date }
 			]
 		});
@@ -259,7 +259,7 @@ const findBookOfUserAtTime = async function (userId, start, end, date) {
 const updateBookById = async function (userId, bookId, start, end, date, type) {
 	try {
 		const filter = { _id : ObjectId.createFromHexString(bookId) };
-		const update = { 
+		const update = {
 			start_time : start,
 			end_time : end,
 			date : date,
