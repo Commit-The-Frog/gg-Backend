@@ -26,15 +26,15 @@ var logger = require('../config/logger');
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/tournamentPlayers'
+ *               $ref: '#/components/schemas/Tournament'
  *       '500':
- *         description: InternalServerError
- *  */
+ *         description: GetAllParticipantsInfoError
+ *
+ */
 /* GET users listing. */
 router.get('/', async function (req, res, next) {
 	try {
-		let result;
-		result = tournamentService.getAllTournamentInfo(req.headers.authorization);
+		const result = await tournamentService.getAllTournamentInfo(req.headers.authorization, 1);
 		res.status(200).send(result);
 	} catch(error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
@@ -48,12 +48,12 @@ router.get('/', async function (req, res, next) {
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Users
+ *       - Tournament
  *     summary: insert vote info
  *     description: insert vote info
  *     operationId: insertVote
  *     parameters:
- *       - vote: name
+ *       - name: vote
  *         in: query
  *         description: number of player to vote
  *         required: true
@@ -63,16 +63,14 @@ router.get('/', async function (req, res, next) {
  *     responses:
  *       '200':
  *         description: successful operation
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
+ *       '400':
+ *         description: VoteAlreadyExist, ParticipantNotExist
  *       '500':
- *         description: InternalServerError
+ *         description: VoteInsertError
  */
 router.post('/', async function (req, res, next) {
 	try {
-		tournamentService.postVoteInfo(req.headers.authorization, req.query.vote);
+		await tournamentService.postVoteInfo(req.headers.authorization, req.query.vote, 1);
 		res.status(200).send();
 	} catch(error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
@@ -80,6 +78,7 @@ router.post('/', async function (req, res, next) {
 })
 
 module.exports = router;
+
 /**
  * @swagger
  * components:
@@ -127,4 +126,42 @@ module.exports = router;
  *       type: string
  *       properties:
  *         userName
+ *     Tournament:
+ *       type: object
+ *       properties:
+ *         players:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               tournament_participant_id:
+ *                 type: integer
+ *                 example: 1
+ *               team_name:
+ *                 type: string
+ *                 example: Team A
+ *               club_name:
+ *                 type: string
+ *                 example: Club X
+ *               preliminary_rank:
+ *                 type: integer
+ *                 example: 1
+ *               tactic:
+ *                 type: string
+ *                 example: 4-3-3
+ *               favorite_coach:
+ *                 type: string
+ *                 example: Coach John
+ *               career:
+ *                 type: string
+ *                 example: 10 years of experience
+ *               tournament_id:
+ *                 type: integer
+ *                 example: 1
+ *               message:
+ *                 type: string
+ *                 example: Message 1
+ *         vote:
+ *           type: integer
+ *           example: 3
  */

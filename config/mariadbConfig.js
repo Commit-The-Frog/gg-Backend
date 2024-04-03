@@ -1,6 +1,6 @@
 // mariadbConfig.js
 const mariadb = require('mariadb');
-const { MARIADB_HOST, MARIADB_PORT, MARIADB_USER } = process.env;
+const { MARIADB_HOST, MARIADB_PORT, MARIADB_USER, MARIADB_PASS } = process.env;
 
 const pool = mariadb.createPool({
     host: MARIADB_HOST,
