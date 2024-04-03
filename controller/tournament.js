@@ -158,6 +158,9 @@ module.exports = router;
  *               tournament_id:
  *                 type: integer
  *                 example: 1
+ *               bracket_pos:
+ *                 type: integer
+ *                 example: 3
  *               message:
  *                 type: string
  *                 example: Message 1
