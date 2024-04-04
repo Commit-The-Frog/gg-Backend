@@ -30,6 +30,7 @@ const getTournamentParticipantExist = async function (tournament_participant_id,
         result = await connection.query(`
             SELECT id FROM tournament_participant
             WHERE id = ${tournament_participant_id}
+            AND bracket_pos IS NOT NULL
             AND tournament_id = ${tournament_id};
         `);
         if (!result[0])
