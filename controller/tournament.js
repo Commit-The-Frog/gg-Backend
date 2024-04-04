@@ -137,6 +137,9 @@ module.exports = router;
  *               tournament_participant_id:
  *                 type: integer
  *                 example: 1
+ *               intra_id:
+ *                 type: string
+ *                 example: minjacho
  *               team_name:
  *                 type: string
  *                 example: Team A
@@ -146,7 +149,7 @@ module.exports = router;
  *               preliminary_rank:
  *                 type: integer
  *                 example: 1
- *               tactic:
+ *               formation:
  *                 type: string
  *                 example: 4-3-3
  *               favorite_coach:
@@ -164,6 +167,9 @@ module.exports = router;
  *               message:
  *                 type: string
  *                 example: Message 1
+ *               logo_img:
+ *                 type: string
+ *                 example: img.jpg
  *         vote:
  *           type: integer
  *           example: 3
