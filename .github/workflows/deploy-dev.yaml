@@ -1,8 +1,8 @@
-name: Deploy Level42 Backend
+name: Deploy Level42 Dev Backend
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
 
 jobs:
   deploy:
@@ -15,11 +15,11 @@ jobs:
     - name: Set up SSH key
       uses: webfactory/ssh-agent@v0.5.0
       with:
-        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+        ssh-private-key: ${{ secrets.DEV_EC2_SSH_KEY }}
 
     - name: Deploy to EC2
       env:
-        HOST: ${{ secrets.EC2_HOST }}
-        USERNAME: ${{ secrets.EC2_USERNAME }}
+        HOST: ${{ secrets.DEV_EC2_HOST }}
+        USERNAME: ${{ secrets.DEV_EC2_USERNAME }}
         DEPLOY_COMMAND: ${{ secrets.DEPLOY_COMMAND }}
       run: ssh -o StrictHostKeyChecking=no $USERNAME@$HOST "${DEPLOY_COMMAND}"
