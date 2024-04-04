@@ -1,7 +1,7 @@
 const { User } = require('../config/mongodbConfig');
 const Exception = require('../exception/exception');
-var userException = require('../exception/userException');
-var logger = require('../config/logger');
+const userException = require('../exception/userException');
+const logger = require('../config/logger');
 
 // CREATE user
 const addUser = async function (userId, name, displayName, profileImg) {
@@ -67,7 +67,7 @@ const updateUserById = async function (userId, name, displayName, profileImg) {
 			displayname : displayName,
 			profile_img : profileImg
 		}
-		var user = await User.findOne({ user_id : userId });
+		let user = await User.findOne({ user_id : userId });
 		await User.updateOne(filter, update);
 		user = await User.findOne({ user_id : userId });
 		logger.info(`### user updated from DB : [${user.name}, ${user.user_id}]`);
@@ -80,7 +80,7 @@ const updateUserById = async function (userId, name, displayName, profileImg) {
 // DELETE user by id
 const deleteUserById = async function (userId) {
 	try {
-		var user = await User.findOne({ user_id : userId });
+		let user = await User.findOne({ user_id : userId });
 		await User.deleteOne({ user_id : userId });
 		logger.info(`### user deleted from DB : [${user.name}, ${user.user_id}]`);
 		return user;

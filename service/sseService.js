@@ -1,5 +1,5 @@
-var logger = require('../config/logger');
-var sseException = require('../exception/sseException');
+const logger = require('../config/logger');
+const sseException = require('../exception/sseException');
 const verifyService = require('../service/verifyService.js');
 
 let listener = [];

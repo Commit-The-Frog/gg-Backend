@@ -1,6 +1,6 @@
 const app = require('../app.js');
-var mongoose = require('mongoose');
-var logger = require('../config/logger');
+const mongoose = require('mongoose');
+const logger = require('../config/logger');
 
 const { MONGO_PORT, MONGO_URI } = process.env;
 
