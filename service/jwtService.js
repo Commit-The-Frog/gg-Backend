@@ -66,6 +66,7 @@ const accessTokenVerify = (userId, accessToken) => {
 			throw Error();
 		let access_secret = common_access_secret;
 		let isAdmin = adminService.isAdminUserToken(accessToken);
+		logger.info(`### Access Token Payload : ${isAdmin}`);
 		if (isAdmin)
 			access_secret = admin_access_secret;
 		const decoded = jwt.verify(accessToken, access_secret);
@@ -103,7 +104,7 @@ const refreshTokenSign = async (userId, admin) => {
 			expiresIn: '14d',
 		})
 		const redisClient = await createRedisClient();
-		const tokenScore = Date.now() / 1000;
+		const tokenScore = Date.now();
 		await redisClient.sendCommand(['ZADD', userId, tokenScore.toString(), data]); // userId set에 새로운 RT 추가
 		logger.info("### Refresh Token Saved In Redis");
 		const tokenLength = await redisClient.sendCommand(['ZCARD', userId]);
@@ -186,6 +187,7 @@ const refreshTokenDelete = async (userId, refreshToken) => {
 }
 
 module.exports = {
+	tokenParse,
 	accessTokenSign,
 	accessTokenVerify,
 	refreshTokenSign,

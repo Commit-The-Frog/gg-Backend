@@ -12,6 +12,7 @@ var usersRouter = require('./controller/users');
 var authRouter = require('./controller/auth');
 var bookRouter = require('./controller/book');
 var sseRouter = require('./controller/sse');
+var tournamentRouter = require('./controller/tournament');
 const cors = require('cors');
 
 // CORS 미들웨어 추가
@@ -34,6 +35,7 @@ app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/books', bookRouter);
 app.use('/sse', sseRouter);
+app.use('/tournament', tournamentRouter);
 
 // swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
