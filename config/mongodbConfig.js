@@ -1,6 +1,6 @@
 const app = require('../app.js');
-var mongoose = require('mongoose');
-var logger = require('../config/logger');
+const mongoose = require('mongoose');
+const logger = require('../config/logger');
 
 const { MONGO_PORT, MONGO_URI } = process.env;
 
@@ -17,6 +17,7 @@ const connectMongoDB = function () {
 const userSchema = new mongoose.Schema({
 	user_id : { type : String, required: true, unique : true },
 	name : { type : String, required: true, unique : true },
+	displayname : { type : String, required: false },
 	profile_img : { type : String, required: false }
 },
 {

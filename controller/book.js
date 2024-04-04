@@ -1,6 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var bookService = require('../service/bookService');
+const express = require('express');
+const router = express.Router();
+const bookService = require('../service/bookService');
 
 /**
  * @swagger
@@ -49,7 +49,7 @@ var bookService = require('../service/bookService');
  */
 router.get('/:userId/list', async function(req, res, next) {
 	try {
-		var bookList = await bookService.findBookListOfUserByTypeAndDate(
+		let bookList = await bookService.findBookListOfUserByTypeAndDate(
 			req.params.userId,
 			req.query.type,
 			req.query.date
@@ -96,7 +96,7 @@ router.get('/:userId/list', async function(req, res, next) {
  */
 router.get('/:userId/history', async function(req, res, next) {
 	try {
-		var bookList = await bookService.findBookListOfUser(
+		let bookList = await bookService.findBookListOfUser(
 			req.params.userId,
 			req.query.type
 		);
@@ -140,7 +140,7 @@ router.get('/:userId/history', async function(req, res, next) {
  */
 router.get('/', async function(req, res, next) {
 	try {
-		var bookList = await bookService.findBookListOfDate(
+		let bookList = await bookService.findBookListOfDate(
 			req.query.date,
 			req.query.type
 		);
@@ -177,7 +177,7 @@ router.get('/', async function(req, res, next) {
  */
 router.get('/:bookId', async function (req, res, next) {
 	try {
-		var bookList = await bookService.findBookById(
+		let bookList = await bookService.findBookById(
 			req.params.bookId
 		);
 		res.status(200).send(bookList);
@@ -222,7 +222,7 @@ router.get('/:bookId', async function (req, res, next) {
  */
 router.post('/', async function(req, res, next) {
 	try {
-		var book = await bookService.addBook(
+		let book = await bookService.addBook(
 			req.query.userId,
 			req.body.start,
 			req.body.end,
@@ -277,7 +277,7 @@ router.post('/', async function(req, res, next) {
  */
 router.patch('/', async function (req, res, next) {
 	try {
-		var book = await bookService.updateBookById(
+		let book = await bookService.updateBookById(
 			req.query.userId,
 			req.query.bookId,
 			req.body.start,

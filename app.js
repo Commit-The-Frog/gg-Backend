@@ -1,21 +1,22 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var dotenv = require('dotenv').config();
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const dotenv = require('dotenv').config();
 const { connectMongoDB } = require('./config/mongodbConfig');
 const { swaggerUi, specs } = require('./swagger/swagger');
 
-var indexRouter = require('./controller/index');
-var usersRouter = require('./controller/users');
-var authRouter = require('./controller/auth');
-var bookRouter = require('./controller/book');
-var sseRouter = require('./controller/sse');
+const indexRouter = require('./controller/index');
+const usersRouter = require('./controller/users');
+const authRouter = require('./controller/auth');
+const bookRouter = require('./controller/book');
+const sseRouter = require('./controller/sse');
+const tournamentRouter = require('./controller/tournament');
 const cors = require('cors');
 
 // CORS 미들웨어 추가
-var app = express();
+const app = express();
 
 app.use(cors());
 // view engine setup
@@ -34,6 +35,7 @@ app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/books', bookRouter);
 app.use('/sse', sseRouter);
+app.use('/tournament', tournamentRouter);
 
 // swagger
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));

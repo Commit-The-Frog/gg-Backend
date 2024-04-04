@@ -1,6 +1,35 @@
+const dotenv = require("dotenv").config();
 const bookException = require('../exception/bookException');
+const verifyException = require('../exception/verifyException');
 const bookRepository = require('../repository/bookRepository');
 const userRepository = require('../repository/userRepository');
+const verifyService = require('../service/verifyService.js');
+const sseService = require('../service/sseService.js');
+const logger = require('../config/logger.js');
+
+/**
+ * [isValidBook]
+ * start, end시간에 대해서
+ * 유저가 현재 시각부터 남은 슬롯의 개수와
+ * 새로 넣는 start end 시각이 차지하는 슬롯의 개수 합이
+ *
+ */
+async function isValidBook(userId, start, end, date) {
+	const limit_slot = parseInt(process.env.LIMIT_SLOT);
+	let now = new Date();
+	let utc = now.getTime() + now.getTimezoneOffset() * 60000;
+	let newDateTime = new Date(utc + 9 * 3600000);
+	let today = `${newDateTime.getFullYear()}-${(newDateTime.getMonth() + 1).toString().padStart(2, '0')}-${newDateTime.getDate().toString().padStart(2, '0')}`;
+	let curTick = Math.floor((newDateTime.getHours() + newDateTime.getMinutes() / 60) * 2);
+	let userRemainBook = await bookRepository.findBookOfUserAtTime(userId, curTick, 47, today);
+	let userRemainBookTick = 0;
+	userRemainBook.forEach(function(element) {
+		userRemainBookTick += element.end_time - Math.max(element.start_time, curTick) + 1;
+	});
+	logger.info(`### User Remain Book Tick = ${userRemainBookTick}`);
+	if (date != today || curTick > start || end - start + 1 > limit_slot || userRemainBookTick + (end - start + 1) > limit_slot)
+		throw new bookException.InvalidTimeError('from service');
+}
 
 /*	[addBook]
 	해당 기기가 유효한지 검사
@@ -12,9 +41,10 @@ const userRepository = require('../repository/userRepository');
 const addBook = async function (userId, start, end, date, type) {
 	try {
 		await verifyBook(userId, start, end, date, type);
-		var result = await bookRepository.createBook(
+		let result = await bookRepository.createBook(
 			userId, start, end, date, type
 		);
+		sseService.sendInfoToListeners('ADD', result[0]);
 		return result;
 	} catch (error) {
 		throw error;
@@ -25,15 +55,20 @@ const addBook = async function (userId, start, end, date, type) {
 	=> 유효한 예약인지 검사 */
 const verifyBook = async function (userId, start, end, date, type) {
 	try {
+		if (!verifyService.isValidDate(date) || !verifyService.isValidId(userId)
+			|| !verifyService.isValidNumber(start) || !verifyService.isValidNumber(end)
+			|| (type && !verifyService.isValidNumber(type)))
+			throw new verifyException.inputFormatError('from service');
 		if (type < 1 || type > 3)
 			throw new bookException.InvalidTypeError('from service');
-		if (start >= end || start > 144 || start < 0 || end > 144 || end < 0)
+		if (start > end || start > 144 || start < 0 || end > 144 || end < 0)
 			throw new bookException.InvalidTimeError('from service');
+		await isValidBook(userId, start, end, date);
 		await userRepository.findUserById(userId);
-		var bookOfUserAtTime = await bookRepository.findBookOfUserAtTime(userId, start, end, date);
+		let bookOfUserAtTime = await bookRepository.findBookOfUserAtTime(userId, start, end, date);
 		if (bookOfUserAtTime.length > 0)
 			throw new bookException.BookTimeConfilctError('from service');
-		var bookList = await bookRepository.findBookAtTime(
+		let bookList = await bookRepository.findBookAtTime(
 			type,start,end,date
 		);
 		if (bookList.length > 0)
@@ -47,7 +82,7 @@ const verifyBook = async function (userId, start, end, date, type) {
 	=> 예약 id로 단일 예약 정보 조회 */
 const findBookById = async function (bookId) {
 	try {
-		var book = await bookRepository.findBookById(bookId);
+		let book = await bookRepository.findBookById(bookId);
 		if (book === null)
 			throw new bookException.BookNotFoundError("from service");
 		return book;
@@ -60,7 +95,9 @@ const findBookById = async function (bookId) {
 	=> 특정 날짜의 특정 타입으로 모든 예약 목록 조회 */
 const findBookListOfDate = async function (date, type) {
 	try {
-		var bookList = await bookRepository.findBooksAtDate(date, type);
+		if (!verifyService.isValidDate(date) || (type && !verifyService.isValidNumber(type)))
+			throw new verifyException.inputFormatError('from service');
+		let bookList = await bookRepository.findBooksAtDate(date, type);
 		return bookList;
 	} catch (error) {
 		throw error;
@@ -72,8 +109,11 @@ const findBookListOfDate = async function (date, type) {
 	=> 유저의 예약 목록 조회 (특정 날짜의 특정 타입) */
 const findBookListOfUserByTypeAndDate = async function (userId, type, date) {
 	try {
+		if (!verifyService.isValidDate(date) || !verifyService.isValidId(userId)
+			|| (type && !verifyService.isValidNumber(type)))
+			throw new verifyException.inputFormatError('from service');
 		await userRepository.findUserById(userId);
-		var bookList;
+		let bookList;
 		if (type) {
 			bookList = await bookRepository.findBooksByUserIdAndTypeAndDate(userId, type, date);
 		}
@@ -91,8 +131,10 @@ const findBookListOfUserByTypeAndDate = async function (userId, type, date) {
 	=> 해당 유저의 특정 타입으로 모든 예약 목록 조회 */
 const findBookListOfUser = async function (userId, type) {
 	try {
+		if (!verifyService.isValidId(userId) || (type && !verifyService.isValidNumber(type)))
+			throw new verifyException.inputFormatError('from service');
 		await userRepository.findUserById(userId);
-		var bookList = await bookRepository.findBooksByUserId(userId, type);
+		let bookList = await bookRepository.findBooksByUserId(userId, type);
 		return bookList;
 	} catch (error) {
 		throw error;
@@ -104,6 +146,10 @@ const findBookListOfUser = async function (userId, type) {
 	=> 해당 유저의 해당 예약 id로 예약 정보 수정 */
 const updateBookById = async function (userId, bookId, start, end, date, type) {
 	try {
+		if (!verifyService.isValidDate(date) || !verifyService.isValidId(userId)
+		|| !verifyService.isValidNumber(start) || !verifyService.isValidNumber(end)
+		|| (type && !verifyService.isValidNumber(type)))
+			throw new verifyException.inputFormatError('from service');
 		await verifyBook(userId, start, end, date, type);
 		return await bookRepository.updateBookById(userId, bookId, start, end, date, type);
 	} catch (error) {
@@ -116,7 +162,11 @@ const updateBookById = async function (userId, bookId, start, end, date, type) {
 	=> 해당 유저의 해당 예약 id로 예약 정보 삭제 */
 const deleteBookById = async function (userId, bookId) {
 	try {
+		if (!verifyService.isValidId(userId))
+			throw new verifyException.inputFormatError('from service');
+		const targetBook = await bookRepository.findBookById(bookId);
 		await bookRepository.deleteBookById(userId, bookId);
+		sseService.sendInfoToListeners("DEL", {"_id": bookId, "type": targetBook[0].type});
 	} catch (error) {
 		throw error;
 	}

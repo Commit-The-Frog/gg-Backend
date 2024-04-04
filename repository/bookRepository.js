@@ -2,14 +2,14 @@ const { Book } = require('../config/mongodbConfig');
 const { User } = require('../config/mongodbConfig');
 const Exception = require('../exception/exception');
 const bookException = require('../exception/bookException');
-var logger = require('../config/logger');
+const logger = require('../config/logger');
 const { UserNotFoundError } = require('../exception/userException');
 const {ObjectId} = require('mongodb');
 
 // CREATE book
 const createBook = async function (userId, start, end, date, type) {
 	try {
-		var result = await Book.create({
+		let result = await Book.create({
 			user_id : userId,
 			start_time : start,
 			end_time : end,
@@ -27,7 +27,7 @@ const createBook = async function (userId, start, end, date, type) {
 const findBookById = async function (bookId) {
 	try {
 		bookId = ObjectId.createFromHexString(bookId);
-		var result = await Book.aggregate([
+		let result = await Book.aggregate([
 			{
 				$match:
 				{
@@ -35,7 +35,7 @@ const findBookById = async function (bookId) {
 				}
 			},
 			{
-				$lookup: 
+				$lookup:
 				{
 					from : "users",
 					localField: "user_id",
@@ -59,7 +59,7 @@ const findBookById = async function (bookId) {
 const findBooksByUserIdAndTypeAndDate = async function (userId, type, date) {
 	try {
 		type = parseInt(type);
-		var result = await Book.aggregate([
+		let result = await Book.aggregate([
 			{
 				$match:
 				{
@@ -69,7 +69,7 @@ const findBooksByUserIdAndTypeAndDate = async function (userId, type, date) {
 				}
 			},
 			{
-				$lookup: 
+				$lookup:
 				{
 					from : "users",
 					localField: "user_id",
@@ -100,7 +100,7 @@ const findBooksByUserIdAndDate = async function (userId, date) {
 				}
 			},
 			{
-				$lookup: 
+				$lookup:
 				{
 					from : "users",
 					localField: "user_id",
@@ -122,7 +122,7 @@ const findBooksByUserIdAndDate = async function (userId, date) {
 // READ books by userId and type
 const findBooksByUserId = async function (userId, type) {
 	try {
-		var result;
+		let result;
 		if (type) {
 			result = await Book.aggregate([
 				{
@@ -133,7 +133,7 @@ const findBooksByUserId = async function (userId, type) {
 					}
 				},
 				{
-					$lookup: 
+					$lookup:
 					{
 						from : "users",
 						localField: "user_id",
@@ -152,7 +152,7 @@ const findBooksByUserId = async function (userId, type) {
 					}
 				},
 				{
-					$lookup: 
+					$lookup:
 					{
 						from : "users",
 						localField: "user_id",
@@ -166,13 +166,13 @@ const findBooksByUserId = async function (userId, type) {
 		return result;
 	} catch (error) {
 		throw new Exception("from repository");
-	} 
+	}
 };
 
 // READ books by date and type
 const findBooksAtDate = async function (date, type) {
 	try {
-		var result;
+		let result;
 		type = parseInt(type);
 		if (type) {
 			result = await Book.aggregate([
@@ -184,7 +184,7 @@ const findBooksAtDate = async function (date, type) {
 					}
 				},
 				{
-					$lookup: 
+					$lookup:
 					{
 						from : "users",
 						localField: "user_id",
@@ -202,7 +202,7 @@ const findBooksAtDate = async function (date, type) {
 					}
 				},
 				{
-					$lookup: 
+					$lookup:
 					{
 						from : "users",
 						localField: "user_id",
@@ -222,11 +222,11 @@ const findBooksAtDate = async function (date, type) {
 // READ books by type and start/end time
 const findBookAtTime = async function (type, start, end, date) {
 	try {
-		var result = await Book.find({
+		let result = await Book.find({
 			$and : [
 				{ type: type },
-				{ start_time : { $lt : end } },
-				{ end_time : { $gt : start }},
+				{ start_time : { $lte : end } },
+				{ end_time : { $gte : start }},
 				{ date : date }
 			]
 		});
@@ -240,11 +240,11 @@ const findBookAtTime = async function (type, start, end, date) {
 // READ books of user at time
 const findBookOfUserAtTime = async function (userId, start, end, date) {
 	try {
-		var result = await Book.find({
+		let result = await Book.find({
 			$and : [
 				{ user_id : userId },
-				{ start_time : { $lt : end } },
-				{ end_time : { $gt : start }},
+				{ start_time : { $lte : end } },
+				{ end_time : { $gte : start }},
 				{ date : date }
 			]
 		});
@@ -259,16 +259,16 @@ const findBookOfUserAtTime = async function (userId, start, end, date) {
 const updateBookById = async function (userId, bookId, start, end, date, type) {
 	try {
 		const filter = { _id : ObjectId.createFromHexString(bookId) };
-		const update = { 
+		const update = {
 			start_time : start,
 			end_time : end,
 			date : date,
 			type : type
 		};
-		var user = await User.findOne({ user_id : userId });
+		let user = await User.findOne({ user_id : userId });
 		if (user === null)
 			throw new UserNotFoundError('from repository');
-		var result = await Book.updateOne(filter, update);
+		let result = await Book.updateOne(filter, update);
 		if (result.modifiedCount == 0)
 			throw new bookException.BookNotFoundError('from repository');
 		logger.info(`### book of user updated from DB`);
@@ -285,10 +285,10 @@ const updateBookById = async function (userId, bookId, start, end, date, type) {
 const deleteBookById = async function (userId, bookId) {
 	try {
 		bookId = ObjectId.createFromHexString(bookId);
-		var user = await User.findOne({ user_id : userId });
+		let user = await User.findOne({ user_id : userId });
 		if (user === null)
 			throw new UserNotFoundError('from repository');
-		var result = await Book.deleteOne({
+		let result = await Book.deleteOne({
 			_id : bookId,
 			user_id: userId
 		});

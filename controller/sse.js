@@ -1,7 +1,7 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const sseService = require('../service/sseService.js');
-var logger = require('../config/logger');
+const logger = require('../config/logger');
 
 /**
  * @swagger
@@ -35,13 +35,12 @@ var logger = require('../config/logger');
 /* listing events by subscribe */
 router.get('/subscribe', async function (req, res, next) {
 	try {
-		const id = Date.now() + '.' + req.query.userId;
-		sseService.addListener(id, res);
+		const id = sseService.addListener(req.query.userId, res);
 		req.on('close', function () {
 			sseService.deleteListener(id);
 		});
 	} catch (error) {
-		throw error;
+		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 })
 
@@ -75,11 +74,12 @@ router.post('/speaker', async function (req, res, next) {
 		sseService.sendInfoToListeners(req.body);
 		res.send(req.body);
 	} catch (error) {
-		throw error;
+		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 })
 
 module.exports = router;
+
 
 /**
  * @swagger
@@ -97,6 +97,9 @@ module.exports = router;
  *         name:
  *           type: string
  *           example: "minjacho"
+ *         displayname:
+ *           type: string
+ *           example: "MinJae Choi"
  *         profile_img:
  *           type: string
  *           example: "https://cdn.intra.42.fr/users/1bf8948249e8d63a265c19b793c62bc9/small_minjacho.jpg"
@@ -126,3 +129,4 @@ module.exports = router;
  *       properties:
  *         userName
  */
+

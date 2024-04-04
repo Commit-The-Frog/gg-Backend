@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const userService = require('../service/userService.js');
 const searchService = require('../service/searchService.js');
-var logger = require('../config/logger');
+const logger = require('../config/logger');
 
 /**
  * @swagger
@@ -62,9 +62,7 @@ router.get('/', async function (req, res, next) {
 		} else if (req.query.name) {
 			result = await userService.getOneUserInfoByName(req.query.name);
 		} else if (req.query.pattern) {
-			result = await searchService.findUserNameByPatternInRedis(req.query.pattern + '*');
-		} else {
-			result = await userService.getUsersInfo();
+			result = await searchService.findUserNameByPatternInRedis(req.query.pattern);
 		}
 		res.status(200).send(result);
 	} catch(error) {
@@ -129,6 +127,9 @@ module.exports = router;
  *         name:
  *           type: string
  *           example: "minjacho"
+ *         displayname:
+ *           type: string
+ *           example: "MinJae Choi"
  *         profile_img:
  *           type: string
  *           example: "https://cdn.intra.42.fr/users/1bf8948249e8d63a265c19b793c62bc9/small_minjacho.jpg"

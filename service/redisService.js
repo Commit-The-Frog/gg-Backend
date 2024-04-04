@@ -1,6 +1,6 @@
 const dotenv = require("dotenv").config();
 const redis = require('redis');
-var logger = require('../config/logger');
+const logger = require('../config/logger');
 
 async function createRedisClient() {
     return new Promise((resolve, reject) => {

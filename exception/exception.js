@@ -1,4 +1,4 @@
-var logger = require('../config/logger');
+const logger = require('../config/logger');
 
 class Exception extends Error {
 	constructor(message) {
