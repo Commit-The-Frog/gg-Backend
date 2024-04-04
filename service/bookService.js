@@ -16,13 +16,13 @@ const logger = require('../config/logger.js');
  */
 async function isValidBook(userId, start, end, date) {
 	const limit_slot = parseInt(process.env.LIMIT_SLOT);
-	var now = new Date();
-	var utc = now.getTime() + now.getTimezoneOffset() * 60000;
-	var newDateTime = new Date(utc + 9 * 3600000);
-	var today = `${newDateTime.getFullYear()}-${(newDateTime.getMonth() + 1).toString().padStart(2, '0')}-${newDateTime.getDate().toString().padStart(2, '0')}`;
-	var curTick = Math.floor((newDateTime.getHours() + newDateTime.getMinutes() / 60) * 2);
-	var userRemainBook = await bookRepository.findBookOfUserAtTime(userId, curTick, 47, today);
-	var userRemainBookTick = 0;
+	let now = new Date();
+	let utc = now.getTime() + now.getTimezoneOffset() * 60000;
+	let newDateTime = new Date(utc + 9 * 3600000);
+	let today = `${newDateTime.getFullYear()}-${(newDateTime.getMonth() + 1).toString().padStart(2, '0')}-${newDateTime.getDate().toString().padStart(2, '0')}`;
+	let curTick = Math.floor((newDateTime.getHours() + newDateTime.getMinutes() / 60) * 2);
+	let userRemainBook = await bookRepository.findBookOfUserAtTime(userId, curTick, 47, today);
+	let userRemainBookTick = 0;
 	userRemainBook.forEach(function(element) {
 		userRemainBookTick += element.end_time - Math.max(element.start_time, curTick) + 1;
 	});
@@ -41,7 +41,7 @@ async function isValidBook(userId, start, end, date) {
 const addBook = async function (userId, start, end, date, type) {
 	try {
 		await verifyBook(userId, start, end, date, type);
-		var result = await bookRepository.createBook(
+		let result = await bookRepository.createBook(
 			userId, start, end, date, type
 		);
 		sseService.sendInfoToListeners('ADD', result[0]);
@@ -65,10 +65,10 @@ const verifyBook = async function (userId, start, end, date, type) {
 			throw new bookException.InvalidTimeError('from service');
 		await isValidBook(userId, start, end, date);
 		await userRepository.findUserById(userId);
-		var bookOfUserAtTime = await bookRepository.findBookOfUserAtTime(userId, start, end, date);
+		let bookOfUserAtTime = await bookRepository.findBookOfUserAtTime(userId, start, end, date);
 		if (bookOfUserAtTime.length > 0)
 			throw new bookException.BookTimeConfilctError('from service');
-		var bookList = await bookRepository.findBookAtTime(
+		let bookList = await bookRepository.findBookAtTime(
 			type,start,end,date
 		);
 		if (bookList.length > 0)
@@ -82,7 +82,7 @@ const verifyBook = async function (userId, start, end, date, type) {
 	=> 예약 id로 단일 예약 정보 조회 */
 const findBookById = async function (bookId) {
 	try {
-		var book = await bookRepository.findBookById(bookId);
+		let book = await bookRepository.findBookById(bookId);
 		if (book === null)
 			throw new bookException.BookNotFoundError("from service");
 		return book;
@@ -97,7 +97,7 @@ const findBookListOfDate = async function (date, type) {
 	try {
 		if (!verifyService.isValidDate(date) || (type && !verifyService.isValidNumber(type)))
 			throw new verifyException.inputFormatError('from service');
-		var bookList = await bookRepository.findBooksAtDate(date, type);
+		let bookList = await bookRepository.findBooksAtDate(date, type);
 		return bookList;
 	} catch (error) {
 		throw error;
@@ -113,7 +113,7 @@ const findBookListOfUserByTypeAndDate = async function (userId, type, date) {
 			|| (type && !verifyService.isValidNumber(type)))
 			throw new verifyException.inputFormatError('from service');
 		await userRepository.findUserById(userId);
-		var bookList;
+		let bookList;
 		if (type) {
 			bookList = await bookRepository.findBooksByUserIdAndTypeAndDate(userId, type, date);
 		}
@@ -134,7 +134,7 @@ const findBookListOfUser = async function (userId, type) {
 		if (!verifyService.isValidId(userId) || (type && !verifyService.isValidNumber(type)))
 			throw new verifyException.inputFormatError('from service');
 		await userRepository.findUserById(userId);
-		var bookList = await bookRepository.findBooksByUserId(userId, type);
+		let bookList = await bookRepository.findBooksByUserId(userId, type);
 		return bookList;
 	} catch (error) {
 		throw error;

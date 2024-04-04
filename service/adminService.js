@@ -1,5 +1,5 @@
 require('dotenv').config();
-var logger = require('../config/logger');
+const logger = require('../config/logger');
 const jwt = require('jsonwebtoken');
 
 const isAdminUser = function (id) {

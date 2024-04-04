@@ -1,8 +1,8 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 const userService = require('../service/userService.js');
 const searchService = require('../service/searchService.js');
-var logger = require('../config/logger');
+const logger = require('../config/logger');
 
 /**
  * @swagger

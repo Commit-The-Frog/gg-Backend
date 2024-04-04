@@ -1,8 +1,8 @@
 const logger = require('../config/logger');
 const userRepository = require('../repository/userRepository');
 const createRedisClient = require('./redisService.js');
-var userException = require('../exception/userException');
-var verifyService = require('../service/verifyService.js');
+const userException = require('../exception/userException');
+const verifyService = require('../service/verifyService.js');
 
 /*
 [findUserNameByPatternInRedis]

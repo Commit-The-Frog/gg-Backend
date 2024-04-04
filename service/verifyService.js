@@ -1,4 +1,4 @@
-var logger = require('../config/logger');
+const logger = require('../config/logger');
 
 const isValidId = function (input) {
 	if (!(input instanceof String))
