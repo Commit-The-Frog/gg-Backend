@@ -6,6 +6,7 @@ async function createRedisClient() {
     return new Promise((resolve, reject) => {
         const client = redis.createClient({
             socket: {
+                host: process.env.REDIS_HOST,
                 port: process.env.REDIS_PORT
             }
         });
