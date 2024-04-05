@@ -70,10 +70,12 @@ const getAllParticipantsInfo = async function () {
     try {
         connection = await mariadbPool.getConnection();
         const query = `
-            SELECT ftpi.tournament_participant_id, tp.name, ftpi.team_name, ftpi.club_name, ftpi.preliminary_rank, ftpi.formation, ftpi.favorite_coach, ftpi.career, tp.tournament_id, tp.bracket_pos, tp.message, ftpi.logo_img
-            FROM tournament_participant AS tp
-            INNER JOIN fifa_tournament_participant_info AS ftpi
+            SELECT ftpi.tournament_participant_id, tp.name, ftpi.team_name, ftpi.club_name, ftpi.preliminary_rank, ftpi.formation, ftpi.favorite_coach, ftpi.career, tp.tournament_id, tp.bracket_pos, tp.message, ftpi.logo_img, user.profile_img
+            FROM fifa_tournament_participant_info AS ftpi
+            INNER JOIN tournament_participant AS tp
             ON tp.id = ftpi.tournament_participant_id
+            INNER JOIN user
+            ON tp.user_id = user.id
             WHERE tp.bracket_pos IS NOT NULL;
         `;
         results = await connection.query(query);
