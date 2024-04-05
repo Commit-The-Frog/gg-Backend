@@ -4,7 +4,7 @@ class TokenAuthorizeError extends Exception {
 	constructor(from) {
 		super(from);
 		this.name = "TokenAuthorizeError";
-		this.status = 402;
+		this.status = 401;
 		this.logger();
 	}
 }
