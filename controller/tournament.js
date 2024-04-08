@@ -65,6 +65,8 @@ router.get('/', async function (req, res, next) {
  *         description: successful operation
  *       '400':
  *         description: VoteAlreadyExist, ParticipantNotExist
+ *       '420':
+ *         description: VoteTimeOut
  *       '500':
  *         description: VoteInsertError
  */
@@ -173,4 +175,7 @@ module.exports = router;
  *         vote:
  *           type: integer
  *           example: 3
+ *         fin:
+ *           type: boolean
+ *           example: false
  */
