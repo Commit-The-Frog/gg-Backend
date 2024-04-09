@@ -1,6 +1,7 @@
 const mariadbPool = require('../config/mariadbConfig');
 const logger = require('../config/logger');
 const tournamentException = require('../exception/tournamentException');
+const userRepository = require('./userRepository');
 
 const insertVote = async function (user_id, tournament_participant_id, tournament_id) {
     let connection;
@@ -10,7 +11,8 @@ const insertVote = async function (user_id, tournament_participant_id, tournamen
         const exist = await getVoteIdByUserId(user_id, tournament_id);
         if (exist)
             throw new tournamentException.VoteAlreadyExist('In Repository');
-        await connection.query(`INSERT INTO vote (user_id, tournament_participant_id, tournament_id) VALUES (${user_id}, ${tournament_participant_id}, ${tournament_id})`);
+        const user_info = await userRepository.findUserById(user_id);
+        await connection.query(`INSERT INTO vote (user_id, name, tournament_participant_id, tournament_id) VALUES (${user_id}, '${user_info.name}', ${tournament_participant_id}, ${tournament_id})`);
         logger.info("### Successfully inserted vote");
     } catch (error) {
         logger.info("### Failed to insert vote");
