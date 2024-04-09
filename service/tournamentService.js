@@ -5,6 +5,7 @@ const jwtService = require('../service/jwtService');
 const verifyService = require('../service/verifyService.js');
 const limitDate = new Date(process.env.LIMIT_VOTE_TIME);
 const tournamentException = require('../exception/tournamentException.js');
+const verifyException = require('../exception/verifyException.js');
 
 const getAllTournamentInfo = async function (token, tournament_id) {
 	let participantsInfo;
@@ -14,8 +15,10 @@ const getAllTournamentInfo = async function (token, tournament_id) {
 		const parsedToken = jwtService.tokenParse(token);
 		const tokenPayload = jwt.decode(parsedToken);
 		jwtService.accessTokenVerify(tokenPayload.id, token);
-		verifyService.isValidId(tokenPayload.id);
-		verifyService.isValidId(tournament_id);
+		if (!verifyService.isValidId(tokenPayload.id))
+			throw new verifyException.inputFormatError('in service');
+		if (!verifyService.isValidId(tournament_id))
+			throw new verifyException.inputFormatError('in service');
 		userVote = await tournamentRepository.getVoteIdByUserId(tokenPayload.id, tournament_id);
 	} catch (error) {
 		if (error.name != 'TokenAuthorizeError')
@@ -36,9 +39,12 @@ const postVoteInfo = async function (token, vote_id, tournament_id) {
 		const parsedToken = jwtService.tokenParse(token);
 		const tokenPayload = jwt.decode(parsedToken);
 		jwtService.accessTokenVerify(tokenPayload.id, token);
-		verifyService.isValidId(tokenPayload.id);
-		verifyService.isValidId(vote_id);
-		verifyService.isValidId(tournament_id);
+		if (!verifyService.isValidId(tokenPayload.id))
+			throw new verifyException.inputFormatError('in service');
+		if (!verifyService.isValidId(vote_id))
+			throw new verifyException.inputFormatError('in service');
+		if (!verifyService.isValidId(tournament_id))
+			throw new verifyException.inputFormatError('in service');
 		await tournamentRepository.insertVote(tokenPayload.id, vote_id, tournament_id);
 	} catch (error) {
 		throw error;
@@ -55,7 +61,21 @@ const checkRequestTime = async () => {
 	}
 }
 
+const getVoteUserByParticipantId = async (tournament_participant_id, tournament_id) => {
+	try {
+		if (!verifyService.isValidId(tournament_participant_id))
+			throw new verifyException.inputFormatError('in service');
+		if (!verifyService.isValidId(tournament_id))
+			throw new verifyException.inputFormatError('in service');
+		const results = await tournamentRepository.getVoteUserByParticipantId(tournament_participant_id, tournament_id);
+		return results;
+	} catch (error) {
+		throw error;
+	}
+}
+
 module.exports = {
 	getAllTournamentInfo,
-	postVoteInfo
+	postVoteInfo,
+	getVoteUserByParticipantId
 }
