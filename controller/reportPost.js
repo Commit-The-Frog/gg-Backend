@@ -19,18 +19,22 @@ const reportPostService = require('../service/reportPostService');
  *       summary: 신고 생성
  *       parameters:
  *         - name: data
- *           in: path
+ *           in: query
  *           description: 고장접수 정보(base64)
  *           required: true
  *           schema:
  *             type: string
  */
-router.post('/' , async (req, res, next) => {
-	console.log('[log]' + req.query.data);
-	const result = await reportPostService.addReport(
-		req.query.data
-	);
-	res.send(result);
+router.post('/', async (req, res, next) => {
+	try {
+		const result = await reportPostService.addReport(
+			req.query.data
+		);
+		console.log(result);
+		res.send(result);
+	} catch (error) {
+		res.send('error');
+	}
 });
 
 module.exports = router;
