@@ -12,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: "https://" + process.env.IP + ':' + process.env.PORT, // 요청 URL
+        url: "http://" + process.env.IP + ':' + process.env.PORT, // 요청 URL
       },
     ],
   },
