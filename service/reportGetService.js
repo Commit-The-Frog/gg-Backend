@@ -9,12 +9,11 @@ const getDeviceListByType = async (type) => {
 		if (!verifyService.isValidId(type))
 			throw new verifyException.inputFormatError('in service');
 		deviceList = await reportGetRepository.getDeviceListByConsoleId(type);
-	} catch (error) {
-		throw error;
-	} finally {
 		return ({
 			"devices" : deviceList
 		});
+	} catch (error) {
+		throw error;
 	}
 }
 
@@ -24,17 +23,20 @@ const getMultipleListByControllerType = async (type) => {
 	let btn_malf_type_list;
 	try {
 		malf_type_list = await reportGetRepository.getMalfunctionTypeList();
+		if (!verifyService.isValidName(type))
+			throw new verifyException.inputFormatError('in service');
+		await reportGetRepository.isDeviceIdExist(type);
 		type = type.substring(0, 2);
+		await reportGetRepository.isControllerButtonTableExist(type);
 		btn_list = await reportGetRepository.getControllerButtonTypeList(type);
 		btn_malf_type_list = await reportGetRepository.getButtonMalfunctionTypeList();
-	} catch (error) {
-		throw error;
-	} finally {
 		return ({
 			"malf_type_list" : malf_type_list,
 			"btn_list" : btn_list,
 			"btn_malf_type_list" : btn_malf_type_list,
 		});
+	} catch (error) {
+		throw error;
 	}
 }
 

@@ -81,6 +81,15 @@ class DeviceIdNotExistError extends Exception {
 	}
 };
 
+class ControllerButtonTableNotExist extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'ControllerButtonTableNotExist';
+		this.status = 400;
+		this.logger();
+	}
+};
+
 module.exports = {
 	GetConsoleListError,
 	GetDeviceListError,
@@ -90,5 +99,6 @@ module.exports = {
 	GetControllerButtonTypeListError,
 	GetButtonMalfunctionTypeListError,
 	InsertButtonMalfunctionTypeListError,
-	DeviceIdNotExistError
+	DeviceIdNotExistError,
+	ControllerButtonTableNotExist
 };

@@ -196,6 +196,27 @@ const isDeviceIdExist = async (id) => {
 	}
 }
 
+const isControllerButtonTableExist = async (table_name) => {
+	let connection;
+	try {
+		connection = await mariadbPool.getConnection();
+		const query = `
+			SELECT table_name FROM information_schema.tables
+			WHERE table_schema = '${process.env.MARIADB_DATABASE}'
+			AND table_name = '${'controller_button_type_' + table_name}';
+		`;
+		const result = await connection.query(query);
+		if (!result.length)
+			throw Error();
+		logger.info(`### ${'controller_button_type_' + table_name} TABLE EXIST`);
+	} catch (error) {
+		logger.info("### ${'controller_button_type_' + table_name} TABLE DOESN'T EXIST");
+		throw new reportGetException.ControllerButtonTableNotExist('In Repository');
+	} finally {
+		if (connection) connection.release();
+	}
+}
+
 module.exports = {
 	getConsoleList,
 	getDeviceListByConsoleId,
@@ -206,5 +227,6 @@ module.exports = {
 	insertMalfunctionType,
 	insertButtonMalfunctionType,
 	updateDeviceStatus,
-	isDeviceIdExist
+	isDeviceIdExist,
+	isControllerButtonTableExist
 };
