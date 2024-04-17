@@ -207,7 +207,7 @@ router.post('/testButtonMalfunctionType', async (req, res, next) => {
  *         required: false
  *         explode: false
  *         schema:
- *           type: string
+ *           type: int
  *     responses:
  *       '200':
  *         description: 다양한 리스트 받음

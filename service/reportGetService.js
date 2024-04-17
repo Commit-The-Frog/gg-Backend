@@ -75,7 +75,7 @@ const insertButtonMalfunctionType = async (name, description) => {
 const updateDeviceStatus = async (id, status) => {
 	try {
 		if (!verifyService.isValidName(id) ||
-			!verifyService.isValidName(status))
+			!verifyService.isValidId(status))
 			throw new verifyException.inputFormatError('in service');
 		await reportGetRepository.isDeviceIdExist(id);
 		await reportGetRepository.updateDeviceStatus(id, status);
