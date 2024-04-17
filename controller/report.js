@@ -39,7 +39,7 @@ router.post('/', async (req, res, next) => {
 		console.log(result);
 		res.send(result);
 	} catch (error) {
-		res.send('error');
+		res.status(500).send('error');
 	}
 });
 
@@ -61,12 +61,68 @@ router.get('/', async (req, res, next) => {
 		console.log('[CONTROLLER] all reports searched');
 		res.send(result);
 	} catch (error) {
-		res.send('error');
+		res.status(200).send('error');
 	}
 })
 
-// !!!!!!!!!!!!!!!!!!!!!!신고 상태 업데이트 필요!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!신고 삭제 필요!!!!!!!!!!!!!!!!!!!!!!
+/**
+ * @swagger
+ * paths:
+ *   /reports:
+ *     patch:
+ *       tags:
+ *         - Report
+ *       summary: (관리자) 신고 상태 업데이트
+ *       parameters:
+ *         - name: id
+ *           in: query
+ *           description: 업데이트할 신고 id
+ *         - name: status
+ *           in: query
+ *           description: 상태 정보 (접수됨 0 | 수리중 1 | 완료 2)
+ *       responses:
+ *         '200':
+ *           description: 업데이트 성공
+ */
+router.patch('/', async (req, res, next) => {
+	try {
+		await reportPostService.changeReportStatus(
+			req.query.id,
+			req.query.status
+		);
+		console.log('[CONTROLLER] updated status');
+		res.status(200).send();
+	} catch (error) {
+		res.status(500).send('error');
+	}
+})
+
+/**
+ * @swagger
+ * paths:
+ *   /reports:
+ *     delete:
+ *       tags:
+ *         - Report
+ *       summary: (관리자) 신고 삭제
+ *       parameters:
+ *         - name: id
+ *           in: query
+ *           description: 삭제할 신고 id
+ *       responses:
+ *         '200':
+ *           description: 업데이트 성공
+ */
+router.delete('/', async (req, res, next) => {
+	try {
+		await reportPostService.removeReport(req.query.id);
+		console.log('[CONTROLLER] deleted report');
+		res.status(200).send();
+	} catch (error) {
+		res.status(500).send('error');
+	}
+})
+
 
 /**
  * @swagger

@@ -1,4 +1,7 @@
 const reportPostRepository = require('../repository/reportPostRepository');
+const reportGetService = require('./reportGetService');
+const {DeviceStatus} = require('../config/enum');
+const { error } = require('winston');
 
 /** 
  * [addReport]
@@ -13,8 +16,8 @@ const addReport = async (encodedReq) => {
 	try {
 		const decodedString = Buffer.from(encodedReq, 'base64').toString('utf-8');
 		const obj = JSON.parse(decodedString);
+		await reportGetService.updateDeviceStatus(obj.device, DeviceStatus.MALFUNCTION);
 		console.log('decoding & json parsing success');
-		console.log(obj);
 		return await reportPostRepository.createReport(
 			obj.console_type,
 			obj.device,
@@ -42,7 +45,45 @@ const findAllReport = async () => {
 	}
 }
 
+/**
+ * [changeReportStatus]
+ * 신고 상태를 변경
+ */
+const changeReportStatus = async (id, status) => {
+	try {
+		// find device by report id
+		const report = reportPostRepository.findReportById(id);
+		// update device status
+		reportGetService.updateDeviceStatus(report.device, status);
+		// update report status
+		const result = await reportPostRepository.updateReportStatus(id, status);
+		if (result.modifiedCount === 0)
+			throw error;
+		console.log('[SERVICE] updated status');
+	} catch (error) {
+		throw error;
+	}
+}
+
+/**
+ * [removeReport]
+ * 신고 삭제
+ */
+const removeReport = async (id) => {
+	try {
+		const result = await reportPostRepository.deleteReport(id);
+		console.log(result);
+		if (result.deletedCount === 0)
+			throw error;
+		console.log('[SERVICE] deleted status');
+	} catch (error) {
+		throw error;
+	}
+}
+
 module.exports = {
 	addReport,
-	findAllReport
+	findAllReport,
+	changeReportStatus,
+	removeReport
 };
