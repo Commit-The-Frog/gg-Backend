@@ -12,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://" + process.env.IP + ':' + process.env.PORT, // 요청 URL
+        url: process.env.SWAGGER_HOST, // 요청 URL
       },
     ],
   },
