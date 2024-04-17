@@ -91,12 +91,10 @@ router.get('/', async (req, res, next) => {
  *
  */
 
-const reportGetRepository = require('../repository/reportGetRepository');
-
 router.post('/testDevice', async (req, res, next) => {
 	let result;
 	try {
-		reportGetRepository.addDevice(req.query.id, req.query.console_id, req.query.status)
+		await reportGetService.insertDevice(req.query.id, req.query.console_id, req.query.status)
 		res.status(200).send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
@@ -138,7 +136,7 @@ router.post('/testDevice', async (req, res, next) => {
 router.post('/testMalfunctionType', async (req, res, next) => {
 	let result;
 	try {
-		reportGetRepository.addMalfunctionType(req.query.name, req.query.description);
+		await reportGetService.insertMalfunctionType(req.query.name, req.query.description);
 		res.status(200).send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
@@ -180,7 +178,48 @@ router.post('/testMalfunctionType', async (req, res, next) => {
 router.post('/testButtonMalfunctionType', async (req, res, next) => {
 	let result;
 	try {
-		reportGetRepository.addButtonMalfunctionType(req.query.name, req.query.description);
+		await reportGetService.insertButtonMalfunctionType(req.query.name, req.query.description);
+		res.status(200).send(result);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+})
+
+/**
+ * @swagger
+ * /report/testUpdateDeviceStatus:
+ *   patch:
+ *     summary: testUpdateDeviceStatus
+ *     description: testUpdateDeviceStatus
+ *     operationId: patchtestUpdateDeviceStatus
+ *     tags: [report]
+ *     parameters:
+ *       - name: id
+ *         in: query
+ *         description: id
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *       - name: status
+ *         in: query
+ *         description: status
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: 다양한 리스트 받음
+ *       '500':
+ *         description: InternalServerError
+ *
+ */
+
+router.patch('/testUpdateDeviceStatus', async (req, res, next) => {
+	let result;
+	try {
+		await reportGetService.updateDeviceStatus(req.query.id, req.query.status);
 		res.status(200).send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");

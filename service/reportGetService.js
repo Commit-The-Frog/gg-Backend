@@ -38,7 +38,55 @@ const getMultipleListByControllerType = async (type) => {
 	}
 }
 
+const insertDevice = async (id, console_id, status) => {
+	try {
+		if (!verifyService.isValidId(console_id) ||
+			!verifyService.isValidName(id) ||
+			!verifyService.isValidName(status))
+			throw new verifyException.inputFormatError('in service');
+		await reportGetRepository.insertDevice(id, console_id, status);
+	} catch (error) {
+		throw error;
+	}
+}
+
+const insertMalfunctionType = async (name, description) => {
+	try {
+		if (!verifyService.isValidName(name))
+			throw new verifyException.inputFormatError('in service');
+		await reportGetRepository.insertMalfunctionType(name, description);
+	} catch (error) {
+		throw error;
+	}
+}
+
+const insertButtonMalfunctionType = async (name, description) => {
+	try {
+		if (!verifyService.isValidName(name))
+			throw new verifyException.inputFormatError('in service');
+		await reportGetRepository.insertButtonMalfunctionType(name, description);
+	} catch (error) {
+		throw error;
+	}
+}
+
+const updateDeviceStatus = async (id, status) => {
+	try {
+		if (!verifyService.isValidName(id) ||
+			!verifyService.isValidName(status))
+			throw new verifyException.inputFormatError('in service');
+		await reportGetRepository.isDeviceIdExist(id);
+		await reportGetRepository.updateDeviceStatus(id, status);
+	} catch (error) {
+		throw error;
+	}
+}
+
 module.exports = {
 	getDeviceListByType,
-	getMultipleListByControllerType
+	getMultipleListByControllerType,
+	insertDevice,
+	insertMalfunctionType,
+	insertButtonMalfunctionType,
+	updateDeviceStatus
 }

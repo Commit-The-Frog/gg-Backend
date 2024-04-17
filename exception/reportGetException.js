@@ -18,10 +18,28 @@ class GetDeviceListError extends Exception {
 	}
 };
 
+class InsertDeviceListError extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'InsertDeviceListError';
+		this.status = 500;
+		this.logger();
+	}
+};
+
 class GetMalfunctionTypeListError extends Exception {
 	constructor(message) {
 		super(message);
 		this.name = 'GetMalfunctionTypeListError';
+		this.status = 500;
+		this.logger();
+	}
+};
+
+class InsertMalfunctionTypeListError extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'InsertMalfunctionTypeListError';
 		this.status = 500;
 		this.logger();
 	}
@@ -45,11 +63,32 @@ class GetButtonMalfunctionTypeListError extends Exception {
 	}
 };
 
+class InsertButtonMalfunctionTypeListError extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'InsertButtonMalfunctionTypeListError';
+		this.status = 500;
+		this.logger();
+	}
+};
+
+class DeviceIdNotExistError extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'DeviceIdNotExistError';
+		this.status = 400;
+		this.logger();
+	}
+};
 
 module.exports = {
 	GetConsoleListError,
 	GetDeviceListError,
+	InsertDeviceListError,
 	GetMalfunctionTypeListError,
+	InsertMalfunctionTypeListError,
 	GetControllerButtonTypeListError,
-	GetButtonMalfunctionTypeListError
+	GetButtonMalfunctionTypeListError,
+	InsertButtonMalfunctionTypeListError,
+	DeviceIdNotExistError
 };
