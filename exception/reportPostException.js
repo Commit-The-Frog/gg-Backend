@@ -9,7 +9,16 @@ class DeviceIsUnderRepairError extends Exception {
 	}
 }
 
+class ReportNotFoundError extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'ReportNotFoundError';
+		this.status = 404;
+		this.logger();
+	}
+}
+
 module.exports = {
 	DeviceIsUnderRepairError,
-	
+	ReportNotFoundError
 }

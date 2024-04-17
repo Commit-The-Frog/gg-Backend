@@ -51,7 +51,6 @@ const updateReportStatus = async (id, status) => {
 		const filter = { _id : id };
 		const update = { status : status };
 		const result = await Report.updateOne(filter, update);
-		console.log('[REPO] updated status');
 		return result;
 	} catch (error) {
 		throw error;
@@ -63,7 +62,6 @@ const deleteReport = async (id) => {
 	try {
 		id = ObjectId.createFromHexString(id);
 		const result = await Report.deleteOne({ _id : id });
-		console.log('[REPO] deleted status');
 		return result;
 	} catch (error) {
 		throw error;

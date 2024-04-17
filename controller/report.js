@@ -36,7 +36,6 @@ router.post('/', async (req, res, next) => {
 		const result = await reportPostService.addReport(
 			req.query.data
 		);
-		console.log(result);
 		res.send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || 'InternalServerError');
@@ -58,7 +57,6 @@ router.post('/', async (req, res, next) => {
 router.get('/', async (req, res, next) => {
 	try {
 		const result = await reportPostService.findAllReport();
-		console.log('[CONTROLLER] all reports searched');
 		res.send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || 'InternalServerError');
@@ -90,8 +88,7 @@ router.patch('/', async (req, res, next) => {
 			req.query.id,
 			req.query.status
 		);
-		console.log('[CONTROLLER] updated status');
-		res.status(200).send();
+		res.status(200).send('successfully updated report status');
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || 'InternalServerError');
 	}
@@ -116,8 +113,7 @@ router.patch('/', async (req, res, next) => {
 router.delete('/', async (req, res, next) => {
 	try {
 		await reportPostService.removeReport(req.query.id);
-		console.log('[CONTROLLER] deleted report');
-		res.status(200).send();
+		res.status(200).send('successfully deleted report');
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || 'InternalServerError');
 	}

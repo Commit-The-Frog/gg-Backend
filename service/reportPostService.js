@@ -2,6 +2,7 @@ const reportPostRepository = require('../repository/reportPostRepository');
 const reportGetService = require('./reportGetService');
 const {DeviceStatus} = require('../config/enum');
 const { error } = require('winston');
+const reportPostException = require('../exception/reportPostException');
 
 /** 
  * [addReport]
@@ -18,7 +19,8 @@ const addReport = async (encodedReq) => {
 		const decodedString = Buffer.from(encodedReq, 'base64').toString('utf-8');
 		const obj = JSON.parse(decodedString);
 		// if device is already under repair
-
+		if (await reportGetService.getDeviceStatus(obj.device) != DeviceStatus.NORMAL)
+			throw new reportPostException.DeviceIsUnderRepairError('from service');
 		// update device status
 		await reportGetService.updateDeviceStatus(obj.device, DeviceStatus.MALFUNCTION);
 		// add report
@@ -55,14 +57,15 @@ const findAllReport = async () => {
 const changeReportStatus = async (id, status) => {
 	try {
 		// find device by report id
-		const report = reportPostRepository.findReportById(id);
+		const report = await reportPostRepository.searchReportById(id);
+		if (!report)
+			throw new reportPostException.ReportNotFoundError('from service');
 		// update device status
-		reportGetService.updateDeviceStatus(report.device, status);
+		await reportGetService.updateDeviceStatus(report.device, status);
 		// update report status
 		const result = await reportPostRepository.updateReportStatus(id, status);
 		if (result.modifiedCount === 0)
-			throw error;
-		console.log('[SERVICE] updated status');
+			throw Exception;
 	} catch (error) {
 		throw error;
 	}
@@ -75,10 +78,8 @@ const changeReportStatus = async (id, status) => {
 const removeReport = async (id) => {
 	try {
 		const result = await reportPostRepository.deleteReport(id);
-		console.log(result);
 		if (result.deletedCount === 0)
-			throw error;
-		console.log('[SERVICE] deleted status');
+			throw Exception;
 	} catch (error) {
 		throw error;
 	}
