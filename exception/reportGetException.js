@@ -119,5 +119,6 @@ module.exports = {
 	InsertButtonMalfunctionTypeListError,
 	DeviceIdNotExistError,
 	ControllerButtonTableNotExist,
-	DeleteDeviceError
+	DeleteDeviceError,
+	getDeviceStatusError
 };
