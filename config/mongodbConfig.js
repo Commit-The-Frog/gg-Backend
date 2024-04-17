@@ -42,12 +42,29 @@ const bookSchema = new mongoose.Schema({
 	timestamps: true
 });
 
+// Define Scehma : report
+const reportSchema = new mongoose.Schema({
+	console_type : { type : String, required: true },
+	device : { type : String, required: true },
+	malf_type : { type : String , required: true },
+	controller_btn_malf_list : [{
+		btn_type : { type : String, required: true },
+		btn_malf_type : { type : String, required: true }
+	}],
+	etc_description : { type : String, required: true }
+},
+{
+	timestamps : true
+});
+
 // Create Models
 const User = mongoose.model('user', userSchema);
 const Book = mongoose.model('book', bookSchema);
+const Report = mongoose.model('report', reportSchema);
 
 module.exports = {
 	connectMongoDB,
 	User,
-	Book
+	Book,
+	Report
 };
