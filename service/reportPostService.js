@@ -14,10 +14,14 @@ const { error } = require('winston');
  */
 const addReport = async (encodedReq) => {
 	try {
+		// decode and JSON parse
 		const decodedString = Buffer.from(encodedReq, 'base64').toString('utf-8');
 		const obj = JSON.parse(decodedString);
+		// if device is already under repair
+
+		// update device status
 		await reportGetService.updateDeviceStatus(obj.device, DeviceStatus.MALFUNCTION);
-		console.log('decoding & json parsing success');
+		// add report
 		return await reportPostRepository.createReport(
 			obj.console_type,
 			obj.device,
@@ -38,7 +42,6 @@ const addReport = async (encodedReq) => {
 const findAllReport = async () => {
 	try {
 		const result = await reportPostRepository.searchAllReport();
-		console.log ('[SERVICE] all reports searched');
 		return result;
 	} catch (error) {
 		throw error;
