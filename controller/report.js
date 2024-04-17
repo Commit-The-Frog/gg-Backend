@@ -1,100 +1,100 @@
 const express = require('express');
 const router = express.Router();
-const reportGetService = require('../service/reportGetService.js');
+const reportPostService = require('../service/reportPostService');
+const reportGetService = require('../service/reportGetService');
 
 /**
  * @swagger
  * tags:
- *   name: report
- *   description: report 관련 API
+ *   name: Report
+ *   description: Report 관련 API
  */
 
 /**
  * @swagger
- * /report:
- *   get:
- *     summary: Report Format Info Get
- *     description: Report Format Info Get
- *     operationId: getReportInfo
- *     tags: [report]
- *     parameters:
- *       - name: console_type
- *         in: query
- *         description: get device list by console type
- *         required: false
- *         explode: false
- *         schema:
- *           type: string
- *       - name: device
- *         in: query
- *         description: get list compound by device
- *         required: false
- *         explode: false
- *         schema:
- *           type: string
- *     responses:
- *       '200':
- *         description: 다양한 리스트 받음
- *       '500':
- *         description: InternalServerError
- *
+ * paths:
+ *   /reports:
+ *     post:
+ *       tags:
+ *         - Report
+ *       summary: (사용자) 신고 생성
+ *       parameters:
+ *         - name: data
+ *           in: query
+ *           description: 고장접수 정보(base64)
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         '200':
+ *           description: 접수 성공
+ *         '500':
+ *           description: 서버 에러
+ */
+router.post('/', async (req, res, next) => {
+	try {
+		const result = await reportPostService.addReport(
+			req.query.data
+		);
+		console.log(result);
+		res.send(result);
+	} catch (error) {
+		res.send('error');
+	}
+});
+
+/**
+ * @swagger
+ * paths:
+ *   /reports:
+ *     get:
+ *       tags:
+ *         - Report
+ *       summary: (관리자) 신고 목록 조회
+ *       responses:
+ *         '200':
+ *           description: 조회 성공
  */
 router.get('/', async (req, res, next) => {
-	let result;
 	try {
-		if (req.query.console_type) {
-			result = await reportGetService.getDeviceListByType(req.query.console_type);
-		} else if (req.query.device) {
-			result = await reportGetService.getMultipleListByControllerType(req.query.device);
-		}
-		res.status(200).send(result);
+		const result = await reportPostService.findAllReport();
+		console.log('[CONTROLLER] all reports searched');
+		res.send(result);
 	} catch (error) {
-		res.status(error.status || 500).send(error.name || "InternalServerError");
+		res.send('error');
 	}
 })
 
+// !!!!!!!!!!!!!!!!!!!!!!신고 상태 업데이트 필요!!!!!!!!!!!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!신고 삭제 필요!!!!!!!!!!!!!!!!!!!!!!
+
 /**
  * @swagger
- * /report/testDevice:
- *   post:
- *     summary: testDevice
- *     description: testDevice
- *     operationId: postReportInfo
- *     tags: [report]
+ * /reports/types:
+ *   get:
+ *     summary: 신고를 위한 고장 유형과 버튼 매핑 받기
+ *     description: 고장 유형 + 버튼 정보 + 버튼 고장 유형
+ *     operationId: getReportInfo
+ *     tags: [Report]
  *     parameters:
- *       - name: id
+ *       - name: device
  *         in: query
- *         description: id
- *         required: false
- *         explode: false
- *         schema:
- *           type: string
- *       - name: console_id
- *         in: query
- *         description: console_id
- *         required: false
- *         explode: false
- *         schema:
- *           type: string
- *       - name: status
- *         in: query
- *         description: status
- *         required: false
- *         explode: false
+ *         description: 고장 유형와 버튼 매핑 정보 받을 디바이스 ex) np1, xc1 ...
+ *         required: true
+ *         explode: true
  *         schema:
  *           type: string
  *     responses:
  *       '200':
- *         description: 다양한 리스트 받음
+ *         description: 디바이스에 해당하는 선택지 리스트 받음
  *       '500':
  *         description: InternalServerError
  *
  */
-
-router.post('/testDevice', async (req, res, next) => {
+router.get('/types', async (req, res, next) => {
 	let result;
 	try {
-		await reportGetService.insertDevice(req.query.id, req.query.console_id, req.query.status)
+		result = await reportGetService.getMultipleListByControllerType(req.query.device);
 		res.status(200).send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
@@ -103,12 +103,12 @@ router.post('/testDevice', async (req, res, next) => {
 
 /**
  * @swagger
- * /report/testMalfunctionType:
+ * /reports/testMalfunctionType:
  *   post:
  *     summary: testMalfunctionType
  *     description: testMalfunctionType
  *     operationId: posttestMalfunctionType
- *     tags: [report]
+ *     tags: [Report]
  *     parameters:
  *       - name: name
  *         in: query
@@ -145,12 +145,12 @@ router.post('/testMalfunctionType', async (req, res, next) => {
 
 /**
  * @swagger
- * /report/testButtonMalfunctionType:
+ * /reports/testButtonMalfunctionType:
  *   post:
  *     summary: testButtonMalfunctionType
  *     description: testButtonMalfunctionType
  *     operationId: posttestButtonMalfunctionType
- *     tags: [report]
+ *     tags: [Report]
  *     parameters:
  *       - name: name
  *         in: query
@@ -187,12 +187,12 @@ router.post('/testButtonMalfunctionType', async (req, res, next) => {
 
 /**
  * @swagger
- * /report/testUpdateDeviceStatus:
+ * /reports/testUpdateDeviceStatus:
  *   patch:
  *     summary: testUpdateDeviceStatus
  *     description: testUpdateDeviceStatus
  *     operationId: patchtestUpdateDeviceStatus
- *     tags: [report]
+ *     tags: [Report]
  *     parameters:
  *       - name: id
  *         in: query
@@ -227,7 +227,6 @@ router.patch('/testUpdateDeviceStatus', async (req, res, next) => {
 })
 
 module.exports = router;
-
 /**
  * @swagger
  * components:
