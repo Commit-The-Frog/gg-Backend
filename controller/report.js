@@ -39,7 +39,7 @@ router.post('/', async (req, res, next) => {
 		console.log(result);
 		res.send(result);
 	} catch (error) {
-		res.status(500).send('error');
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
 	}
 });
 
@@ -61,7 +61,7 @@ router.get('/', async (req, res, next) => {
 		console.log('[CONTROLLER] all reports searched');
 		res.send(result);
 	} catch (error) {
-		res.status(200).send('error');
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
 	}
 })
 
@@ -93,7 +93,7 @@ router.patch('/', async (req, res, next) => {
 		console.log('[CONTROLLER] updated status');
 		res.status(200).send();
 	} catch (error) {
-		res.status(500).send('error');
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
 	}
 })
 
@@ -119,7 +119,7 @@ router.delete('/', async (req, res, next) => {
 		console.log('[CONTROLLER] deleted report');
 		res.status(200).send();
 	} catch (error) {
-		res.status(500).send('error');
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
 	}
 })
 
@@ -153,7 +153,7 @@ router.get('/types', async (req, res, next) => {
 		result = await reportGetService.getMultipleListByControllerType(req.query.device);
 		res.status(200).send(result);
 	} catch (error) {
-		res.status(error.status || 500).send(error.name || "InternalServerError");
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
 	}
 })
 

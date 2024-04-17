@@ -15,7 +15,6 @@ const createReport = async (console_type, device, malf_type,
 			etc_description : etc_description,
 			status : ReportStatus.REPORTED
 		});
-		console.log('db insert success');
 		return result;
 	} catch (error) {
 		throw error;
@@ -26,7 +25,6 @@ const createReport = async (console_type, device, malf_type,
 const searchAllReport = async () => {
 	try {
 		const result = await Report.find().sort({createAt:-1});
-		console.log('[REPO] all reports searched');
 		return result;
 	} catch (error) {
 		throw error;
