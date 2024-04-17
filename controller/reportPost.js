@@ -58,7 +58,6 @@ router.get('/', async (req, res, next) => {
 	try {
 		const result = await reportPostService.findAllReport();
 		console.log('[CONTROLLER] all reports searched');
-		console.log(result);
 		res.send(result);
 	} catch (error) {
 		res.send('error');

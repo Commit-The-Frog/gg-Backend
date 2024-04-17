@@ -51,7 +51,8 @@ const reportSchema = new mongoose.Schema({
 		btn_type : { type : String, required: true },
 		btn_malf_type : { type : String, required: true }
 	}],
-	etc_description : { type : String, required: true }
+	etc_description : { type : String, required: true },
+	status : { type : Number, required: true }
 },
 {
 	timestamps : true
