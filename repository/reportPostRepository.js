@@ -3,7 +3,6 @@ const { Report } = require('../config/mongodbConfig');
 // CREATE report
 const createReport = async (console_type, device, malf_type,
 	controller_btn_malf_list, etc_description) => {
-	
 	try {
 		const result = await Report.create({
 			console_type : console_type,
@@ -19,6 +18,18 @@ const createReport = async (console_type, device, malf_type,
 	}
 }
 
+// SEARCH report
+const searchAllReport = async () => {
+	try {
+		const result = await Report.find().sort({createAt:-1});
+		console.log('[REPO] all reports searched');
+		return result;
+	} catch (error) {
+		throw error;
+	}
+}
+
 module.exports = {
-	createReport
+	createReport,
+	searchAllReport
 };

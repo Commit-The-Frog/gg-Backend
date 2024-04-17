@@ -24,6 +24,11 @@ const reportPostService = require('../service/reportPostService');
  *           required: true
  *           schema:
  *             type: string
+ *       responses:
+ *         '200':
+ *           description: 접수 성공
+ *         '500':
+ *           description: 서버 에러 
  */
 router.post('/', async (req, res, next) => {
 	try {
@@ -36,5 +41,28 @@ router.post('/', async (req, res, next) => {
 		res.send('error');
 	}
 });
+
+/**
+ * @swagger
+ * paths:
+ *   /reports:
+ *     get:
+ *       tags:
+ *         - ReportPost
+ *       summary: 신고 목록 조회
+ *       responses:
+ *         '200':
+ *           description: 조회 성공
+ */
+router.get('/', async (req, res, next) => {
+	try {
+		const result = await reportPostService.findAllReport();
+		console.log('[CONTROLLER] all reports searched');
+		console.log(result);
+		res.send(result);
+	} catch (error) {
+		res.send('error');
+	}
+})
 
 module.exports = router;
