@@ -81,16 +81,46 @@ router.get('/', async (req, res, next) => {
  */
 
 router.post('/', async (req, res, next) => {
-	let result;
 	try {
 		await reportGetService.insertDevice(req.query.id, req.query.console_id, req.query.status)
-		res.status(200).send(result);
+		res.status(200);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 })
 
-// 삭제 만들어야됨.
+/**
+ * @swagger
+ * /devices:
+ *   delete:
+ *     summary: (관리자) 디바이스 삭제
+ *     description:
+ *     operationId: deleteDevice
+ *     tags: [device]
+ *     parameters:
+ *       - name: id
+ *         in: query
+ *         description: "id (np1, np2, xc1 ...)"
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Delete Success
+ *       '500':
+ *         description: InternalServerError
+ *
+ */
+
+router.delete('/', async (req, res, next) => {
+	try {
+		await reportGetService.deleteDevice(req.query.id);
+		res.status(200);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+})
 
 module.exports = router;
 

@@ -90,6 +90,24 @@ class ControllerButtonTableNotExist extends Exception {
 	}
 };
 
+class DeleteDeviceError extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'DeleteDeviceError';
+		this.status = 400;
+		this.logger();
+	}
+};
+
+class getDeviceStatusError extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'getDeviceStatusError';
+		this.status = 400;
+		this.logger();
+	}
+};
+
 module.exports = {
 	GetConsoleListError,
 	GetDeviceListError,
@@ -100,5 +118,7 @@ module.exports = {
 	GetButtonMalfunctionTypeListError,
 	InsertButtonMalfunctionTypeListError,
 	DeviceIdNotExistError,
-	ControllerButtonTableNotExist
+	ControllerButtonTableNotExist,
+	DeleteDeviceError,
+	getDeviceStatusError
 };
