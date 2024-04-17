@@ -84,11 +84,35 @@ const updateDeviceStatus = async (id, status) => {
 	}
 }
 
+const deleteDevice = async (id) => {
+	try {
+		if (!verifyService.isValidName(id))
+			throw new verifyException.inputFormatError('in service');
+		await reportGetRepository.isDeviceIdExist(id);
+		await reportGetRepository.deleteDevice(id);
+	} catch (error) {
+		throw error;
+	}
+}
+
+const getDeviceStatus = async (id) => {
+	try {
+		if (!verifyService.isValidName(id))
+			throw new verifyException.inputFormatError('in service');
+		await reportGetRepository.isDeviceIdExist(id);
+		return (await reportGetRepository.getDeviceStatus(id));
+	} catch (error) {
+		throw error;
+	}
+}
+
 module.exports = {
 	getDeviceListByType,
 	getMultipleListByControllerType,
 	insertDevice,
 	insertMalfunctionType,
 	insertButtonMalfunctionType,
-	updateDeviceStatus
+	updateDeviceStatus,
+	deleteDevice,
+	getDeviceStatus
 }

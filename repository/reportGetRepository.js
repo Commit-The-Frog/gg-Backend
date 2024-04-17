@@ -119,7 +119,7 @@ const insertDevice = async (id, console_id, status) => {
 	} finally {
 		if (connection) connection.release();
 	}
-}
+};
 
 const insertMalfunctionType = async (name, description) => {
 	let connection;
@@ -137,7 +137,7 @@ const insertMalfunctionType = async (name, description) => {
 	} finally {
 		if (connection) connection.release();
 	}
-}
+};
 
 const insertButtonMalfunctionType = async (name, description) => {
 	let connection;
@@ -155,7 +155,7 @@ const insertButtonMalfunctionType = async (name, description) => {
 	} finally {
 		if (connection) connection.release();
 	}
-}
+};
 
 const updateDeviceStatus = async (id, status) => {
 	let connection;
@@ -174,7 +174,7 @@ const updateDeviceStatus = async (id, status) => {
 	} finally {
 		if (connection) connection.release();
 	}
-}
+};
 
 const isDeviceIdExist = async (id) => {
 	let connection;
@@ -194,7 +194,7 @@ const isDeviceIdExist = async (id) => {
 	} finally {
 		if (connection) connection.release();
 	}
-}
+};
 
 const isControllerButtonTableExist = async (table_name) => {
 	let connection;
@@ -215,7 +215,46 @@ const isControllerButtonTableExist = async (table_name) => {
 	} finally {
 		if (connection) connection.release();
 	}
-}
+};
+
+const deleteDevice = async (id) => {
+	let connection;
+	try {
+		connection = await mariadbPool.getConnection();
+		const query = `
+			DELETE FROM device
+			WHERE id = '${id}';
+		`;
+		await connection.query(query);
+		logger.info('### DELETE DEVICE SUCCESS');
+	} catch (error) {
+		logger.info('### DELETE DEVICE FAIL');
+		throw new reportGetException.DeleteDeviceError('In Repository');
+	} finally {
+		if (connection) connection.release();
+	}
+};
+
+const getDeviceStatus = async (id) => {
+	let connection;
+	try {
+		connection = await mariadbPool.getConnection();
+		const query = `
+			SELECT status FROM device
+			WHERE id = '${id}';
+		`;
+		const result = await connection.query(query);
+		if (!result.length)
+			throw Error();
+		logger.info('### GET DEVICE STATUS SUCCESS');
+		return (result[0]);
+	} catch (error) {
+		logger.info('### GET DEVICE STATUS FAIL');
+		throw new reportGetException.getDeviceStatusError('In Repository');
+	} finally {
+		if (connection) connection.release();
+	}
+};
 
 module.exports = {
 	getConsoleList,
@@ -228,5 +267,7 @@ module.exports = {
 	insertButtonMalfunctionType,
 	updateDeviceStatus,
 	isDeviceIdExist,
-	isControllerButtonTableExist
+	isControllerButtonTableExist,
+	deleteDevice,
+	getDeviceStatus
 };
