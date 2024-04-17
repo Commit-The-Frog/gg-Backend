@@ -15,7 +15,6 @@ const createReport = async (console_type, device, malf_type,
 			etc_description : etc_description,
 			status : ReportStatus.REPORTED
 		});
-		console.log('db insert success');
 		return result;
 	} catch (error) {
 		throw error;
@@ -26,7 +25,6 @@ const createReport = async (console_type, device, malf_type,
 const searchAllReport = async () => {
 	try {
 		const result = await Report.find().sort({createAt:-1});
-		console.log('[REPO] all reports searched');
 		return result;
 	} catch (error) {
 		throw error;
@@ -53,7 +51,6 @@ const updateReportStatus = async (id, status) => {
 		const filter = { _id : id };
 		const update = { status : status };
 		const result = await Report.updateOne(filter, update);
-		console.log('[REPO] updated status');
 		return result;
 	} catch (error) {
 		throw error;
@@ -65,7 +62,6 @@ const deleteReport = async (id) => {
 	try {
 		id = ObjectId.createFromHexString(id);
 		const result = await Report.deleteOne({ _id : id });
-		console.log('[REPO] deleted status');
 		return result;
 	} catch (error) {
 		throw error;

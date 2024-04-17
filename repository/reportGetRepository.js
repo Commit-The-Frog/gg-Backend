@@ -247,7 +247,7 @@ const getDeviceStatus = async (id) => {
 		if (!result.length)
 			throw Error();
 		logger.info('### GET DEVICE STATUS SUCCESS');
-		return (result[0]);
+		return (result[0].status);
 	} catch (error) {
 		logger.info('### GET DEVICE STATUS FAIL');
 		throw new reportGetException.getDeviceStatusError('In Repository');
