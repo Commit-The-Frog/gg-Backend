@@ -1,83 +1,96 @@
-var express = require('express');
-var router = express.Router();
-const tournamentService = require('../service/tournamentService.js');
-var logger = require('../config/logger');
+const express = require('express');
+const router = express.Router();
+const reportGetService = require('../service/reportGetService.js');
 
 /**
  * @swagger
  * tags:
- *   name: Tournament
- *   description: Tournament 관련 API
+ *   name: device
+ *   description: device 관련 API
  */
 
 /**
  * @swagger
- * /tournament:
+ * /devices:
  *   get:
- *     security:
- *       - bearerAuth: []
- *     summary: Get tournament info
- *     description: Get tournament info by get request
- *     operationId: getTournamentInfo
- *     tags: [Tournament]
+ *     summary: 디바이스 목록 조회
+ *     description: 콘솔에 해당하는 컨트롤러나 본체의 이름과 상태 받아오기.
+ *     operationId: getDeviceInfo
+ *     tags: [device]
+ *     parameters:
+ *       - name: console_type
+ *         in: query
+ *         description: "해당하는 디바이스 목록을 받기 위한 콘솔 종류 PS5  1 | NINTENDO  2 | XBOX  3"
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: int
  *     responses:
  *       '200':
- *         description: Value of all players + user vote info
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Tournament'
+ *         description: 다양한 리스트 받음
  *       '500':
- *         description: GetAllParticipantsInfoError
+ *         description: InternalServerError
  *
  */
-/* GET users listing. */
-router.get('/', async function (req, res, next) {
+router.get('/', async (req, res, next) => {
+	let result;
 	try {
-		const result = await tournamentService.getAllTournamentInfo(req.headers.authorization, 1);
+		result = await reportGetService.getDeviceListByType(req.query.console_type);
 		res.status(200).send(result);
-	} catch(error) {
+	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
-});
+})
 
 /**
  * @swagger
- * /tournament:
+ * /devices:
  *   post:
- *     security:
- *       - bearerAuth: []
- *     tags:
- *       - Tournament
- *     summary: insert vote info
- *     description: insert vote info
- *     operationId: insertVote
+ *     summary: (관리자) 디바이스 추가
+ *     description:
+ *     operationId: postDevice
+ *     tags: [device]
  *     parameters:
- *       - name: vote
+ *       - name: id
  *         in: query
- *         description: number of player to vote
- *         required: true
- *         explode: true
+ *         description: "id (np1, np2, xc1 ...)"
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *       - name: console_id
+ *         in: query
+ *         description: "console_id (1번이 PS5, 2번이 닌텐도, 3번이 XBOX)"
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *       - name: status
+ *         in: query
+ *         description: "status (0번이 고장, 1번이 수리중, 2번이 정상)"
+ *         required: false
+ *         explode: false
  *         schema:
  *           type: string
  *     responses:
  *       '200':
- *         description: successful operation
- *       '400':
- *         description: VoteAlreadyExist, ParticipantNotExist
- *       '420':
- *         description: VoteTimeOut
+ *         description: Add Success
  *       '500':
- *         description: VoteInsertError
+ *         description: InternalServerError
+ *
  */
-router.post('/', async function (req, res, next) {
+
+router.post('/', async (req, res, next) => {
+	let result;
 	try {
-		await tournamentService.postVoteInfo(req.headers.authorization, req.query.vote, 1);
-		res.status(200).send();
-	} catch(error) {
+		await reportGetService.insertDevice(req.query.id, req.query.console_id, req.query.status)
+		res.status(200).send(result);
+	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 })
+
+// 삭제 만들어야됨.
 
 module.exports = router;
 

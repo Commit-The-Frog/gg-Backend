@@ -18,6 +18,15 @@ class VoteAlreadyExist extends Exception {
 	}
 };
 
+class VoteTimeOut extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'VoteTimeOut';
+		this.status = 420;
+		this.logger();
+	}
+};
+
 class GetVoteIdError extends Exception {
 	constructor(message) {
 		super(message);
@@ -45,10 +54,22 @@ class GetAllParticipantsInfoError extends Exception {
 	}
 };
 
+class GetVoteUserByParticipantId extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'GetVoteUserByParticipantId';
+		this.status = 500;
+		this.logger();
+	}
+};
+
+
 module.exports = {
 	VoteInsertError,
 	VoteAlreadyExist,
+	VoteTimeOut,
 	ParticipantIdNotExist,
 	GetVoteIdError,
-	GetAllParticipantsInfoError
+	GetAllParticipantsInfoError,
+	GetVoteUserByParticipantId
 };
