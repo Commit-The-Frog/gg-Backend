@@ -16,6 +16,7 @@ const reportPostException = require('../exception/reportPostException');
 const addReport = async (encodedReq) => {
 	try {
 		// decode and JSON parse
+		// decode and JSON parse
 		const decodedString = Buffer.from(encodedReq, 'base64').toString('utf-8');
 		const obj = JSON.parse(decodedString);
 		// if device is already under repair
@@ -23,6 +24,7 @@ const addReport = async (encodedReq) => {
 			throw new reportPostException.DeviceIsUnderRepairError('from service');
 		// update device status
 		await reportGetService.updateDeviceStatus(obj.device, DeviceStatus.MALFUNCTION);
+		// add report
 		// add report
 		return await reportPostRepository.createReport(
 			obj.console_type,
