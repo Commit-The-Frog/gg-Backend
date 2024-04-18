@@ -101,7 +101,47 @@ router.post('/', async (req, res, next) => {
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
-})
+});
+
+/**
+ * @swagger
+ * /devices:
+ *   patch:
+ *     summary: (관리자) 디바이스 상태 변경
+ *     description:
+ *     operationId: patchDevice
+ *     tags: [device]
+ *     parameters:
+ *       - name: id
+ *         in: query
+ *         description: "id (np1, np2, xc1 ...)"
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *       - name: status
+ *         in: query
+ *         description: "status (0번이 고장, 1번이 수리중, 2번이 정상)"
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: patch Success
+ *       '500':
+ *         description: InternalServerError
+ *
+ */
+
+router.patch('/', async (req, res, next) => {
+	try {
+		await reportGetService.updateDeviceStatus(req.query.id, req.query.status);
+		res.status(200).send();
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+});
 
 /**
  * @swagger
@@ -133,7 +173,9 @@ router.delete('/', async (req, res, next) => {
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
-})
+});
+
+
 
 module.exports = router;
 

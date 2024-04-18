@@ -2,6 +2,7 @@ const mariadbPool = require('../config/mariadbConfig');
 const logger = require('../config/logger');
 const reportGetException = require('../exception/reportGetException');
 const mariadbException = require('../exception/mariadbException');
+const { Exception, DefaultException} = require('../exception/exception');
 
 const getConsoleList = async () => {
 	let connection;
@@ -19,7 +20,7 @@ const getConsoleList = async () => {
 		logger.info("### Failed to fetch all console info");
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.GetConsoleListError('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
@@ -44,7 +45,7 @@ const getDeviceListByConsoleId = async (console_id, device_type) => {
 		logger.info("### Failed to fetch all device info");
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.GetDeviceListError('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
@@ -66,7 +67,7 @@ const getMalfunctionTypeList = async () => {
 		logger.info("### Failed to fetch all malfunction_type info");
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.GetMalfunctionTypeListError('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
@@ -88,7 +89,9 @@ const getControllerButtonTypeList = async (device_type) => {
 		logger.info(`### Failed to fetch all controller_button_type_${device_type} info`);
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.GetControllerButtonTypeListError('In Repository');
+		if (error.code == "ER_NO_SUCH_TABLE")
+			throw new reportGetException.ControllerButtonTableNotExist('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
@@ -110,7 +113,7 @@ const getButtonMalfunctionTypeList = async () => {
 		logger.info(`### Failed to fetch all button_malfunction_type info`);
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.GetButtonMalfunctionTypeListError('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
@@ -130,7 +133,7 @@ const insertDevice = async (id, console_id, device_type, status) => {
 		logger.info('### INSERT DEVICE FAIL');
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.InsertDeviceListError('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
@@ -150,7 +153,7 @@ const insertMalfunctionType = async (name, description) => {
 		logger.info('### INSERT malfunction_type FAIL');
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.InsertMalfunctionTypeListError('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
@@ -170,7 +173,7 @@ const insertButtonMalfunctionType = async (name, description) => {
 		logger.info('### INSERT button_malfunction_type FAIL');
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.InsertButtonMalfunctionTypeListError('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
@@ -185,13 +188,15 @@ const updateDeviceStatus = async (id, status) => {
 			SET status = '${status}'
 			WHERE id = '${id}';
 		`;
-		await connection.query(query);
+		const result = await connection.query(query);
+		if (result.affectedRows < 1)
+			throw new reportGetException.DeviceIdNotExistError('In Repository');
 		logger.info('### UPDATE DEVICE STATUS SUCCESS');
 	} catch (error) {
 		logger.info('### UPDATE DEVICE STATUS FAIL');
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.InsertDeviceListError('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
@@ -250,13 +255,15 @@ const deleteDevice = async (id) => {
 			DELETE FROM device
 			WHERE id = '${id}';
 		`;
-		await connection.query(query);
+		const result = await connection.query(query);
+		if (result.affectedRows < 1)
+			throw new reportGetException.DeviceIdNotExistError('In Repository');
 		logger.info('### DELETE DEVICE SUCCESS');
 	} catch (error) {
 		logger.info('### DELETE DEVICE FAIL');
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.DeleteDeviceError('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
@@ -272,14 +279,14 @@ const getDeviceStatus = async (id) => {
 		`;
 		const result = await connection.query(query);
 		if (!result.length)
-			throw Error();
+			throw new reportGetException.DeviceIdNotExistError('In Repository');
 		logger.info('### GET DEVICE STATUS SUCCESS');
 		return (result[0].status);
 	} catch (error) {
 		logger.info('### GET DEVICE STATUS FAIL');
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
-		throw new reportGetException.getDeviceStatusError('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
 	}
