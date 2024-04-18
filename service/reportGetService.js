@@ -9,9 +9,7 @@ const getDeviceListByType = async (type) => {
 		if (!verifyService.isValidId(type))
 			throw new verifyException.inputFormatError('in service');
 		deviceList = await reportGetRepository.getDeviceListByConsoleId(type);
-		return ({
-			"devices" : deviceList
-		});
+		return (deviceList);
 	} catch (error) {
 		throw error;
 	}
