@@ -29,9 +29,9 @@ const getMultipleListByControllerType = async (type) => {
 		btn_list = await reportGetRepository.getControllerButtonTypeList(type);
 		btn_malf_type_list = await reportGetRepository.getButtonMalfunctionTypeList();
 		return ({
-			"malf_type_list" : malf_type_list,
-			"btn_list" : btn_list,
-			"btn_malf_type_list" : btn_malf_type_list,
+			"controller_malf_type_list" : malf_type_list,
+			"controller_btn_list" : btn_list,
+			"controller_btn_malf_type_list" : btn_malf_type_list,
 		});
 	} catch (error) {
 		throw error;

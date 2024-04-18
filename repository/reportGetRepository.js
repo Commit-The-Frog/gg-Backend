@@ -14,6 +14,7 @@ const getConsoleList = async () => {
 		`;
 		results = await connection.query(query);
 		logger.info("### Successfully fetched all console info");
+		return results;
 	} catch (error) {
 		logger.info("### Failed to fetch all console info");
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
@@ -21,7 +22,6 @@ const getConsoleList = async () => {
 		throw new reportGetException.GetConsoleListError('In Repository');
 	} finally {
 		if (connection) connection.release();
-		return results;
 	}
 };
 
@@ -37,6 +37,7 @@ const getDeviceListByConsoleId = async (console_id) => {
 		`;
 		results = await connection.query(query);
 		logger.info("### Successfully fetched all device info");
+		return results;
 	} catch (error) {
 		logger.info("### Failed to fetch all device info");
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
@@ -44,7 +45,6 @@ const getDeviceListByConsoleId = async (console_id) => {
 		throw new reportGetException.GetDeviceListError('In Repository');
 	} finally {
 		if (connection) connection.release();
-		return results;
 	}
 };
 
@@ -59,6 +59,7 @@ const getMalfunctionTypeList = async () => {
 		`;
 		results = await connection.query(query);
 		logger.info("### Successfully fetched all malfunction_type info");
+		return results;
 	} catch (error) {
 		logger.info("### Failed to fetch all malfunction_type info");
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
@@ -66,7 +67,6 @@ const getMalfunctionTypeList = async () => {
 		throw new reportGetException.GetMalfunctionTypeListError('In Repository');
 	} finally {
 		if (connection) connection.release();
-		return results;
 	}
 };
 
@@ -81,6 +81,7 @@ const getControllerButtonTypeList = async (device_type) => {
 		`;
 		results = await connection.query(query);
 		logger.info(`### Successfully fetched all controller_button_type_${device_type} info`);
+		return results;
 	} catch (error) {
 		logger.info(`### Failed to fetch all controller_button_type_${device_type} info`);
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
@@ -88,7 +89,6 @@ const getControllerButtonTypeList = async (device_type) => {
 		throw new reportGetException.GetControllerButtonTypeListError('In Repository');
 	} finally {
 		if (connection) connection.release();
-		return results;
 	}
 };
 
@@ -103,6 +103,7 @@ const getButtonMalfunctionTypeList = async () => {
 		`;
 		results = await connection.query(query);
 		logger.info(`### Successfully fetched all button_malfunction_type info`);
+		return results;
 	} catch (error) {
 		logger.info(`### Failed to fetch all button_malfunction_type info`);
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
@@ -110,7 +111,6 @@ const getButtonMalfunctionTypeList = async () => {
 		throw new reportGetException.GetButtonMalfunctionTypeListError('In Repository');
 	} finally {
 		if (connection) connection.release();
-		return results;
 	}
 };
 
