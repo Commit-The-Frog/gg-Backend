@@ -97,7 +97,7 @@ router.get('/', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
 	try {
 		await reportGetService.insertDevice(req.query.id, req.query.console_id, req.query.device_type, req.query.status)
-		res.status(200);
+		res.status(200).send();
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
@@ -129,7 +129,7 @@ router.post('/', async (req, res, next) => {
 router.delete('/', async (req, res, next) => {
 	try {
 		await reportGetService.deleteDevice(req.query.id);
-		res.status(200);
+		res.status(200).send();
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
