@@ -1,16 +1,18 @@
 const reportPostRepository = require('../repository/reportPostRepository');
 const reportGetService = require('./reportGetService');
 const {DeviceStatus} = require('../config/enum');
-const { error } = require('winston');
 const reportPostException = require('../exception/reportPostException');
+const verifyService = require('../service/verifyService');
+const verifyException = require('../exception/verifyException');
+const {Exception, DefaultException} = require('../exception/exception');
 
 /** 
  * [addReport]
  * -> base64 decode -> JSON parse
  * console_type : xbox/nintendo/ps5
  * device : x/n/p xc1, 2 ...
- * malf_type : button, connect, charge
- * controller_btn_malf_list : [1, unpress], [2, unpress], ...
+ * conrtoller_malf_type : button, connect, charge
+ * controller_malf_btn_list : [1, unpress], [2, unpress], ...
  * etc_description : not working...
  */
 const addReport = async (encodedReq) => {
@@ -18,6 +20,11 @@ const addReport = async (encodedReq) => {
 		// decode and JSON parse
 		const decodedString = Buffer.from(encodedReq, 'base64').toString('utf-8');
 		const obj = JSON.parse(decodedString);
+		// verify obj
+		if (!verifyService.isValidNumber(obj.console_type) ||
+			!verifyService.isValidName(obj.device) ||
+			!verifyService.isValidName(obj.controller_malf_type))
+			throw new verifyException.inputFormatError('from service');
 		// if device is already under repair
 		if (await reportGetService.getDeviceStatus(obj.device) != DeviceStatus.NORMAL)
 			throw new reportPostException.DeviceIsUnderRepairError('from service');
@@ -27,12 +34,12 @@ const addReport = async (encodedReq) => {
 		return await reportPostRepository.createReport(
 			obj.console_type,
 			obj.device,
-			obj.malf_type,
-			obj.controller_btn_malf_list,
+			obj.controller_malf_type,
+			obj.controller_malf_btn_list,
 			obj.etc_description
 		);
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('service', error.name));
 	}
 }
 
@@ -46,7 +53,7 @@ const findAllReport = async () => {
 		const result = await reportPostRepository.searchAllReport();
 		return result;
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('service', error.name));
 	}
 }
 
@@ -56,18 +63,22 @@ const findAllReport = async () => {
  */
 const changeReportStatus = async (id, status) => {
 	try {
+		// verify id and status
+		if (!verifyService.isValidName(id) || 
+			!verfifyService.isValidNumber(status))
+			throw new verifyException.inputFormatError('service');
 		// find device by report id
 		const report = await reportPostRepository.searchReportById(id);
-		if (!report)
-			throw new reportPostException.ReportNotFoundError('from service');
+		if (report === undefined)
+			throw new reportPostException.ReportNotFoundError('service');
 		// update device status
 		await reportGetService.updateDeviceStatus(report.device, status);
 		// update report status
 		const result = await reportPostRepository.updateReportStatus(id, status);
 		if (result.modifiedCount === 0)
-			throw Exception;
+			throw new DefaultException('service', 'not modified');
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('service', error.name));
 	}
 }
 
@@ -77,11 +88,14 @@ const changeReportStatus = async (id, status) => {
  */
 const removeReport = async (id) => {
 	try {
+		// verify id
+		if (!verifyService.isValidName(id))
+			throw new verifyException.inputFormatError('service');
 		const result = await reportPostRepository.deleteReport(id);
 		if (result.deletedCount === 0)
-			throw Exception;
+			throw new DefaultException('service', 'not deleted');
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('service', error.name));
 	}
 }
 

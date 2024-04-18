@@ -44,12 +44,12 @@ const bookSchema = new mongoose.Schema({
 
 // Define Scehma : report
 const reportSchema = new mongoose.Schema({
-	console_type : { type : String, required: true },
+	console_type : { type : Number, required: true },
 	device : { type : String, required: true },
-	malf_type : { type : String , required: true },
-	controller_btn_malf_list : [{
-		btn_type : { type : String, required: true },
-		btn_malf_type : { type : String, required: true }
+	controller_malf_type : { type : String , required: true },
+	controller_malf_btn_list : [{
+		controller_btn_id : { type : String, required: true },
+		controller_btn_malf_type : { type : String, required: true }
 	}],
 	etc_description : { type : String, required: true },
 	status : { type : Number, required: true }

@@ -1,4 +1,4 @@
-const Exception = require('./exception');
+const {Exception} = require('./exception');
 
 class UserNameDuplicateError extends Exception {
 	constructor(from) {
