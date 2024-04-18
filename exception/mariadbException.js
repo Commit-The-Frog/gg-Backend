@@ -1,4 +1,4 @@
-const Exception = require('./exception');
+const {Exception} = require('./exception');
 
 class MariadbConnectionTimeout extends Exception {
 	constructor(message) {
