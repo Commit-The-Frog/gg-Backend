@@ -3,12 +3,12 @@ const reportGetRepository = require('../repository/reportGetRepository');
 const verifyService = require('../service/verifyService.js');
 const verifyException = require('../exception/verifyException.js');
 
-const getDeviceListByType = async (type) => {
+const getDeviceListByType = async (console_type, device_type) => {
 	let deviceList;
 	try {
-		if (!verifyService.isValidId(type))
+		if (!verifyService.isValidId(console_type) || !verifyService.isValidId(device_type))
 			throw new verifyException.inputFormatError('in service');
-		deviceList = await reportGetRepository.getDeviceListByConsoleId(type);
+		deviceList = await reportGetRepository.getDeviceListByConsoleId(console_type, device_type);
 		return (deviceList);
 	} catch (error) {
 		throw error;
@@ -38,13 +38,13 @@ const getMultipleListByControllerType = async (type) => {
 	}
 }
 
-const insertDevice = async (id, console_id, status) => {
+const insertDevice = async (id, console_id, device_type, status) => {
 	try {
 		if (!verifyService.isValidId(console_id) ||
 			!verifyService.isValidName(id) ||
 			!verifyService.isValidName(status))
 			throw new verifyException.inputFormatError('in service');
-		await reportGetRepository.insertDevice(id, console_id, status);
+		await reportGetRepository.insertDevice(id, console_id, device_type, status);
 	} catch (error) {
 		throw error;
 	}
