@@ -2,7 +2,7 @@ const app = require('../app.js');
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
 
-const { MONGO_PORT, MONGO_URI, MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD, MONGO_AUTH_SOURCE } = process.env;
+const { MONGO_URI, MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD, MONGO_AUTH_SOURCE } = process.env;
 
 // connecting mongodb
 const connectMongoDB = function () {

@@ -2,6 +2,7 @@ const logger = require('../config/logger');
 const reportGetRepository = require('../repository/reportGetRepository');
 const verifyService = require('../service/verifyService.js');
 const verifyException = require('../exception/verifyException.js');
+const { Exception, DefaultException} = require('../exception/exception');
 
 const getDeviceListByType = async (console_type, device_type) => {
 	let deviceList;
@@ -11,7 +12,7 @@ const getDeviceListByType = async (console_type, device_type) => {
 		deviceList = await reportGetRepository.getDeviceListByConsoleId(console_type, device_type);
 		return (deviceList);
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	}
 }
 
@@ -23,9 +24,7 @@ const getMultipleListByControllerType = async (type) => {
 		malf_type_list = await reportGetRepository.getMalfunctionTypeList();
 		if (!verifyService.isValidName(type))
 			throw new verifyException.inputFormatError('in service');
-		await reportGetRepository.isDeviceIdExist(type);
 		type = type.substring(0, 2);
-		await reportGetRepository.isControllerButtonTableExist(type);
 		btn_list = await reportGetRepository.getControllerButtonTypeList(type);
 		btn_malf_type_list = await reportGetRepository.getButtonMalfunctionTypeList();
 		return ({
@@ -34,19 +33,19 @@ const getMultipleListByControllerType = async (type) => {
 			"controller_btn_malf_type_list" : btn_malf_type_list,
 		});
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	}
 }
 
-const insertDevice = async (id, console_id, device_type, status) => {
+const insertDevice = async (id, name, console_id, device_type, status) => {
 	try {
 		if (!verifyService.isValidId(console_id) ||
 			!verifyService.isValidName(id) ||
 			!verifyService.isValidName(status))
 			throw new verifyException.inputFormatError('in service');
-		await reportGetRepository.insertDevice(id, console_id, device_type, status);
+		await reportGetRepository.insertDevice(id, name, console_id, device_type, status);
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	}
 }
 
@@ -56,7 +55,7 @@ const insertMalfunctionType = async (name, description) => {
 			throw new verifyException.inputFormatError('in service');
 		await reportGetRepository.insertMalfunctionType(name, description);
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	}
 }
 
@@ -66,7 +65,7 @@ const insertButtonMalfunctionType = async (name, description) => {
 			throw new verifyException.inputFormatError('in service');
 		await reportGetRepository.insertButtonMalfunctionType(name, description);
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	}
 }
 
@@ -75,10 +74,9 @@ const updateDeviceStatus = async (id, status) => {
 		if (!verifyService.isValidName(id) ||
 			!verifyService.isValidId(status))
 			throw new verifyException.inputFormatError('in service');
-		await reportGetRepository.isDeviceIdExist(id);
 		await reportGetRepository.updateDeviceStatus(id, status);
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	}
 }
 
@@ -86,10 +84,9 @@ const deleteDevice = async (id) => {
 	try {
 		if (!verifyService.isValidName(id))
 			throw new verifyException.inputFormatError('in service');
-		await reportGetRepository.isDeviceIdExist(id);
 		await reportGetRepository.deleteDevice(id);
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	}
 }
 
@@ -97,10 +94,9 @@ const getDeviceStatus = async (id) => {
 	try {
 		if (!verifyService.isValidName(id))
 			throw new verifyException.inputFormatError('in service');
-		await reportGetRepository.isDeviceIdExist(id);
 		return (await reportGetRepository.getDeviceStatus(id));
 	} catch (error) {
-		throw error;
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	}
 }
 
