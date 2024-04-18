@@ -25,6 +25,13 @@ const reportGetService = require('../service/reportGetService.js');
  *         explode: false
  *         schema:
  *           type: int
+ *       - name: device_type
+ *         in: query
+ *         description: "device_type (1번이 콘솔, 2번이 컨트롤러, 3번이 기타)"
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
  *     responses:
  *       '200':
  *         description: 다양한 리스트 받음
@@ -35,7 +42,7 @@ const reportGetService = require('../service/reportGetService.js');
 router.get('/', async (req, res, next) => {
 	let result;
 	try {
-		result = await reportGetService.getDeviceListByType(req.query.console_type);
+		result = await reportGetService.getDeviceListByType(req.query.console_type, req.query.device_type);
 		res.status(200).send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
@@ -65,6 +72,13 @@ router.get('/', async (req, res, next) => {
  *         explode: false
  *         schema:
  *           type: string
+ *       - name: device_type
+ *         in: query
+ *         description: "device_type (1번이 콘솔, 2번이 컨트롤러, 3번이 기타)"
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
  *       - name: status
  *         in: query
  *         description: "status (0번이 고장, 1번이 수리중, 2번이 정상)"
@@ -82,7 +96,7 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
 	try {
-		await reportGetService.insertDevice(req.query.id, req.query.console_id, req.query.status)
+		await reportGetService.insertDevice(req.query.id, req.query.console_id, req.query.device_type, req.query.status)
 		res.status(200);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
@@ -110,7 +124,6 @@ router.post('/', async (req, res, next) => {
  *         description: Delete Success
  *       '500':
  *         description: InternalServerError
- *
  */
 
 router.delete('/', async (req, res, next) => {
