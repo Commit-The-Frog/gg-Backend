@@ -74,7 +74,7 @@ router.get('/', async (req, res, next) => {
  *           type: string
  *       - name: console_id
  *         in: query
- *         description: "console_id (1번이 PS5, 2번이 닌텐도, 3번이 XBOX)"
+ *         description: "console_id (1번이 XBOX, 2번이 닌텐도, 3번이 PS5)"
  *         required: false
  *         explode: false
  *         schema:

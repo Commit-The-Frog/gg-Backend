@@ -153,130 +153,89 @@ router.get('/types', async (req, res, next) => {
 	}
 })
 
-// /**
-//  * @swagger
-//  * /reports/testMalfunctionType:
-//  *   post:
-//  *     summary: testMalfunctionType
-//  *     description: testMalfunctionType
-//  *     operationId: posttestMalfunctionType
-//  *     tags: [Report]
-//  *     parameters:
-//  *       - name: name
-//  *         in: query
-//  *         description: name
-//  *         required: false
-//  *         explode: false
-//  *         schema:
-//  *           type: string
-//  *       - name: description
-//  *         in: query
-//  *         description: description
-//  *         required: false
-//  *         explode: false
-//  *         schema:
-//  *           type: string
-//  *     responses:
-//  *       '200':
-//  *         description: 다양한 리스트 받음
-//  *       '500':
-//  *         description: InternalServerError
-//  *
-//  */
+/**
+ * @swagger
+ * /reports/types/malfunction_type:
+ *   post:
+ *     summary: (관리자) malfunction_type 새로 추가
+ *     description: (관리자) malfunction_type 새로 추가 ex. (connect, 연결문제)
+ *     operationId: posttypesMalfunctiontype
+ *     tags: [Report]
+ *     parameters:
+ *       - name: name
+ *         in: query
+ *         description: name
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *       - name: description
+ *         in: query
+ *         description: description
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: 다양한 리스트 받음
+ *       '500':
+ *         description: InternalServerError
+ *
+ */
 
 
-// router.post('/testMalfunctionType', async (req, res, next) => {
-// 	let result;
-// 	try {
-// 		await reportGetService.insertMalfunctionType(req.query.name, req.query.description);
-// 		res.status(200).send(result);
-// 	} catch (error) {
-// 		res.status(error.status || 500).send(error.name || "InternalServerError");
-// 	}
-// })
+router.post('/types/malfunction_type', async (req, res, next) => {
+	let result;
+	try {
+		await reportGetService.insertMalfunctionType(req.query.name, req.query.description);
+		res.status(200).send(result);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+})
 
-// /**
-//  * @swagger
-//  * /reports/testButtonMalfunctionType:
-//  *   post:
-//  *     summary: testButtonMalfunctionType
-//  *     description: testButtonMalfunctionType
-//  *     operationId: posttestButtonMalfunctionType
-//  *     tags: [Report]
-//  *     parameters:
-//  *       - name: name
-//  *         in: query
-//  *         description: name
-//  *         required: false
-//  *         explode: false
-//  *         schema:
-//  *           type: string
-//  *       - name: description
-//  *         in: query
-//  *         description: description
-//  *         required: false
-//  *         explode: false
-//  *         schema:
-//  *           type: string
-//  *     responses:
-//  *       '200':
-//  *         description: 다양한 리스트 받음
-//  *       '500':
-//  *         description: InternalServerError
-//  *
-//  */
+/**
+ * @swagger
+ * /reports/types/button_malfunction_type:
+ *   post:
+ *     summary: (관리자) 버튼 고장 타입 추가.
+ *     description: (관리자) 버튼 고장 타입 추가. ex> (unpress, 눌리지 않음)
+ *     operationId: posttypesButtonMalfunctionType
+ *     tags: [Report]
+ *     parameters:
+ *       - name: name
+ *         in: query
+ *         description: name
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *       - name: description
+ *         in: query
+ *         description: description
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: 다양한 리스트 받음
+ *       '500':
+ *         description: InternalServerError
+ *
+ */
 
 
-// router.post('/testButtonMalfunctionType', async (req, res, next) => {
-// 	let result;
-// 	try {
-// 		await reportGetService.insertButtonMalfunctionType(req.query.name, req.query.description);
-// 		res.status(200).send(result);
-// 	} catch (error) {
-// 		res.status(error.status || 500).send(error.name || "InternalServerError");
-// 	}
-// })
-
-// /**
-//  * @swagger
-//  * /reports/testUpdateDeviceStatus:
-//  *   patch:
-//  *     summary: testUpdateDeviceStatus
-//  *     description: testUpdateDeviceStatus
-//  *     operationId: patchtestUpdateDeviceStatus
-//  *     tags: [Report]
-//  *     parameters:
-//  *       - name: id
-//  *         in: query
-//  *         description: id
-//  *         required: false
-//  *         explode: false
-//  *         schema:
-//  *           type: string
-//  *       - name: status
-//  *         in: query
-//  *         description: status
-//  *         required: false
-//  *         explode: false
-//  *         schema:
-//  *           type: int
-//  *     responses:
-//  *       '200':
-//  *         description: 다양한 리스트 받음
-//  *       '500':
-//  *         description: InternalServerError
-//  *
-//  */
-
-// router.patch('/testUpdateDeviceStatus', async (req, res, next) => {
-// 	let result;
-// 	try {
-// 		await reportGetService.updateDeviceStatus(req.query.id, req.query.status);
-// 		res.status(200).send(result);
-// 	} catch (error) {
-// 		res.status(error.status || 500).send(error.name || "InternalServerError");
-// 	}
-// })
+router.post('/types/button_malfunction_type', async (req, res, next) => {
+	let result;
+	try {
+		await reportGetService.insertButtonMalfunctionType(req.query.name, req.query.description);
+		res.status(200).send(result);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+})
 
 module.exports = router;
 /**

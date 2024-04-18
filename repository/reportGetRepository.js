@@ -184,7 +184,7 @@ const updateDeviceStatus = async (id, status) => {
 		connection = await mariadbPool.getConnection();
 		const query = `
 			UPDATE device
-			SET status = '${status}'
+			SET status = ${status}
 			WHERE id = '${id}';
 		`;
 		const result = await connection.query(query);
