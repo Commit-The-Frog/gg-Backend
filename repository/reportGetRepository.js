@@ -35,6 +35,7 @@ const getDeviceListByConsoleId = async (console_id) => {
 			FROM device
 			WHERE console_id = ${console_id};
 		`;
+		console.log(query);
 		results = await connection.query(query);
 		logger.info("### Successfully fetched all device info");
 		return results;

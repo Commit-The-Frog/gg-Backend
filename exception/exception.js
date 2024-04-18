@@ -14,4 +14,16 @@ class Exception extends Error {
 	}
 }
 
-module.exports = Exception;
+class DefaultException extends Exception {
+	constructor(message, name) {
+		super(message);
+		this.name = name;
+		this.status = 400;
+		this.logger();
+	}
+}
+
+module.exports = {
+	Exception,
+	DefaultException
+}
