@@ -37,13 +37,13 @@ const getMultipleListByControllerType = async (type) => {
 	}
 }
 
-const insertDevice = async (id, console_id, device_type, status) => {
+const insertDevice = async (id, name, console_id, device_type, status) => {
 	try {
 		if (!verifyService.isValidId(console_id) ||
 			!verifyService.isValidName(id) ||
 			!verifyService.isValidName(status))
 			throw new verifyException.inputFormatError('in service');
-		await reportGetRepository.insertDevice(id, console_id, device_type, status);
+		await reportGetRepository.insertDevice(id, name, console_id, device_type, status);
 	} catch (error) {
 		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	}

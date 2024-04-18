@@ -49,11 +49,6 @@ router.get("/login", async (req, res) => {
 	}
 })
 
-/* REDIRECTION TEST of FE */
-router.get("/test", async (req, res) => {
-	res.redirect(process.env.LOGIN_42_API_REDIRECT);
-});
-
 /**
  * @swagger
  *   /auth/refresh:

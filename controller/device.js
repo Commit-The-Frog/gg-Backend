@@ -65,6 +65,13 @@ router.get('/', async (req, res, next) => {
  *         explode: false
  *         schema:
  *           type: string
+ *       - name: name
+ *         in: query
+ *         description: name (디바이스 이름 ex. 조이콘 1)"
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: string
  *       - name: console_id
  *         in: query
  *         description: "console_id (1번이 PS5, 2번이 닌텐도, 3번이 XBOX)"
@@ -96,7 +103,7 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
 	try {
-		await reportGetService.insertDevice(req.query.id, req.query.console_id, req.query.device_type, req.query.status)
+		await reportGetService.insertDevice(req.query.id, req.query.name, req.query.console_id, req.query.device_type, req.query.status)
 		res.status(200).send();
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");

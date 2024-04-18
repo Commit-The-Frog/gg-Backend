@@ -37,7 +37,6 @@ const getDeviceListByConsoleId = async (console_id, device_type) => {
 			WHERE console_id = ${console_id}
 			AND device_type = ${device_type};
 		`;
-		console.log(query);
 		results = await connection.query(query);
 		logger.info("### Successfully fetched all device info");
 		return results;
@@ -119,13 +118,13 @@ const getButtonMalfunctionTypeList = async () => {
 	}
 };
 
-const insertDevice = async (id, console_id, device_type, status) => {
+const insertDevice = async (id, name, console_id, device_type, status) => {
 	let connection;
 	try {
 		connection = await mariadbPool.getConnection();
 		const query = `
-			INSERT INTO device (id, console_id, device_type, status)
-			VALUES ('${id}', ${console_id}, ${device_type}, '${status}');
+			INSERT INTO device (id, name, console_id, device_type, status)
+			VALUES ('${id}', '${name}', ${console_id}, ${device_type}, '${status}');
 		`;
 		await connection.query(query);
 		logger.info('### INSERT DEVICE SUCCESS');
