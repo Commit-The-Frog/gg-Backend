@@ -69,7 +69,6 @@ const accessTokenVerify = (userId, accessToken) => {
 		} else {
 			logger.info("### Access Token ID Verified");
 		}
-		return (true);
 	} catch (error) {
 		throw new jwtException.TokenAuthorizeError("from service");
 	}
