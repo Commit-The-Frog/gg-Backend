@@ -28,7 +28,7 @@ const setUserAndCreateToken = async (code) => {
 		const refreshToken = await jwt.refreshTokenSign(userInfo.id, adminService.isAdminUser(userInfo.id));
 		return ({
 			user_id: userInfo.id,
-			admin: adminService.isAdminUser(userInfo.id),
+			role : adminService.isAdminUser(userInfo.id) ? 'admin' : 'client',
 			accessToken: accessToken,
 			refreshToken: refreshToken
 		})
