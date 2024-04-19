@@ -30,13 +30,13 @@ const accessTokenSign = (userId, admin) => {
 			userId = userId.toString();
 		if (!verifyService.isValidId(userId))
 			throw Error();
+		const payload = {
+			id : userId,
+			role : admin ? 'admin' : 'client'
+		}
 		let access_secret = common_access_secret;
 		if (admin)
 			access_secret = admin_access_secret;
-		const payload = {
-			id: userId,
-			admin: admin
-		}
 		const accessToken = jwt.sign(
 			payload,
 			access_secret, {
@@ -65,7 +65,7 @@ const accessTokenVerify = (userId, accessToken) => {
 		if (!verifyService.isValidTokenStruct(accessToken))
 			throw Error();
 		let access_secret = common_access_secret;
-		let isAdmin = adminService.isAdminUserToken(accessToken);
+		const isAdmin = adminService.isAdminUserToken(accessToken);
 		logger.info(`### Access Token Payload : ${isAdmin}`);
 		if (isAdmin)
 			access_secret = admin_access_secret;
@@ -93,13 +93,16 @@ const refreshTokenSign = async (userId, admin) => {
 			userId = userId.toString();
 		if (!verifyService.isValidId(userId))
 			throw Error();
+		const payload = {
+			id : userId,
+			role : admin ? 'admin' : 'client'
+		}
 		let refresh_secret = common_refresh_secret;
 		if (admin)
 			refresh_secret = admin_refresh_secret;
-		const data = jwt.sign({
-			id: userId,
-			admin: admin
-		}, refresh_secret, {
+		const data = jwt.sign(
+			payload,
+			refresh_secret, {
 			algorithm: 'HS256',
 			expiresIn: '14d',
 		})
@@ -138,10 +141,8 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 		refreshToken = tokenParse(refreshToken);
 		if (!verifyService.isValidTokenStruct(refreshToken))
 			throw Error();
-		let refresh_secret = common_refresh_secret;
-		let isAdmin = adminService.isAdminUserToken(refreshToken);
-		if (isAdmin)
-			refresh_secret = admin_refresh_secret;
+		const isAdmin = adminService.isAdminUserToken(refreshToken);
+		const refresh_secret = isAdmin ? admin_refresh_secret : common_refresh_secret;
 		const decoded = jwt.verify(refreshToken, refresh_secret);
 		logger.info(`### Request RT verified ADMIN : ${isAdmin}`);
 		if (!isAdmin && decoded.id != userId) {
