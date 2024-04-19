@@ -1,9 +1,6 @@
 const jwt = require('jsonwebtoken');
 const createRedisClient = require('./redisService.js');
-const common_access_secret = process.env.JWT_ACCESS_SECRET;
-const admin_access_secret = process.env.ADMIN_ACCESS_SECRET;
-const common_refresh_secret = process.env.JWT_REFRESH_SECRET;
-const admin_refresh_secret = process.env.ADMIN_REFRESH_SECRET;
+const { JWT_ACCESS_SECRET, ADMIN_ACCESS_SECRET, JWT_REFRESH_SECRET, ADMIN_REFRESH_SECRET } = process.env;
 const jwtException = require('../exception/jwtException.js');
 const logger = require('../config/logger');
 const verifyService = require('../service/verifyService.js');
@@ -34,9 +31,7 @@ const accessTokenSign = (userId, admin) => {
 			id : userId,
 			role : admin ? 'admin' : 'client'
 		}
-		let access_secret = common_access_secret;
-		if (admin)
-			access_secret = admin_access_secret;
+		const access_secret = admin ? ADMIN_ACCESS_SECRET : JWT_ACCESS_SECRET;
 		const accessToken = jwt.sign(
 			payload,
 			access_secret, {
@@ -64,11 +59,9 @@ const accessTokenVerify = (userId, accessToken) => {
 			throw Error();
 		if (!verifyService.isValidTokenStruct(accessToken))
 			throw Error();
-		let access_secret = common_access_secret;
 		const isAdmin = adminService.isAdminUserToken(accessToken);
+		const access_secret = isAdmin ? ADMIN_ACCESS_SECRET : JWT_ACCESS_SECRET;
 		logger.info(`### Access Token Payload : ${isAdmin}`);
-		if (isAdmin)
-			access_secret = admin_access_secret;
 		const decoded = jwt.verify(accessToken, access_secret);
 		logger.info(`### Access Token Verified ADMIN : ${isAdmin}`);
 		if (!isAdmin && decoded.id != userId) {
@@ -97,9 +90,7 @@ const refreshTokenSign = async (userId, admin) => {
 			id : userId,
 			role : admin ? 'admin' : 'client'
 		}
-		let refresh_secret = common_refresh_secret;
-		if (admin)
-			refresh_secret = admin_refresh_secret;
+		const refresh_secret = admin ? ADMIN_REFRESH_SECRET : JWT_REFRESH_SECRET;
 		const data = jwt.sign(
 			payload,
 			refresh_secret, {
@@ -142,7 +133,7 @@ const refreshTokenVerify = async (refreshToken, userId) => {
 		if (!verifyService.isValidTokenStruct(refreshToken))
 			throw Error();
 		const isAdmin = adminService.isAdminUserToken(refreshToken);
-		const refresh_secret = isAdmin ? admin_refresh_secret : common_refresh_secret;
+		const refresh_secret = isAdmin ? ADMIN_REFRESH_SECRET : JWT_REFRESH_SECRET;
 		const decoded = jwt.verify(refreshToken, refresh_secret);
 		logger.info(`### Request RT verified ADMIN : ${isAdmin}`);
 		if (!isAdmin && decoded.id != userId) {
