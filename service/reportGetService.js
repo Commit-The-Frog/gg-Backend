@@ -90,6 +90,27 @@ const deleteDevice = async (id) => {
 	}
 }
 
+const deleteMalfunctionType = async (id) => {
+	try {
+		if (!verifyService.isValidName(id))
+			throw new verifyException.inputFormatError('in service');
+		await reportGetRepository.deleteMalfunctionType(id);
+	} catch (error) {
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
+	}
+}
+
+const deleteButtonMalfunctionType = async (id) => {
+	try {
+		if (!verifyService.isValidName(id))
+			throw new verifyException.inputFormatError('in service');
+		await reportGetRepository.deleteButtonMalfunctionType(id);
+	} catch (error) {
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
+	}
+}
+
+
 const getDeviceStatus = async (id) => {
 	try {
 		if (!verifyService.isValidName(id))
@@ -108,5 +129,7 @@ module.exports = {
 	insertButtonMalfunctionType,
 	updateDeviceStatus,
 	deleteDevice,
+	deleteMalfunctionType,
+	deleteButtonMalfunctionType,
 	getDeviceStatus
 }
