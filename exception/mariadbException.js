@@ -18,10 +18,10 @@ class MariadbDupEntryError extends Exception {
 	}
 };
 
-class MariadbZeroRowAffected extends Exception {
+class MariadbZeroRowAffectedError extends Exception {
 	constructor(message) {
 		super(message);
-		this.name = 'MariadbZeroRowAffected';
+		this.name = 'MariadbZeroRowAffectedError';
 		this.status = 400;
 		this.logger();
 	}
@@ -30,5 +30,5 @@ class MariadbZeroRowAffected extends Exception {
 module.exports = {
 	MariadbConnectionTimeout,
 	MariadbDupEntryError,
-	MariadbZeroRowAffected
+	MariadbZeroRowAffectedError
 };

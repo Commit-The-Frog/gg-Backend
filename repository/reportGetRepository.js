@@ -191,7 +191,7 @@ const updateDeviceStatus = async (id, status) => {
 		`;
 		const result = await connection.query(query);
 		if (result.affectedRows < 1)
-			throw new mariadbException.MariadbZeroRowAffected('In Repository');
+			throw new mariadbException.MariadbZeroRowAffectedError('In Repository');
 		logger.info('### UPDATE DEVICE STATUS SUCCESS');
 	} catch (error) {
 		logger.info('### UPDATE DEVICE STATUS FAIL');
@@ -258,7 +258,7 @@ const deleteDevice = async (id) => {
 		`;
 		const result = await connection.query(query);
 		if (result.affectedRows < 1)
-			throw new mariadbException.MariadbZeroRowAffected('In Repository');
+			throw new mariadbException.MariadbZeroRowAffectedError('In Repository');
 		logger.info('### DELETE DEVICE SUCCESS');
 	} catch (error) {
 		logger.info('### DELETE DEVICE FAIL');
