@@ -171,9 +171,9 @@ module.exports = router;
  *         user_id:
  *           type: string
  *           example: "158010"
- *         admin:
+ *         role:
  *           type: string
- *           example: "true"
+ *           example: "client"
  *         accessToken:
  *           type: string
  *           example: "<token>"
