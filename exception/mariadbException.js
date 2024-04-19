@@ -9,6 +9,26 @@ class MariadbConnectionTimeout extends Exception {
 	}
 };
 
+class MariadbDupEntryError extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'MariadbDupEntryError';
+		this.status = 400;
+		this.logger();
+	}
+};
+
+class MariadbZeroRowAffectedError extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'MariadbZeroRowAffectedError';
+		this.status = 400;
+		this.logger();
+	}
+};
+
 module.exports = {
-	MariadbConnectionTimeout
+	MariadbConnectionTimeout,
+	MariadbDupEntryError,
+	MariadbZeroRowAffectedError
 };

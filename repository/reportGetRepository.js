@@ -132,6 +132,8 @@ const insertDevice = async (id, name, console_id, device_type, status) => {
 		logger.info('### INSERT DEVICE FAIL');
 		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
 			throw new mariadbException.MariadbConnectionTimeout('In Repository');
+		if (error.code == "ER_DUP_ENTRY")
+			throw new mariadbException.MariadbDupEntryError('In Repository');
 		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
 	} finally {
 		if (connection) connection.release();
@@ -189,7 +191,7 @@ const updateDeviceStatus = async (id, status) => {
 		`;
 		const result = await connection.query(query);
 		if (result.affectedRows < 1)
-			throw new reportGetException.DeviceIdNotExistError('In Repository');
+			throw new mariadbException.MariadbZeroRowAffectedError('In Repository');
 		logger.info('### UPDATE DEVICE STATUS SUCCESS');
 	} catch (error) {
 		logger.info('### UPDATE DEVICE STATUS FAIL');
@@ -256,7 +258,7 @@ const deleteDevice = async (id) => {
 		`;
 		const result = await connection.query(query);
 		if (result.affectedRows < 1)
-			throw new reportGetException.DeviceIdNotExistError('In Repository');
+			throw new mariadbException.MariadbZeroRowAffectedError('In Repository');
 		logger.info('### DELETE DEVICE SUCCESS');
 	} catch (error) {
 		logger.info('### DELETE DEVICE FAIL');
