@@ -197,6 +197,41 @@ router.post('/types/malfunction_type', async (req, res, next) => {
 
 /**
  * @swagger
+ * /reports/types/malfunction_type:
+ *   delete:
+ *     summary: (관리자) malfunction_type id로 삭제
+ *     description: (관리자) malfunction_type id로 삭제 ex. (connect, 연결문제)
+ *     operationId: deletetypesMalfunctiontype
+ *     tags: [Report]
+ *     parameters:
+ *       - name: id
+ *         in: query
+ *         description: name
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: int
+ *     responses:
+ *       '200':
+ *         description: malf type 삭제 성공
+ *       '500':
+ *         description: InternalServerError
+ *
+ */
+
+
+router.delete('/types/malfunction_type', async (req, res, next) => {
+	let result;
+	try {
+		await reportGetService.deleteMalfunctionType(req.query.id);
+		res.status(200).send(result);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+})
+
+/**
+ * @swagger
  * /reports/types/button_malfunction_type:
  *   post:
  *     summary: (관리자) 버튼 고장 타입 추가.
@@ -231,6 +266,41 @@ router.post('/types/button_malfunction_type', async (req, res, next) => {
 	let result;
 	try {
 		await reportGetService.insertButtonMalfunctionType(req.query.name, req.query.description);
+		res.status(200).send(result);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+})
+
+/**
+ * @swagger
+ * /reports/types/button_malfunction_type:
+ *   delete:
+ *     summary: (관리자) 버튼 고장 타입 id로 삭제
+ *     description: (관리자) 버튼 고장 타입 id로 삭제 ex> (unpress, 눌리지 않음)
+ *     operationId: deletetypesButtonMalfunctionType
+ *     tags: [Report]
+ *     parameters:
+ *       - name: id
+ *         in: query
+ *         description: name
+ *         required: false
+ *         explode: false
+ *         schema:
+ *           type: int
+ *     responses:
+ *       '200':
+ *         description: 다양한 리스트 받음
+ *       '500':
+ *         description: InternalServerError
+ *
+ */
+
+
+router.delete('/types/button_malfunction_type', async (req, res, next) => {
+	let result;
+	try {
+		await reportGetService.deleteButtonMalfunctionType(req.query.id);
 		res.status(200).send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");

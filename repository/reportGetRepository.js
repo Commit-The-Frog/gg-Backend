@@ -270,6 +270,50 @@ const deleteDevice = async (id) => {
 	}
 };
 
+const deleteMalfunctionType = async (id) => {
+	let connection;
+	try {
+		connection = await mariadbPool.getConnection();
+		const query = `
+			DELETE FROM malfunction_type
+			WHERE id = '${id}';
+		`;
+		const result = await connection.query(query);
+		if (result.affectedRows < 1)
+			throw new mariadbException.MariadbZeroRowAffectedError('In Repository');
+		logger.info('### DELETE MALFUNCTION TYPE SUCCESS');
+	} catch (error) {
+		logger.info('### DELETE MALFUNCTION TYPE FAIL');
+		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
+			throw new mariadbException.MariadbConnectionTimeout('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
+	} finally {
+		if (connection) connection.release();
+	}
+};
+
+const deleteButtonMalfunctionType = async (id) => {
+	let connection;
+	try {
+		connection = await mariadbPool.getConnection();
+		const query = `
+			DELETE FROM button_malfunction_type
+			WHERE id = '${id}';
+		`;
+		const result = await connection.query(query);
+		if (result.affectedRows < 1)
+			throw new mariadbException.MariadbZeroRowAffectedError('In Repository');
+		logger.info('### DELETE BUTTON MALFUNCTION TYPE SUCCESS');
+	} catch (error) {
+		logger.info('### DELETE BUTTON MALFUNCTION TYPE FAIL');
+		if (error.code == "ER_GET_CONNECTION_TIMEOUT")
+			throw new mariadbException.MariadbConnectionTimeout('In Repository');
+		throw (error instanceof Exception ? error : new DefaultException('repository', error.name));
+	} finally {
+		if (connection) connection.release();
+	}
+};
+
 const getDeviceStatus = async (id) => {
 	let connection;
 	try {
@@ -306,5 +350,7 @@ module.exports = {
 	isDeviceIdExist,
 	isControllerButtonTableExist,
 	deleteDevice,
+	deleteMalfunctionType,
+	deleteButtonMalfunctionType,
 	getDeviceStatus
 };
