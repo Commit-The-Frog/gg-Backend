@@ -85,6 +85,8 @@ const refreshTokenSign = async (userId, admin) => {
 			userId = userId.toString();
 		if (!verifyService.isValidId(userId))
 			throw Error();
+		if (admin) // admin은 refresh token을 만들지 않는다.
+			throw Error();
 		const payload = {
 			id : userId,
 			role : admin ? 'admin' : 'client'
@@ -132,6 +134,8 @@ const refreshTokenVerify = async (userId, refreshToken) => {
 		if (!verifyService.isValidTokenStruct(refreshToken))
 			throw Error();
 		const isAdmin = adminService.isAdminUserToken(refreshToken);
+		if (isAdmin) // admin은 refresh token을 주지 않는다.
+			throw Error();
 		const refresh_secret = isAdmin ? ADMIN_REFRESH_SECRET : JWT_REFRESH_SECRET;
 		const decoded = jwt.verify(refreshToken, refresh_secret);
 		logger.info(`### Request RT verified ADMIN : ${isAdmin}`);

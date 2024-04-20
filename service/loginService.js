@@ -29,7 +29,7 @@ const setUserAndCreateToken = async (code, adminLogin) => {
 			}
 		}
 		const accessToken = jwt.accessTokenSign(userInfo.id, adminLogin);
-		const refreshToken = await jwt.refreshTokenSign(userInfo.id, adminLogin);
+		const refreshToken = adminLogin ? null : await jwt.refreshTokenSign(userInfo.id, adminLogin);
 		return ({
 			user_id: userInfo.id,
 			role : adminLogin ? 'admin' : 'client',
@@ -47,10 +47,10 @@ const setUserAndCreateToken = async (code, adminLogin) => {
 	성공시 Token set 반환 */
 const createNewTokenSet = async (userId, refreshToken) => {
 	try {
-		await jwt.refreshTokenVerify(refreshToken, userId);
-		const isAdmin = adminService.isAdminUserToken(refreshToken);
-		const newRefreshToken = await jwt.refreshTokenSign(userId, isAdmin);
+		await jwt.refreshTokenVerify(userId, refreshToken);
+		const isAdmin = adminService.isAdminUserToken(jwt.tokenParse(refreshToken));
 		const newAccessToken = jwt.accessTokenSign(userId, isAdmin);
+		const newRefreshToken = isAdmin ? null : await jwt.refreshTokenSign(userId, isAdmin);
 		return ({
 			role: isAdmin ? 'admin' : 'client',
 			accessToken: newAccessToken,
@@ -67,7 +67,7 @@ const createNewTokenSet = async (userId, refreshToken) => {
 	성공시 status 200 반환 */
 const logoutRefreshToken = async (userId, refreshToken) => {
 	try {
-		await jwt.refreshTokenVerify(refreshToken, userId);
+		await jwt.refreshTokenVerify(userId, refreshToken);
 		return true;
 	} catch (error) {
 		throw error;
