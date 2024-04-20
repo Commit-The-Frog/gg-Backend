@@ -9,7 +9,7 @@ const {Exception, DefaultException} = require('../exception/exception');
 /** 
  * [addReport]
  * -> base64 decode -> JSON parse
- * console_type : xbox/nintendo/ps5
+ * console_type : 1/2/3
  * device : x/n/p xc1, 2 ...
  * conrtoller_malf_type : button, connect, charge
  * controller_malf_btn_list : [1, unpress], [2, unpress], ...
@@ -20,10 +20,13 @@ const addReport = async (encodedReq) => {
 		// decode and JSON parse
 		const decodedString = Buffer.from(encodedReq, 'base64').toString('utf-8');
 		const obj = JSON.parse(decodedString);
+		// check required parts
+		if (!obj.console_type || !obj.device)
+			throw new verifyException.inputFormatError('from service');
 		// verify obj
 		if (!verifyService.isValidNumber(obj.console_type) ||
 			!verifyService.isValidName(obj.device) ||
-			!verifyService.isValidName(obj.controller_malf_type))
+			(obj.controller_malf_type && !verifyService.isValidName(obj.controller_malf_type)))
 			throw new verifyException.inputFormatError('from service');
 		// if device is already under repair
 		if (await reportGetService.getDeviceStatus(obj.device) != DeviceStatus.NORMAL)
