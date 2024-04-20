@@ -1,19 +1,23 @@
 const jwt = require("../service/jwtService.js")
-const apiGetter = require("../service/authService.js")
+const apiGetter = require("./fourtyTwoApiService.js")
 const userRepo = require("../repository/userRepository.js");
+const authException = require("../exception/authException.js");
 const { UserNotFoundError } = require("../exception/userException.js");
 const searchService = require('./searchService.js');
 const adminService = require('./adminService.js');
 
 /*  [INIT]
 	code 로 42 API 에서 유저 정보 받아옴
+	adminLogin이면 admin용 at, rt를 생성해서 보내준다.
 	유저 조회 후 존재하면 정보 업데이트, 없으면 생성(회원가입)
 	해당 유저정보로 AT, RT 발급 후 리턴 */
-const setUserAndCreateToken = async (code) => {
+const setUserAndCreateToken = async (code, adminLogin) => {
 	try {
 		let userInfo = null;
 		try {
 			userInfo = await apiGetter(code);
+			if (adminLogin && !adminService.isAdminUser(userInfo.id))
+				throw new authException.NotAdminUserError('In Service');
 			await userRepo.findUserById(userInfo.id);
 			await userRepo.updateUserById(userInfo.id, userInfo.login, userInfo.displayname, userInfo.image.versions.small, userInfo.image.versions.micro);
 		} catch (error) {
@@ -24,11 +28,11 @@ const setUserAndCreateToken = async (code) => {
 				throw error;
 			}
 		}
-		const accessToken = await jwt.accessTokenSign(userInfo.id, adminService.isAdminUser(userInfo.id));
-		const refreshToken = await jwt.refreshTokenSign(userInfo.id, adminService.isAdminUser(userInfo.id));
+		const accessToken = jwt.accessTokenSign(userInfo.id, adminLogin);
+		const refreshToken = await jwt.refreshTokenSign(userInfo.id, adminLogin);
 		return ({
 			user_id: userInfo.id,
-			admin: adminService.isAdminUser(userInfo.id),
+			role : adminLogin ? 'admin' : 'client',
 			accessToken: accessToken,
 			refreshToken: refreshToken
 		})
@@ -44,10 +48,11 @@ const setUserAndCreateToken = async (code) => {
 const createNewTokenSet = async (userId, refreshToken) => {
 	try {
 		await jwt.refreshTokenVerify(refreshToken, userId);
-		const newRefreshToken = await jwt.refreshTokenSign(userId, adminService.isAdminUser(userId));
-		const newAccessToken = await jwt.accessTokenSign(userId, adminService.isAdminUser(userId));
+		const isAdmin = adminService.isAdminUserToken(refreshToken);
+		const newRefreshToken = await jwt.refreshTokenSign(userId, isAdmin);
+		const newAccessToken = jwt.accessTokenSign(userId, isAdmin);
 		return ({
-			admin: adminService.isAdminUser(userId),
+			role: isAdmin ? 'admin' : 'client',
 			accessToken: newAccessToken,
 			refreshToken: newRefreshToken
 		});
