@@ -122,7 +122,7 @@ const refreshTokenSign = async (userId, admin) => {
 	실패시 TokenAuthorizeError
 	성공시 true 리턴
 */
-const refreshTokenVerify = async (refreshToken, userId) => {
+const refreshTokenVerify = async (userId, refreshToken) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
