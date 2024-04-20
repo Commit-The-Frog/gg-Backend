@@ -5,6 +5,7 @@ const jwtException = require('../exception/jwtException.js');
 const logger = require('../config/logger');
 const verifyService = require('../service/verifyService.js');
 const adminService = require('../service/adminService.js');
+const crypto = require('crypto');
 
 const tokenParse = (rawToken) => {
 	try {
@@ -14,6 +15,14 @@ const tokenParse = (rawToken) => {
 	} catch(error) {
 		throw new jwtException.TokenAuthorizeError("from service")
 	}
+}
+
+const tokenHashCreater = (id) => {
+	const hash = crypto.createHash('sha256');
+	hash.update(id + Date.now());
+	const base64 = hash.digest('base64');
+	logger.info(`${base64}`)
+	return base64;
 }
 
 /*	[accessTokenSign]
@@ -79,7 +88,7 @@ const accessTokenVerify = (userId, accessToken) => {
 	새로은 refresh token 발급 2주 이후에는 자동 삭제
 	실패시 TokenSignError
 */
-const refreshTokenSign = async (userId, admin) => {
+const refreshTokenSign = async (userId, admin, hash) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
@@ -87,9 +96,11 @@ const refreshTokenSign = async (userId, admin) => {
 			throw Error();
 		if (admin) // admin은 refresh token을 만들지 않는다.
 			throw Error();
+		const userTokenId = hash ? hash : tokenHashCreater(userId);
 		const payload = {
 			id : userId,
-			role : admin ? 'admin' : 'client'
+			role : admin ? 'admin' : 'client',
+			userTokenId : userTokenId
 		}
 		const refresh_secret = admin ? ADMIN_REFRESH_SECRET : JWT_REFRESH_SECRET;
 		const data = jwt.sign(
@@ -99,15 +110,7 @@ const refreshTokenSign = async (userId, admin) => {
 			expiresIn: '14d',
 		})
 		const redisClient = await createRedisClient();
-		const tokenScore = Date.now();
-		await redisClient.sendCommand(['ZADD', userId, tokenScore.toString(), data]); // userId set에 새로운 RT 추가
-		logger.info("### Refresh Token Saved In Redis");
-		const tokenLength = await redisClient.sendCommand(['ZCARD', userId]);
-		if (tokenLength > 5)
-		{
-			await redisClient.sendCommand(['ZREMRANGEBYRANK', userId, '0', '0']);
-			logger.info("### Oldest Refresh Token Deleted");
-		}
+		await redisClient.hSet(userId, userTokenId, data);
 		redisClient.quit();
 		return (data);
 	} catch (error) {
@@ -145,16 +148,16 @@ const refreshTokenVerify = async (userId, refreshToken) => {
 			logger.info("### Refresh Token ID Verified");
 		}
 		const redisClient = await createRedisClient();
-		if (await redisClient.sendCommand(['ZSCORE', userId, refreshToken])) { // RT가 있는지 확인
-			logger.info("### Requset RT is not used before");
-		} else {
-			await redisClient.sendCommand(['DEL', userId]);
-			logger.info('### ' + userId + "'s all RT are deleted from redis because of security issue");
+		const savedToken = await redisClient.hGet(decoded.id, decoded.userTokenId);
+		if (savedToken !== refreshToken)
+		{
+			logger.info("### Refresh Token Already Used");
+			await redisClient.del(decoded.id);
 			throw Error();
 		}
-		await redisClient.sendCommand(['ZREM', userId, refreshToken]); // 사용된 RT set에서 삭제
-		logger.info("### Make Request RT Expire");
+		const newToken = await refreshTokenSign(decoded.id, isAdmin, decoded.userTokenId);
 		redisClient.quit();
+		return newToken;
 	} catch (error) {
 		throw new jwtException.TokenAuthorizeError("from service");
 	}
@@ -172,8 +175,10 @@ const refreshTokenDelete = async (userId, refreshToken) => {
 		refreshToken = tokenParse(refreshToken);
 		if (!verifyService.isValidTokenStruct(refreshToken))
 			throw Error();
+		const refresh_secret = adminService.isAdminUserToken(refreshToken) ? ADMIN_REFRESH_SECRET : JWT_REFRESH_SECRET;
+		const decoded = jwt.verify(refreshToken, refresh_secret);
 		const redisClient = await createRedisClient();
-		await redisClient.sendCommand(['ZREM', userId, refreshToken]);
+		await redisClient.HDEL(decoded.id, decoded.userTokenId);
 		redisClient.quit();
 		logger.info("### " + userId + "'s RT Deleted From Redis");
 	} catch (error) {
