@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const reportGetService = require('../service/reportGetService.js');
-const adminService = require('../service/adminService.js');
 const jwtService = require('../service/jwtService.js');
 
 /**
@@ -53,7 +52,7 @@ router.get('/', async (req, res, next) => {
 
 /**
  * @swagger
- * /devices:
+ *   /devices:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -107,6 +106,7 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
 	try {
+		jwtService.adminTokenAuthorize(req.headers.authorization);
 		await reportGetService.insertDevice(req.query.id, req.query.name, req.query.console_id, req.query.device_type, req.query.status)
 		res.status(200).send();
 	} catch (error) {
@@ -116,7 +116,7 @@ router.post('/', async (req, res, next) => {
 
 /**
  * @swagger
- * /devices:
+ *   /devices:
  *   patch:
  *     security:
  *       - bearerAuth: []
@@ -149,6 +149,7 @@ router.post('/', async (req, res, next) => {
 
 router.patch('/', async (req, res, next) => {
 	try {
+		jwtService.adminTokenAuthorize(req.headers.authorization);
 		await reportGetService.updateDeviceStatus(req.query.id, req.query.status);
 		res.status(200).send();
 	} catch (error) {
@@ -158,7 +159,7 @@ router.patch('/', async (req, res, next) => {
 
 /**
  * @swagger
- * /devices:
+ *   /devices:
  *   delete:
  *     security:
  *       - bearerAuth: []
@@ -183,6 +184,7 @@ router.patch('/', async (req, res, next) => {
 
 router.delete('/', async (req, res, next) => {
 	try {
+		jwtService.adminTokenAuthorize(req.headers.authorization);
 		await reportGetService.deleteDevice(req.query.id);
 		res.status(200).send();
 	} catch (error) {
@@ -197,6 +199,11 @@ module.exports = router;
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     User:
  *       type: object

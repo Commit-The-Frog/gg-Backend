@@ -5,6 +5,9 @@ const jwtException = require('../exception/jwtException.js');
 const logger = require('../config/logger');
 const verifyService = require('../service/verifyService.js');
 const adminService = require('../service/adminService.js');
+const authException = require('../exception/authException');
+const {Exception, DefaultException} = require('../exception/exception');
+
 
 const tokenParse = (rawToken) => {
 	try {
@@ -177,11 +180,24 @@ const refreshTokenDelete = async (userId, refreshToken) => {
 	}
 }
 
+const adminTokenAuthorize = (accessToken) => {
+	try {
+		if (!accessToken)
+			throw new jwtException.TokenAuthorizeError('In Service');
+		if (!adminService.isAdminUserToken(tokenParse(accessToken)))
+			throw new authException.NotAdminUserError('In Service');
+		accessTokenVerify(jwt.decode(tokenParse(accessToken)).id, accessToken);
+	} catch (error) {
+		throw (error instanceof Exception ? error : new DefaultException('service', error.name));
+	}
+}
+
 module.exports = {
 	tokenParse,
 	accessTokenSign,
 	accessTokenVerify,
 	refreshTokenSign,
 	refreshTokenVerify,
-	refreshTokenDelete
+	refreshTokenDelete,
+	adminTokenAuthorize
 }

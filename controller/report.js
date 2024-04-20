@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const reportPostService = require('../service/reportPostService');
 const reportGetService = require('../service/reportGetService');
-const adminService = require('../service/adminService.js');
 const jwtService = require('../service/jwtService.js');
 
 /**
@@ -49,6 +48,8 @@ router.post('/', async (req, res, next) => {
  * paths:
  *   /reports:
  *     get:
+ *       security:
+ *         - bearerAuth: []
  *       tags:
  *         - Report
  *       summary: (관리자) 신고 목록 조회
@@ -58,6 +59,7 @@ router.post('/', async (req, res, next) => {
  */
 router.get('/', async (req, res, next) => {
 	try {
+		jwtService.adminTokenAuthorize(req.headers.authorization);
 		const result = await reportPostService.findAllReport();
 		res.send(result);
 	} catch (error) {
@@ -70,6 +72,8 @@ router.get('/', async (req, res, next) => {
  * paths:
  *   /reports:
  *     patch:
+ *       security:
+ *         - bearerAuth: []
  *       tags:
  *         - Report
  *       summary: (관리자) 신고 상태 업데이트
@@ -86,6 +90,7 @@ router.get('/', async (req, res, next) => {
  */
 router.patch('/', async (req, res, next) => {
 	try {
+		jwtService.adminTokenAuthorize(req.headers.authorization);
 		await reportPostService.changeReportStatus(
 			req.query.id,
 			req.query.status
@@ -101,6 +106,8 @@ router.patch('/', async (req, res, next) => {
  * paths:
  *   /reports:
  *     delete:
+ *       security:
+ *         - bearerAuth: []
  *       tags:
  *         - Report
  *       summary: (관리자) 신고 삭제
@@ -114,6 +121,7 @@ router.patch('/', async (req, res, next) => {
  */
 router.delete('/', async (req, res, next) => {
 	try {
+		jwtService.adminTokenAuthorize(req.headers.authorization);
 		await reportPostService.removeReport(req.query.id);
 		res.status(200).send('successfully deleted report');
 	} catch (error) {
@@ -159,6 +167,8 @@ router.get('/types', async (req, res, next) => {
  * @swagger
  * /reports/types/malfunction_type:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     summary: (관리자) malfunction_type 새로 추가
  *     description: (관리자) malfunction_type 새로 추가 ex. (connect, 연결문제)
  *     operationId: posttypesMalfunctiontype
@@ -190,6 +200,7 @@ router.get('/types', async (req, res, next) => {
 router.post('/types/malfunction_type', async (req, res, next) => {
 	let result;
 	try {
+		jwtService.adminTokenAuthorize(req.headers.authorization);
 		await reportGetService.insertMalfunctionType(req.query.name, req.query.description);
 		res.status(200).send(result);
 	} catch (error) {
@@ -201,6 +212,8 @@ router.post('/types/malfunction_type', async (req, res, next) => {
  * @swagger
  * /reports/types/malfunction_type:
  *   delete:
+ *     security:
+ *       - bearerAuth: []
  *     summary: (관리자) malfunction_type id로 삭제
  *     description: (관리자) malfunction_type id로 삭제 ex. (connect, 연결문제)
  *     operationId: deletetypesMalfunctiontype
@@ -225,6 +238,7 @@ router.post('/types/malfunction_type', async (req, res, next) => {
 router.delete('/types/malfunction_type', async (req, res, next) => {
 	let result;
 	try {
+		jwtService.adminTokenAuthorize(req.headers.authorization);
 		await reportGetService.deleteMalfunctionType(req.query.id);
 		res.status(200).send(result);
 	} catch (error) {
@@ -236,6 +250,8 @@ router.delete('/types/malfunction_type', async (req, res, next) => {
  * @swagger
  * /reports/types/button_malfunction_type:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     summary: (관리자) 버튼 고장 타입 추가.
  *     description: (관리자) 버튼 고장 타입 추가. ex> (unpress, 눌리지 않음)
  *     operationId: posttypesButtonMalfunctionType
@@ -267,6 +283,7 @@ router.delete('/types/malfunction_type', async (req, res, next) => {
 router.post('/types/button_malfunction_type', async (req, res, next) => {
 	let result;
 	try {
+		jwtService.adminTokenAuthorize(req.headers.authorization);
 		await reportGetService.insertButtonMalfunctionType(req.query.name, req.query.description);
 		res.status(200).send(result);
 	} catch (error) {
@@ -278,6 +295,8 @@ router.post('/types/button_malfunction_type', async (req, res, next) => {
  * @swagger
  * /reports/types/button_malfunction_type:
  *   delete:
+ *     security:
+ *       - bearerAuth: []
  *     summary: (관리자) 버튼 고장 타입 id로 삭제
  *     description: (관리자) 버튼 고장 타입 id로 삭제 ex> (unpress, 눌리지 않음)
  *     operationId: deletetypesButtonMalfunctionType
@@ -302,6 +321,7 @@ router.post('/types/button_malfunction_type', async (req, res, next) => {
 router.delete('/types/button_malfunction_type', async (req, res, next) => {
 	let result;
 	try {
+		jwtService.adminTokenAuthorize(req.headers.authorization);
 		await reportGetService.deleteButtonMalfunctionType(req.query.id);
 		res.status(200).send(result);
 	} catch (error) {
@@ -313,6 +333,11 @@ module.exports = router;
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     User:
  *       type: object
