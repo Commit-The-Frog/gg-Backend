@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const reportGetService = require('../service/reportGetService.js');
+const adminService = require('../service/adminService.js');
+const jwtService = require('../service/jwtService.js');
 
 /**
  * @swagger
@@ -53,6 +55,8 @@ router.get('/', async (req, res, next) => {
  * @swagger
  * /devices:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     summary: (관리자) 디바이스 추가
  *     description:
  *     operationId: postDevice
@@ -114,6 +118,8 @@ router.post('/', async (req, res, next) => {
  * @swagger
  * /devices:
  *   patch:
+ *     security:
+ *       - bearerAuth: []
  *     summary: (관리자) 디바이스 상태 변경
  *     description:
  *     operationId: patchDevice
@@ -154,6 +160,8 @@ router.patch('/', async (req, res, next) => {
  * @swagger
  * /devices:
  *   delete:
+ *     security:
+ *       - bearerAuth: []
  *     summary: (관리자) 디바이스 삭제
  *     description:
  *     operationId: deleteDevice

@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const reportPostService = require('../service/reportPostService');
 const reportGetService = require('../service/reportGetService');
+const adminService = require('../service/adminService.js');
+const jwtService = require('../service/jwtService.js');
 
 /**
  * @swagger
