@@ -1,5 +1,5 @@
 const jwt = require("../service/jwtService.js")
-const apiGetter = require("../service/authService.js")
+const apiGetter = require("./fourtyTwoApiService.js")
 const userRepo = require("../repository/userRepository.js");
 const authException = require("../exception/authException.js");
 const { UserNotFoundError } = require("../exception/userException.js");
