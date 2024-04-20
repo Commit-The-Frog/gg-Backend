@@ -29,7 +29,9 @@ const setUserAndCreateToken = async (code, adminLogin) => {
 			}
 		}
 		const accessToken = jwt.accessTokenSign(userInfo.id, adminLogin);
-		const refreshToken = await jwt.refreshTokenSign(userInfo.id, adminLogin);
+		let refreshToken = null;
+		if (!adminLogin)
+			refreshToken = await jwt.refreshTokenSign(userInfo.id, adminLogin);
 		return ({
 			user_id: userInfo.id,
 			role : adminLogin ? 'admin' : 'client',
@@ -49,8 +51,10 @@ const createNewTokenSet = async (userId, refreshToken) => {
 	try {
 		await jwt.refreshTokenVerify(refreshToken, userId);
 		const isAdmin = adminService.isAdminUserToken(refreshToken);
-		const newRefreshToken = await jwt.refreshTokenSign(userId, isAdmin);
 		const newAccessToken = jwt.accessTokenSign(userId, isAdmin);
+		let newRefreshToken = null;
+		if (!isAdmin)
+			newRefreshToken = await jwt.refreshTokenSign(userId, isAdmin);
 		return ({
 			role: isAdmin ? 'admin' : 'client',
 			accessToken: newAccessToken,

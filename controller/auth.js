@@ -57,7 +57,7 @@ router.get("/login", async (req, res) => {
  *       - Auth
  *     summary: 관리자용 Login with 42 API
  *     description: Get user info with 42 API and give user user id and Tokens 관리자 권한으로 로그인을 시도한다.
- *     operationId: authLogin
+ *     operationId: adminLogin
  *     parameters:
  *       - name: code
  *         in: query
