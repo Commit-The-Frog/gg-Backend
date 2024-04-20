@@ -32,7 +32,8 @@ const addReport = async (encodedReq) => {
 		if (obj.device != 'etc' && await reportGetService.getDeviceStatus(obj.device) != DeviceStatus.NORMAL)
 			throw new reportPostException.DeviceIsUnderRepairError('from service');
 		// update device status
-		await reportGetService.updateDeviceStatus(obj.device, DeviceStatus.MALFUNCTION);
+		if (obj.device != 'etc')
+			await reportGetService.updateDeviceStatus(obj.device, DeviceStatus.MALFUNCTION);
 		// add report
 		return await reportPostRepository.createReport(
 			obj.console_type,
