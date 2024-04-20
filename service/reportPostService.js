@@ -29,7 +29,7 @@ const addReport = async (encodedReq) => {
 			(obj.controller_malf_type && !verifyService.isValidName(obj.controller_malf_type)))
 			throw new verifyException.inputFormatError('from service');
 		// if device is already under repair
-		if (await reportGetService.getDeviceStatus(obj.device) != DeviceStatus.NORMAL)
+		if (obj.device != 'etc' && await reportGetService.getDeviceStatus(obj.device) != DeviceStatus.NORMAL)
 			throw new reportPostException.DeviceIsUnderRepairError('from service');
 		// update device status
 		await reportGetService.updateDeviceStatus(obj.device, DeviceStatus.MALFUNCTION);
