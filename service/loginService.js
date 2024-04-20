@@ -49,8 +49,8 @@ const createNewTokenSet = async (userId, refreshToken) => {
 	try {
 		await jwt.refreshTokenVerify(refreshToken, userId);
 		const isAdmin = adminService.isAdminUserToken(refreshToken);
-		const newRefreshToken = await jwt.refreshTokenSign(userId, adminService.isAdmin);
-		const newAccessToken = jwt.accessTokenSign(userId, adminService.isAdmin);
+		const newRefreshToken = await jwt.refreshTokenSign(userId, isAdmin);
+		const newAccessToken = jwt.accessTokenSign(userId, isAdmin);
 		return ({
 			role: isAdmin ? 'admin' : 'client',
 			accessToken: newAccessToken,
