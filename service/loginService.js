@@ -13,9 +13,11 @@ const adminService = require('./adminService.js');
 	해당 유저정보로 AT, RT 발급 후 리턴 */
 const setUserAndCreateToken = async (code, adminLogin) => {
 	try {
-		let userInfo;
+		let userInfo = null;
 		try {
 			userInfo = await apiGetter(code);
+			if (adminLogin && !adminService.isAdminUser(userInfo.id))
+				throw new authException.NotAdminUserError('In Service');
 			await userRepo.findUserById(userInfo.id);
 			await userRepo.updateUserById(userInfo.id, userInfo.login, userInfo.displayname, userInfo.image.versions.small, userInfo.image.versions.micro);
 		} catch (error) {
@@ -26,8 +28,6 @@ const setUserAndCreateToken = async (code, adminLogin) => {
 				throw error;
 			}
 		}
-		if (adminLogin && !adminService.isAdminUser(userInfo.id))
-			throw new authException.NotAdminUserError('In Service');
 		const accessToken = jwt.accessTokenSign(userInfo.id, adminLogin);
 		const refreshToken = await jwt.refreshTokenSign(userInfo.id, adminLogin);
 		return ({

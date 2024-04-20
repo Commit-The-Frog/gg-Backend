@@ -17,7 +17,7 @@ const isAdminUser = function (id) {
 
 const isAdminUserToken = function (token) {
 	const tokenPayload = jwt.decode(token);
-	if (tokenPayload.role == 'admin')
+	if (tokenPayload.role === 'admin')
 		return true;
 	return false;
 }

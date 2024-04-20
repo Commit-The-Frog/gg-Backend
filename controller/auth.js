@@ -42,7 +42,7 @@ const loginService = require("../service/loginService.js");
 /* LOGIN */
 router.get("/login", async (req, res) => {
 	try {
-		result = await loginService.setUserAndCreateToken(req.query.code, false);
+		const result = await loginService.setUserAndCreateToken(req.query.code, false);
 		res.status(200).send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
@@ -81,7 +81,7 @@ router.get("/login", async (req, res) => {
 /* LOGIN */
 router.get("/admin", async (req, res) => {
 	try {
-		result = await loginService.setUserAndCreateToken(req.query.code, true);
+		const result = await loginService.setUserAndCreateToken(req.query.code, true);
 		res.status(200).send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
