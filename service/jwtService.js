@@ -21,7 +21,6 @@ const tokenHashCreater = (id) => {
 	const hash = crypto.createHash('sha256');
 	hash.update(id + Date.now());
 	const base64 = hash.digest('base64');
-	logger.info(`${base64}`)
 	return base64;
 }
 
@@ -110,7 +109,8 @@ const refreshTokenSign = async (userId, admin, hash) => {
 			expiresIn: '14d',
 		})
 		const redisClient = await createRedisClient();
-		await redisClient.hSet(userId, userTokenId, data);
+		await redisClient.set(`${userId}.${userTokenId}`, data);
+		await redisClient.expire(`${userId}.${userTokenId}`, 60 * 60 * 24 * 14);
 		redisClient.quit();
 		return (data);
 	} catch (error) {
@@ -148,11 +148,15 @@ const refreshTokenVerify = async (userId, refreshToken) => {
 			logger.info("### Refresh Token ID Verified");
 		}
 		const redisClient = await createRedisClient();
-		const savedToken = await redisClient.hGet(decoded.id, decoded.userTokenId);
+		const savedToken = await redisClient.get(`${decoded.id}.${decoded.userTokenId}`);
 		if (savedToken !== refreshToken)
 		{
 			logger.info("### Refresh Token Already Used");
-			await redisClient.del(decoded.id);
+			const keys = await redisClient.keys(`${decoded.id}.*`);
+			keys.forEach(async (key) => {
+				redisClient.del(key);
+				logger.info(`### DEL ${key}`);
+			});
 			throw Error();
 		}
 		const newToken = await refreshTokenSign(decoded.id, isAdmin, decoded.userTokenId);
@@ -178,7 +182,7 @@ const refreshTokenDelete = async (userId, refreshToken) => {
 		const refresh_secret = adminService.isAdminUserToken(refreshToken) ? ADMIN_REFRESH_SECRET : JWT_REFRESH_SECRET;
 		const decoded = jwt.verify(refreshToken, refresh_secret);
 		const redisClient = await createRedisClient();
-		await redisClient.HDEL(decoded.id, decoded.userTokenId);
+		await redisClient.del(`${decoded.id}.${decoded.userTokenId}`);
 		redisClient.quit();
 		logger.info("### " + userId + "'s RT Deleted From Redis");
 	} catch (error) {
