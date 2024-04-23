@@ -41,10 +41,10 @@ app.use('/sse', sseRouter);
 app.use('/tournament', tournamentRouter);
 app.use('/reports', reportRouter);
 app.use('/devices', deviceRouter);
-app.use(`/${process.env.ADMIN_PAGE_ENDPOINT}`, adminRouter)
+app.use(`/${process.env.ADMIN_PAGE_ENDPOINT}`, swaggerUi.serve, swaggerUi.setup(specs))
 
 // swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // connect MongoDB
 connectMongoDB();
