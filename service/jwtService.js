@@ -17,9 +17,10 @@ const tokenParse = (rawToken) => {
 	}
 }
 
-const tokenHashCreater = (id) => { // salt 값 넣기 추가
+const tokenHashCreater = () => { // salt 값 넣기 추가
 	const hash = crypto.createHash('sha256');
-	hash.update(id + Date.now());
+	const uuid = crypto.randomUUID();
+	hash.update(uuid + Date.now());
 	const base64 = hash.digest('base64');
 	return base64;
 }
@@ -95,7 +96,7 @@ const refreshTokenSign = async (userId, admin, hash) => {
 			throw Error();
 		if (admin) // admin은 refresh token을 만들지 않는다.
 			throw Error();
-		const userTokenId = hash ? hash : tokenHashCreater(userId);
+		const userTokenId = hash ? hash : tokenHashCreater();
 		const payload = {
 			id : userId,
 			role : admin ? 'admin' : 'client',
