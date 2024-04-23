@@ -66,7 +66,7 @@ const changeReportStatus = async (id, status) => {
 	try {
 		// verify id and status
 		if (!verifyService.isValidName(id) || 
-			!verfifyService.isValidNumber(status))
+			!verifyService.isValidNumber(status))
 			throw new verifyException.inputFormatError('service');
 		// find device by report id
 		const report = await reportPostRepository.searchReportById(id);
