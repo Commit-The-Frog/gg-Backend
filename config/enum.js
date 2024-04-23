@@ -1,5 +1,4 @@
 const DeviceStatus = {
-	MALFUNCTION: 0,
 	UNDER_REPAIR: 1,
 	NORMAL: 2
 };
