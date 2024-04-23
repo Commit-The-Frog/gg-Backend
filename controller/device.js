@@ -20,7 +20,7 @@ const reportGetService = require('../service/reportGetService.js');
  *     parameters:
  *       - name: console_type
  *         in: query
- *         description: "해당하는 디바이스 목록을 받기 위한 콘솔 종류 PS5  1 | NINTENDO  2 | XBOX  3"
+ *         description: "해당하는 디바이스 목록을 받기 위한 콘솔 종류 XBOX  1 | NINTENDO  2 | PS5  3"
  *         required: false
  *         explode: false
  *         schema:
@@ -88,7 +88,7 @@ router.get('/', async (req, res, next) => {
  *           type: string
  *       - name: status
  *         in: query
- *         description: "status (0번이 고장, 1번이 수리중, 2번이 정상)"
+ *         description: "status (1번이 수리중, 2번이 정상)"
  *         required: false
  *         explode: false
  *         schema:
@@ -128,7 +128,7 @@ router.post('/', async (req, res, next) => {
  *           type: string
  *       - name: status
  *         in: query
- *         description: "status (0번이 고장, 1번이 수리중, 2번이 정상)"
+ *         description: "status (1번이 수리중, 2번이 정상)"
  *         required: false
  *         explode: false
  *         schema:
