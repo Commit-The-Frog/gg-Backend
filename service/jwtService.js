@@ -17,7 +17,7 @@ const tokenParse = (rawToken) => {
 	}
 }
 
-const tokenHashCreater = (id) => {
+const tokenHashCreater = (id) => { // salt 값 넣기 추가
 	const hash = crypto.createHash('sha256');
 	hash.update(id + Date.now());
 	const base64 = hash.digest('base64');
@@ -106,11 +106,11 @@ const refreshTokenSign = async (userId, admin, hash) => {
 			payload,
 			refresh_secret, {
 			algorithm: 'HS256',
-			expiresIn: '14d',
+			expiresIn: '3d',
 		})
 		const redisClient = await createRedisClient();
 		await redisClient.set(`${userId}.${userTokenId}`, data);
-		await redisClient.expire(`${userId}.${userTokenId}`, 60 * 60 * 24 * 14);
+		await redisClient.expire(`${userId}.${userTokenId}`, 60 * 60 * 24 * 3);
 		redisClient.quit();
 		return (data);
 	} catch (error) {
