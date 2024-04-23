@@ -17,9 +17,10 @@ const isAdminUser = function (id) {
 
 const isAdminUserToken = function (token) {
 	const tokenPayload = jwt.decode(token);
-	return tokenPayload.admin;
+	if (tokenPayload.role === 'admin')
+		return true;
+	return false;
 }
-
 
 module.exports = {
 	isAdminUser,

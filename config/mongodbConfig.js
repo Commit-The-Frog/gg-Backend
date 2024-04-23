@@ -2,7 +2,7 @@ const app = require('../app.js');
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
 
-const { MONGO_PORT, MONGO_URI, MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD, MONGO_AUTH_SOURCE } = process.env;
+const { MONGO_URI, MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD, MONGO_AUTH_SOURCE } = process.env;
 
 // connecting mongodb
 const connectMongoDB = function () {
@@ -42,12 +42,30 @@ const bookSchema = new mongoose.Schema({
 	timestamps: true
 });
 
+// Define Scehma : report
+const reportSchema = new mongoose.Schema({
+	console_type : { type : Number, required: true },
+	device : { type : String, required: true },
+	controller_malf_type : { type : String , required: false },
+	controller_malf_btn_list : [{
+		controller_btn_id : { type : String, required: false },
+		controller_btn_malf_type : { type : String, required: false }
+	}],
+	etc_description : { type : String, required: false },
+	status : { type : Number, required: true }
+},
+{
+	timestamps : true
+});
+
 // Create Models
 const User = mongoose.model('user', userSchema);
 const Book = mongoose.model('book', bookSchema);
+const Report = mongoose.model('report', reportSchema);
 
 module.exports = {
 	connectMongoDB,
 	User,
-	Book
+	Book,
+	Report
 };

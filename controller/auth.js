@@ -42,17 +42,51 @@ const loginService = require("../service/loginService.js");
 /* LOGIN */
 router.get("/login", async (req, res) => {
 	try {
-		result = await loginService.setUserAndCreateToken(req.query.code);
+		const result = await loginService.setUserAndCreateToken(req.query.code, false);
 		res.status(200).send(result);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
 	}
 })
 
-/* REDIRECTION TEST of FE */
-router.get("/test", async (req, res) => {
-	res.redirect(process.env.LOGIN_42_API_REDIRECT);
-});
+/**
+ * @swagger
+ * /auth/admin:
+ *   get:
+ *     tags:
+ *       - Auth
+ *     summary: 관리자용 Login with 42 API
+ *     description: Get user info with 42 API and give user user id and Tokens 관리자 권한으로 로그인을 시도한다.
+ *     operationId: adminLogin
+ *     parameters:
+ *       - name: code
+ *         in: query
+ *         description: value of code for 42 API login
+ *         required: true
+ *         explode: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: successful login
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LoginInfo'
+ *       '400':
+ *         description: "ApiInfoGetError"
+ *       '500':
+ *         description: "TokenSignError or InternalServerError"
+ */
+/* LOGIN */
+router.get("/admin", async (req, res) => {
+	try {
+		const result = await loginService.setUserAndCreateToken(req.query.code, true);
+		res.status(200).send(result);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || "InternalServerError");
+	}
+})
 
 /**
  * @swagger
@@ -176,9 +210,9 @@ module.exports = router;
  *         user_id:
  *           type: string
  *           example: "158010"
- *         admin:
+ *         role:
  *           type: string
- *           example: "true"
+ *           example: "client"
  *         accessToken:
  *           type: string
  *           example: "<token>"

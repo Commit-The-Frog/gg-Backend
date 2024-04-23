@@ -23,3 +23,25 @@ jobs:
         USERNAME: ${{ secrets.EC2_USERNAME }}
         DEPLOY_COMMAND: ${{ secrets.DEPLOY_COMMAND }}
       run: ssh -o StrictHostKeyChecking=no $USERNAME@$HOST "${DEPLOY_COMMAND}"
+
+    - name: Notify Discord on failure
+      uses: sarisia/actions-status-discord@v1
+      if: ${{ failure() }}
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        status: ${{ job.status }}
+        content: "[main] 배포 실패"
+        color: 0xff0000
+        username: GitHub Actions
+        avatar_url: 'https://avatars.githubusercontent.com/u/44036562'
+
+    - name: Notify Discord on success
+      uses: sarisia/actions-status-discord@v1
+      if: ${{ success() }}
+      with:
+        webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        status: ${{ job.status }}
+        content: "[main] 배포 성공"
+        color: 0x00ff00
+        username: GitHub Actions
+        avatar_url: 'https://avatars.githubusercontent.com/u/44036562'
