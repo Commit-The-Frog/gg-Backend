@@ -1,6 +1,7 @@
 const logger = require('../config/logger');
 const sseException = require('../exception/sseException');
 const verifyService = require('../service/verifyService.js');
+const crypto = require('crypto');
 
 let listener = [];
 
@@ -14,7 +15,7 @@ const addListener = function (id, res, info) {
 		res.header('Content-Type', 'text/event-stream');
 		res.header('Cache-Control', 'no-cache');
 		res.header('Connection', 'keep-alive');
-		id = Date.now() + '.' + id;
+		id = crypto.randomUUID() + '.' + id;
 		listener.push({id: id, res_id: 1,res: res});
 		const data = {
 			"action" : "INIT"
