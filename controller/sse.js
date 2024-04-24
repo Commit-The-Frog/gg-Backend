@@ -71,7 +71,7 @@ router.get('/subscribe', async function (req, res, next) {
  */
 router.post('/speaker', async function (req, res, next) {
 	try {
-		sseService.sendInfoToListeners(req.body);
+		sseService.sendInfoToListeners('TEST', req.body);
 		res.send(req.body);
 	} catch (error) {
 		res.status(error.status || 500).send(error.name || "InternalServerError");
