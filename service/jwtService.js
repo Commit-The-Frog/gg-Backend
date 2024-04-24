@@ -20,7 +20,7 @@ const tokenParse = (rawToken) => {
 const tokenHashCreater = () => { // salt 값 넣기 추가
 	const hash = crypto.createHash('sha256');
 	const uuid = crypto.randomUUID();
-	hash.update(uuid + Date.now());
+	hash.update(`${uuid}.${Date.now()}`);
 	const base64 = hash.digest('base64');
 	return base64;
 }
