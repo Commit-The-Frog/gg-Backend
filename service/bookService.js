@@ -198,7 +198,7 @@ const userCurrentPlaying = async (userId) => {
 		const curTick = getCurrentTick();
 		const today = getTodayString();
 		const userRemainBook = await bookRepository.findBookOfUserAtTime(userId, curTick, curTick, today);
-		if (userRemainBook.length() > 0)
+		if (userRemainBook[0])
 			return true;
 		return false;
 	} catch (error) {
