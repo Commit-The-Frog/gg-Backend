@@ -191,6 +191,21 @@ const deleteBookById = async function (userId, bookId) {
 	}
 };
 
+/*	[userCurrentPlaying]
+	유저 id로 해당 유저가 현재 시각에 해당하는 예약이 있는지 확인한다. */
+const userCurrentPlaying = async (userId) => {
+	try {
+		const curTick = getCurrentTick();
+		const today = getTodayString();
+		const userRemainBook = await bookRepository.findBookOfUserAtTime(userId, curTick, curTick, today);
+		if (userRemainBook.length() > 0)
+			return true;
+		return false;
+	} catch (error) {
+		throw error;
+	}
+}
+
 
 module.exports = {
 	addBook,
@@ -199,5 +214,6 @@ module.exports = {
 	findBookListOfUserByTypeAndDate,
 	updateBookById,
 	findBookById,
-	deleteBookById
+	deleteBookById,
+	userCurrentPlaying
 };
