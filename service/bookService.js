@@ -7,24 +7,37 @@ const verifyService = require('../service/verifyService.js');
 const sseService = require('../service/sseService.js');
 const logger = require('../config/logger.js');
 
+function getTodayString() {
+	const now = new Date();
+	const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+	const newDateTime = new Date(utc + 9 * 3600000);
+	return `${newDateTime.getFullYear()}-${(newDateTime.getMonth() + 1).toString().padStart(2, '0')}-${newDateTime.getDate().toString().padStart(2, '0')}`;
+}
+
+function getCurrentTick() {
+	const now = new Date();
+	const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+	const newDateTime = new Date(utc + 9 * 3600000);
+	return Math.floor((newDateTime.getHours() + newDateTime.getMinutes() / 60) * 2);
+}
+
 /**
  * [isValidBook]
  * start, end시간에 대해서
- * 유저가 현재 시각부터 남은 슬롯의 개수와
+ * 유저가 현재시각을 기준으로 유효한 예약들의 남은 슬롯 개수와
  * 새로 넣는 start end 시각이 차지하는 슬롯의 개수 합이
- *
+ * limit_slot보다 크면 안된다.
  */
 async function isValidBook(userId, start, end, date) {
 	const limit_slot = parseInt(process.env.LIMIT_SLOT);
-	let now = new Date();
-	let utc = now.getTime() + now.getTimezoneOffset() * 60000;
-	let newDateTime = new Date(utc + 9 * 3600000);
-	let today = `${newDateTime.getFullYear()}-${(newDateTime.getMonth() + 1).toString().padStart(2, '0')}-${newDateTime.getDate().toString().padStart(2, '0')}`;
-	let curTick = Math.floor((newDateTime.getHours() + newDateTime.getMinutes() / 60) * 2);
-	let userRemainBook = await bookRepository.findBookOfUserAtTime(userId, curTick, 47, today);
+	const today = getTodayString();
+	const curTick = getCurrentTick();
+	const userRemainBook = await bookRepository.findBookOfUserAtTime(userId, curTick, 47, today);
 	let userRemainBookTick = 0;
 	userRemainBook.forEach(function(element) {
-		userRemainBookTick += element.end_time - Math.max(element.start_time, curTick) + 1;
+		userRemainBookTick += element.end_time - element.start_time + 1;
+		// userRemainBookTick += element.end_time - Math.max(element.start_time, curTick) + 1;
+		// 위의 코드는 현재 시각을 기준으로 남은 예약 슬롯의 개수를 센다. 계속해서 30분씩 연장가능.
 	});
 	logger.info(`### User Remain Book Tick = ${userRemainBookTick}`);
 	if (date != today || curTick > start || end - start + 1 > limit_slot || userRemainBookTick + (end - start + 1) > limit_slot)
@@ -167,10 +180,31 @@ const deleteBookById = async function (userId, bookId) {
 		const targetBook = await bookRepository.findBookById(bookId);
 		await bookRepository.deleteBookById(userId, bookId);
 		sseService.sendInfoToListeners("DEL", {"_id": bookId, "type": targetBook[0].type});
+		const currentTick = getCurrentTick();
+		if (targetBook[0].start_time < currentTick) {
+			const result = await bookRepository.createBook(targetBook[0].user_id, targetBook[0].start_time,
+				currentTick - 1, targetBook[0].date, targetBook[0].type);
+			sseService.sendInfoToListeners('ADD', result[0]);
+		}
 	} catch (error) {
 		throw error;
 	}
 };
+
+/*	[userCurrentPlaying]
+	유저 id로 해당 유저가 현재 시각에 해당하는 예약이 있는지 확인한다. */
+const userCurrentPlaying = async (userId) => {
+	try {
+		const curTick = getCurrentTick();
+		const today = getTodayString();
+		const userRemainBook = await bookRepository.findBookOfUserAtTime(userId, curTick, curTick, today);
+		if (userRemainBook[0])
+			return true;
+		return false;
+	} catch (error) {
+		throw error;
+	}
+}
 
 
 module.exports = {
@@ -180,5 +214,6 @@ module.exports = {
 	findBookListOfUserByTypeAndDate,
 	updateBookById,
 	findBookById,
-	deleteBookById
+	deleteBookById,
+	userCurrentPlaying
 };
