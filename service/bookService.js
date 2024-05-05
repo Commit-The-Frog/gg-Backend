@@ -178,9 +178,11 @@ const deleteBookById = async function (userId, bookId) {
 		if (!verifyService.isValidId(userId))
 			throw new verifyException.inputFormatError('from service');
 		const targetBook = await bookRepository.findBookById(bookId);
+		const currentTick = getCurrentTick();
+		if (targetBook[0].end_time < currentTick)
+			throw new bookException.InvalidTimeError('From Service');
 		await bookRepository.deleteBookById(userId, bookId);
 		sseService.sendInfoToListeners("DEL", {"_id": bookId, "type": targetBook[0].type});
-		const currentTick = getCurrentTick();
 		if (targetBook[0].start_time < currentTick) {
 			const result = await bookRepository.createBook(targetBook[0].user_id, targetBook[0].start_time,
 				currentTick - 1, targetBook[0].date, targetBook[0].type);
