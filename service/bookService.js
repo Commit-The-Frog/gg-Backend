@@ -133,6 +133,7 @@ const findBookListOfUserByTypeAndDate = async function (userId, type, date) {
 		else {
 			bookList = await bookRepository.findBooksByUserIdAndDate(userId, date);
 		}
+		bookList.sort((a, b) => a.start_time - b.start_time);
 		return bookList;
 	} catch (error) {
 		throw error;
