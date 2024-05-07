@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const bookService = require('../service/bookService');
+const jwtService = require('../service/jwtService');
 
 /**
  * @swagger
@@ -109,6 +110,40 @@ router.get('/:userId/history', async function(req, res, next) {
 /**
  * @swagger
  * paths:
+ *   /books/{userId}/nowplay:
+ *     get:
+ *       tags:
+ *         - Book
+ *       summary: 현재 플레이중인지 확인
+ *       parameters:
+ *         - name: userId
+ *           in: path
+ *           description: 유저 id
+ *           required: true
+ *           schema:
+ *             type: string
+ *       responses:
+ *         '200':
+ *           description: 조회 성공
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: string
+ *         '404':
+ *           description: 조회 실패
+ */
+router.get('/:userId/nowplay', async function (req, res, next) {
+	try {
+		const nowPlay = await bookService.userCurrentPlaying(req.params.userId);
+		res.status(200).send(nowPlay);
+	} catch (error) {
+		res.status(error.status || 500).send(error.name || 'InternalServerError');
+	}
+})
+
+/**
+ * @swagger
+ * paths:
  *   /books:
  *     get:
  *       tags:
@@ -186,11 +221,14 @@ router.get('/:bookId', async function (req, res, next) {
 	}
 })
 
+
 /**
  * @swagger
  * paths:
  *   /books:
  *     post:
+ *       security:
+ *         - bearerAuth: []
  *       tags:
  *         - Book
  *       summary: 예약 생성
@@ -222,7 +260,8 @@ router.get('/:bookId', async function (req, res, next) {
  */
 router.post('/', async function(req, res, next) {
 	try {
-		let book = await bookService.addBook(
+		jwtService.accessTokenVerify(req.query.userId, req.headers.authorization);
+		const book = await bookService.addBook(
 			req.query.userId,
 			req.body.start,
 			req.body.end,
@@ -240,6 +279,8 @@ router.post('/', async function(req, res, next) {
  * paths:
  *   /books:
  *     patch:
+ *       security:
+ *         - bearerAuth: []
  *       tags:
  *         - Book
  *       summary: 예약 수정
@@ -277,6 +318,7 @@ router.post('/', async function(req, res, next) {
  */
 router.patch('/', async function (req, res, next) {
 	try {
+		jwtService.accessTokenVerify(req.query.userId, req.headers.authorization);
 		let book = await bookService.updateBookById(
 			req.query.userId,
 			req.query.bookId,
@@ -296,6 +338,8 @@ router.patch('/', async function (req, res, next) {
  * paths:
  *   /books:
  *     delete:
+ *       security:
+ *         - bearerAuth: []
  *       tags:
  *         - Book
  *       summary: 예약 삭제
@@ -320,6 +364,7 @@ router.patch('/', async function (req, res, next) {
  */
 router.delete('/', async function (req, res, next) {
 	try {
+		jwtService.accessTokenVerify(req.query.userId, req.headers.authorization);
 		await bookService.deleteBookById(
 			req.query.userId,
 			req.query.bookId

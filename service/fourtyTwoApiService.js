@@ -22,6 +22,7 @@ async function apiGetter(code) {
 		logger.info("### Get Token From API Server");
 		const apiUrl = `${process.env.TOKENHOST}/v2/me`;
 		const response = await axios.get(apiUrl, {
+			timeout: 10000, // 10초 후에 timeout
 			headers: {
 				Authorization: `Bearer ${accessToken.token.access_token}`
 			}});

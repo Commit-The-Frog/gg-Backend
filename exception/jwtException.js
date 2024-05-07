@@ -22,7 +22,7 @@ class LogoutError extends Exception {
 	constructor(from) {
 		super(from);
 		this.name = "LogoutError";
-		this.status = 500;
+		this.status = 401;
 		this.logger();
 	}
 }
