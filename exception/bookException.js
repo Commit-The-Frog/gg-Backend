@@ -31,7 +31,7 @@ class BookTimeConflictError extends Exception {
 	constructor(message) {
 		super(message);
 		this.name = 'BookTimeConflictError';
-		this.status = 420;
+		this.status = 400;
 		this.code = 2;
 		this.logger();
 	}
@@ -50,7 +50,7 @@ class BookNotEnoughRemainSlot extends Exception {
 	constructor(message) {
 		super(message);
 		this.name = 'BookNotEnoughRemainSlot';
-		this.status = 410;
+		this.status = 400;
 		this.code = 1;
 		this.logger();
 	}
