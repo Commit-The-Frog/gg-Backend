@@ -270,7 +270,11 @@ router.post('/', async function(req, res, next) {
 		);
 		res.status(200).send(book);
 	} catch (error) {
-		res.status(error.status || 500).send(error.name || 'InternalServerError');
+		res.status(error.status || 500).send({
+			"code" : error.code ? error.code : 0,
+			"msg" : error.name ? error.name : "InternalServerError"
+		})
+		// res.status(error.status || 500).send(error.name || 'InternalServerError');
 	}
 });
 

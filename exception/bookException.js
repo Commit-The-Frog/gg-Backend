@@ -27,11 +27,12 @@ class BookNotFoundError extends Exception {
 	}
 };
 
-class BookTimeConfilctError extends Exception {
+class BookTimeConflictError extends Exception {
 	constructor(message) {
 		super(message);
-		this.name = 'BookTimeConfilctError';
+		this.name = 'BookTimeConflictError';
 		this.status = 400;
+		this.code = 2;
 		this.logger();
 	}
 };
@@ -45,10 +46,21 @@ class BookTimeFormatError extends Exception {
 	}
 };
 
+class BookNotEnoughRemainSlot extends Exception {
+	constructor(message) {
+		super(message);
+		this.name = 'BookNotEnoughRemainSlot';
+		this.status = 400;
+		this.code = 1;
+		this.logger();
+	}
+}
+
 module.exports = {
 	InvalidTypeError,
 	BookNotFoundError,
 	InvalidTimeError,
-	BookTimeConfilctError,
-	BookTimeFormatError
+	BookTimeConflictError,
+	BookTimeFormatError,
+	BookNotEnoughRemainSlot
 };
