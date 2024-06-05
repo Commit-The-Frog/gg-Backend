@@ -40,8 +40,10 @@ async function isValidBook(userId, start, end, date) {
 		// 위의 코드는 현재 시각을 기준으로 남은 예약 슬롯의 개수를 센다. 계속해서 30분씩 연장가능.
 	});
 	logger.info(`### User Remain Book Tick = ${userRemainBookTick}`);
-	if (date != today || curTick > start || end - start + 1 > limit_slot || userRemainBookTick + (end - start + 1) > limit_slot)
+	if (date != today || curTick > start)
 		throw new bookException.InvalidTimeError('from service');
+	if (end - start + 1 > limit_slot || userRemainBookTick + (end - start + 1) > limit_slot)
+		throw new bookException.BookNotEnoughRemainSlot('from service');
 }
 
 /*	[addBook]
@@ -80,12 +82,12 @@ const verifyBook = async function (userId, start, end, date, type) {
 		await userRepository.findUserById(userId);
 		let bookOfUserAtTime = await bookRepository.findBookOfUserAtTime(userId, start, end, date);
 		if (bookOfUserAtTime.length > 0)
-			throw new bookException.BookTimeConfilctError('from service');
+			throw new bookException.BookTimeConflictError('from service');
 		let bookList = await bookRepository.findBookAtTime(
 			type,start,end,date
 		);
 		if (bookList.length > 0)
-			throw new bookException.BookTimeConfilctError('from service');
+			throw new bookException.BookTimeConflictError('from service');
 	} catch (error) {
 		throw error;
 	}
