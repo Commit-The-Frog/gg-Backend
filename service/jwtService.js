@@ -1,11 +1,12 @@
 const jwt = require('jsonwebtoken');
 const createRedisClient = require('./redisService.js');
-const { JWT_ACCESS_SECRET, ADMIN_ACCESS_SECRET, JWT_REFRESH_SECRET, ADMIN_REFRESH_SECRET } = process.env;
+const { JWT_ACCESS_SECRET, JWT_REFRESH_SECRET } = process.env;
 const jwtException = require('../exception/jwtException.js');
 const logger = require('../config/logger');
 const verifyService = require('../service/verifyService.js');
 const adminService = require('../service/adminService.js');
 const crypto = require('crypto');
+const authException = require("../exception/authException.js");
 
 const tokenParse = (rawToken) => {
 	try {
@@ -17,7 +18,7 @@ const tokenParse = (rawToken) => {
 	}
 }
 
-const tokenHashCreater = () => { // salt 값 넣기 추가
+const tokenHashCreater = () => {
 	const hash = crypto.createHash('sha256');
 	const uuid = crypto.randomUUID();
 	hash.update(`${uuid}.${Date.now()}`);
@@ -26,11 +27,12 @@ const tokenHashCreater = () => { // salt 값 넣기 추가
 }
 
 /*	[accessTokenSign]
+	userId 매개변수를 이용해서 admin 여부를 확인한다.
 	access token의 payload에 user id, admin 여부 입력
 	access token 발급
 	실패시 TokenSignError
 */
-const accessTokenSign = (userId, admin) => {
+const accessTokenSign = (userId) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
@@ -38,12 +40,11 @@ const accessTokenSign = (userId, admin) => {
 			throw Error();
 		const payload = {
 			id : userId,
-			role : admin ? 'admin' : 'client'
+			role : adminService.isAdminUser(userId) ? 'admin' : 'client'
 		}
-		const access_secret = admin ? ADMIN_ACCESS_SECRET : JWT_ACCESS_SECRET;
 		const accessToken = jwt.sign(
 			payload,
-			access_secret, {
+			JWT_ACCESS_SECRET, {
 			algorithm: 'HS256',
 			expiresIn: '1h'
 		});
@@ -54,30 +55,46 @@ const accessTokenSign = (userId, admin) => {
 	}
 };
 
+
+/*	[sameIdTokenVerify]
+	token payload 내부의 id가
+	requset로 들어온 userid와 같은지 확인한다.
+*/
+const sameIdTokenVerify = (requset_user_id, token) => {
+	try {
+		if (requset_user_id != jwt.decode(tokenParse(token)).id)
+			throw Error();
+	} catch(error) {
+		throw new jwtException.TokenAuthorizeError("from service");
+	}
+}
+
+const adminAccessTokenVerify = function (token) {
+	try {
+		token = tokenParse(token);
+		if (!adminService.isAdminUserToken(token))
+			throw Error();
+	} catch(error) {
+		throw new authException.NotAdminUserError('from service');
+	}
+}
+
 /*	[accessTokenSign]
 	access token verify 시도.
-	access token payload의 user id와 query의 userId 비교
+	access token이 admin인지 확인.
+		1. admin이면, token의 userid가 admin인지 확인.
+			만약 userid가 admin이 아니라면, NotAdminUserError로 실패.
+		2. admin이 아니면, token을 verify.
 	실패시 TokenAuthorizeError
 */
-const accessTokenVerify = (userId, accessToken) => {
+const accessTokenVerify = (accessToken) => {
 	try {
 		accessToken = tokenParse(accessToken);
-		if (!(userId instanceof String))
-			userId = userId.toString();
-		if (!verifyService.isValidId(userId))
-			throw Error();
 		if (!verifyService.isValidTokenStruct(accessToken))
 			throw Error();
 		const isAdmin = adminService.isAdminUserToken(accessToken);
-		const access_secret = isAdmin ? ADMIN_ACCESS_SECRET : JWT_ACCESS_SECRET;
-		logger.info(`### Access Token Payload : ${isAdmin}`);
-		const decoded = jwt.verify(accessToken, access_secret);
+		const decoded = jwt.verify(accessToken, JWT_ACCESS_SECRET);
 		logger.info(`### Access Token Verified ADMIN : ${isAdmin}`);
-		if (!isAdmin && decoded.id != userId) {
-			throw new Error();
-		} else {
-			logger.info("### Access Token ID Verified");
-		}
 	} catch (error) {
 		throw new jwtException.TokenAuthorizeError("from service");
 	}
@@ -85,27 +102,24 @@ const accessTokenVerify = (userId, accessToken) => {
 
 /*	[refreshTokenSign]
 	refresh token의 payload에 user id, admin 여부 입력
-	새로은 refresh token 발급 2주 이후에는 자동 삭제
+	hash를 매개변수로 받게 되면, 해당 hash 키값에 redis키를 대체하여 넣는다.
 	실패시 TokenSignError
 */
-const refreshTokenSign = async (userId, admin, hash) => {
+const refreshTokenSign = async (userId, hash) => {
 	try {
 		if (!(userId instanceof String))
 			userId = userId.toString();
 		if (!verifyService.isValidId(userId))
 			throw Error();
-		if (admin) // admin은 refresh token을 만들지 않는다.
-			throw Error();
 		const userTokenId = hash ? hash : tokenHashCreater();
 		const payload = {
 			id : userId,
-			role : admin ? 'admin' : 'client',
+			role : adminService.isAdminUser(userId) ? 'admin' : 'client',
 			userTokenId : userTokenId
 		}
-		const refresh_secret = admin ? ADMIN_REFRESH_SECRET : JWT_REFRESH_SECRET;
 		const data = jwt.sign(
 			payload,
-			refresh_secret, {
+			JWT_REFRESH_SECRET, {
 			algorithm: 'HS256',
 			expiresIn: '3d',
 		})
@@ -122,32 +136,19 @@ const refreshTokenSign = async (userId, admin, hash) => {
 /*
 	[refreshTokenVerify]
 	request RT가 Verify되는지 확인
-	request RT의 payload에 저장된 user id가 query의 user id와 같은지 확인
 	request RT가 userId의 set에 있는지 확인
 	확인 후에 RT 삭제
 	실패시 TokenAuthorizeError
 	성공시 true 리턴
 */
-const refreshTokenVerify = async (userId, refreshToken) => {
+const refreshTokenVerify = async (refreshToken) => {
 	try {
-		if (!(userId instanceof String))
-			userId = userId.toString();
-		if (!verifyService.isValidId(userId))
-			throw Error();
 		refreshToken = tokenParse(refreshToken);
 		if (!verifyService.isValidTokenStruct(refreshToken))
 			throw Error();
 		const isAdmin = adminService.isAdminUserToken(refreshToken);
-		if (isAdmin) // admin은 refresh token을 주지 않는다.
-			throw Error();
-		const refresh_secret = isAdmin ? ADMIN_REFRESH_SECRET : JWT_REFRESH_SECRET;
-		const decoded = jwt.verify(refreshToken, refresh_secret);
+		const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
 		logger.info(`### Request RT verified ADMIN : ${isAdmin}`);
-		if (!isAdmin && decoded.id != userId) {
-			throw Error();
-		} else {
-			logger.info("### Refresh Token ID Verified");
-		}
 		const redisClient = await createRedisClient();
 		const savedToken = await redisClient.get(`${decoded.id}.${decoded.userTokenId}`);
 		if (savedToken !== refreshToken)
@@ -160,7 +161,7 @@ const refreshTokenVerify = async (userId, refreshToken) => {
 			});
 			throw Error();
 		}
-		const newToken = await refreshTokenSign(decoded.id, isAdmin, decoded.userTokenId);
+		const newToken = await refreshTokenSign(decoded.id, decoded.userTokenId);
 		redisClient.quit();
 		return newToken;
 	} catch (error) {
@@ -180,8 +181,7 @@ const refreshTokenDelete = async (userId, refreshToken) => {
 		refreshToken = tokenParse(refreshToken);
 		if (!verifyService.isValidTokenStruct(refreshToken))
 			throw Error();
-		const refresh_secret = adminService.isAdminUserToken(refreshToken) ? ADMIN_REFRESH_SECRET : JWT_REFRESH_SECRET;
-		const decoded = jwt.verify(refreshToken, refresh_secret);
+		const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET);
 		const redisClient = await createRedisClient();
 		await redisClient.del(`${decoded.id}.${decoded.userTokenId}`);
 		redisClient.quit();
@@ -194,6 +194,8 @@ const refreshTokenDelete = async (userId, refreshToken) => {
 module.exports = {
 	tokenParse,
 	accessTokenSign,
+	sameIdTokenVerify,
+	adminAccessTokenVerify,
 	accessTokenVerify,
 	refreshTokenSign,
 	refreshTokenVerify,

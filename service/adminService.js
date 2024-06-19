@@ -1,6 +1,7 @@
 require('dotenv').config();
 const logger = require('../config/logger');
 const jwt = require('jsonwebtoken');
+const authException = require("../exception/authException.js");
 
 const isAdminUser = function (id) {
 	if (!(id instanceof String))
@@ -18,7 +19,11 @@ const isAdminUser = function (id) {
 const isAdminUserToken = function (token) {
 	const tokenPayload = jwt.decode(token);
 	if (tokenPayload.role === 'admin')
+	{
+		if (!isAdminUser(tokenPayload.id))
+			throw new authException.NotAdminUserError("from service");
 		return true;
+	}
 	return false;
 }
 
