@@ -1,0 +1,25 @@
+name: 42Api Key Renewal
+
+on:
+  schedule:
+    - cron: '0 0 1 * *' # Runs at 00:00 on the 1st of every month
+
+jobs:
+  renew-token:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Key Renewal
+        uses: Rillmo/NoMore500@v1.0.0
+        with:
+          intra-id: ${{ secrets.INTRA_ID }}
+          intra-pw: ${{ secrets.INTRA_PW }}
+          app-url: ${{ secrets.APP_URL }}
+          ssh-host: ${{ secrets.SSH_HOST }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-user: ${{ secrets.SSH_USER }}
+          env-path: ${{ secrets.ENV_PATH }}
+          env-key: ${{ secrets.ENV_KEY }}
+          reboot-script: 'cd ./deploy && docker-compose up -d --build'
