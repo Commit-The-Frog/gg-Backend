@@ -1,7 +1,8 @@
 name: 42Api Key Renewal
 
 on:
-  workflow_dispatch: # 수동 실행을 위해 설정
+  schedule:
+    - cron: '0 0 1 * *' # 매월 1일에 실행
 
 jobs:
   renew-token:
